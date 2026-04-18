@@ -6,6 +6,8 @@ use App\Models\Player;
 use Barryvdh\DomPDF\Facade\Pdf;
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
+use chillerlan\QRCode\Common\EccLevel;
+use chillerlan\QRCode\Output\QRGdImagePNG;
 
 class PlayerCardService
 {
@@ -26,12 +28,12 @@ class PlayerCardService
             'jersey' => $player->jersey_number,
         ]);
 
-        // Generate QR as PNG base64 using chillerlan/php-qrcode (GD, no imagick needed)
+        // Generate QR as PNG base64 using chillerlan/php-qrcode v6 (GD, no imagick needed)
         $options = new QROptions([
-            'outputType' => QRCode::OUTPUT_IMAGE_PNG,
-            'eccLevel' => QRCode::ECC_H,
+            'outputInterface' => QRGdImagePNG::class,
+            'eccLevel' => EccLevel::H,
             'scale' => 10,
-            'imageBase64' => true,
+            'outputBase64' => true,
             'quietzoneSize' => 1,
         ]);
 
