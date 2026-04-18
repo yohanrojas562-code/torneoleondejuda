@@ -20,6 +20,11 @@ class TournamentResource extends Resource
     protected static ?string $modelLabel = 'Torneo';
     protected static ?string $pluralModelLabel = 'Torneos';
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->hasRole('admin');
+    }
+
     public static function form(Form $form): Form
     {
         return $form->schema([

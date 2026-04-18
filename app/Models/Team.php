@@ -13,11 +13,14 @@ class Team extends Model
         'name', 'slug', 'short_name', 'logo',
         'primary_color', 'secondary_color',
         'leader_id', 'captain_id', 'is_active',
+        'approval_status', 'rejection_reason',
     ];
 
     protected function casts(): array
     {
-        return ['is_active' => 'boolean'];
+        return [
+            'is_active' => 'boolean',
+        ];
     }
 
     public function leader(): BelongsTo

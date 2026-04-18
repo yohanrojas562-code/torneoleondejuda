@@ -19,6 +19,11 @@ class SiteSettingResource extends Resource
     protected static ?string $modelLabel = 'Configuración';
     protected static ?string $pluralModelLabel = 'Configuración del Sitio';
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->hasRole('admin');
+    }
+
     public static function form(Form $form): Form
     {
         return $form->schema([

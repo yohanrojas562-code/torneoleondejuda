@@ -11,6 +11,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Builder;
 
 class TeamResource extends Resource
 {
@@ -23,17 +24,24 @@ class TeamResource extends Resource
 
     public static function form(Form $form): Form
     {
+        $user = auth()->user();
+        $isAdmin = $user?->hasRole('admin');
+
         return $form->schema([
             Forms\Components\Section::make('Información del Equipo')->schema([
                 Forms\Components\TextInput::make('name')
                     ->label('Nombre')
                     ->required()
                     ->maxLength(255)
+                    ->unique(ignoreRecord: true)
                     ->live(onBlur: true)
-                    ->afterStateUpdated(fn (Forms\Set $set, ?string $state) => $set('slug', Str::slug($state))),
+                    ->afterStateUpdated(fn (Forms\Set $set, ?string $state) => $set('slug', Str::slug($state)))
+                    ->extraInputAttributes(['style' => 'text-transform: capitalize;'])
+                    ->dehydrateStateUsing(fn (?string $state) => $state ? ucwords(mb_strtolower($state)) : null),
                 Forms\Components\TextInput::make('slug')
                     ->required()
-                    ->unique(ignoreRecord: true),
+                    ->unique(ignoreRecord: true)
+                    ->visible($isAdmin),
                 Forms\Components\TextInput::make('short_name')
                     ->label('Nombre corto')
                     ->maxLength(5)
@@ -42,6 +50,7 @@ class TeamResource extends Resource
                     ->label('Escudo')
                     ->image()
                     ->directory('teams/logos')
+                    ->disk('public')
                     ->imageResizeMode('cover')
                     ->imageCropAspectRatio('1:1')
                     ->imageResizeTargetWidth('300')
@@ -52,32 +61,77 @@ class TeamResource extends Resource
                     ->label('Color secundario'),
                 Forms\Components\Toggle::make('is_active')
                     ->label('Activo')
-                    ->default(true),
+                    ->default(true)
+                    ->visible($isAdmin),
             ])->columns(2),
 
-            Forms\Components\Section::make('Responsables')->schema([
-                Forms\Components\Select::make('leader_id')
-                    ->label('Líder de equipo')
-                    ->relationship('leader', 'name')
-                    ->searchable()
-                    ->preload()
-                    ->nullable(),
-                Forms\Components\Select::make('captain_id')
-                    ->label('Capitán')
-                    ->relationship('captain', 'name')
-                    ->searchable()
-                    ->preload()
-                    ->nullable(),
-            ])->columns(2),
+            Forms\Components\Section::make('Responsables')
+                ->schema([
+                    Forms\Components\Select::make('leader_id')
+                        ->label('Líder de equipo')
+                        ->relationship('leader', 'name')
+                        ->searchable()
+                        ->preload()
+                        ->nullable()
+                        ->visible($isAdmin),
+                    Forms\Components\Select::make('captain_id')
+                        ->label('Capitán')
+                        ->relationship('captain', 'name')
+                        ->searchable()
+                        ->preload()
+                        ->nullable()
+                        ->visible($isAdmin),
+                ])->columns(2)
+                ->visible($isAdmin),
+
+            Forms\Components\Section::make('Aprobación')
+                ->schema([
+                    Forms\Components\Select::make('approval_status')
+                        ->label('Estado de aprobación')
+                        ->options([
+                            'pending' => 'Pendiente de revisión',
+                            'approved' => 'Aprobado',
+                            'rejected' => 'Rechazado',
+                        ])
+                        ->default('pending')
+                        ->disabled(!$isAdmin),
+                    Forms\Components\Textarea::make('rejection_reason')
+                        ->label('Motivo de rechazo')
+                        ->rows(2)
+                        ->visible(fn (Forms\Get $get): bool => $get('approval_status') === 'rejected')
+                        ->disabled(!$isAdmin),
+                    // Placeholder para líder de equipo que vea el estado
+                    Forms\Components\Placeholder::make('status_display')
+                        ->label('Estado de tu solicitud')
+                        ->content(function ($record) {
+                            if (!$record) return 'Se creará como pendiente de aprobación';
+                            return match ($record->approval_status) {
+                                'pending' => '⏳ Solicitud enviada - Pendiente de revisión',
+                                'approved' => '✅ Equipo aprobado',
+                                'rejected' => '❌ Rechazado: ' . ($record->rejection_reason ?? 'Sin motivo especificado'),
+                                default => 'Pendiente',
+                            };
+                        })
+                        ->visible(!$isAdmin),
+                ])->columns(1),
         ]);
     }
 
     public static function table(Table $table): Table
     {
+        $user = auth()->user();
+        $isAdmin = $user?->hasRole('admin');
+
         return $table
+            ->modifyQueryUsing(function (Builder $query) use ($user, $isAdmin) {
+                if (!$isAdmin && $user?->hasRole('lider_equipo')) {
+                    $query->where('leader_id', $user->id);
+                }
+            })
             ->columns([
                 Tables\Columns\ImageColumn::make('logo')
                     ->label('Escudo')
+                    ->disk('public')
                     ->circular()
                     ->size(40),
                 Tables\Columns\TextColumn::make('name')
@@ -89,28 +143,51 @@ class TeamResource extends Resource
                 Tables\Columns\ColorColumn::make('primary_color')
                     ->label('Color'),
                 Tables\Columns\TextColumn::make('leader.name')
-                    ->label('Líder'),
-                Tables\Columns\TextColumn::make('captain.name')
-                    ->label('Capitán'),
+                    ->label('Líder')
+                    ->visible($isAdmin),
                 Tables\Columns\TextColumn::make('players_count')
                     ->label('Jugadores')
                     ->counts('players'),
+                Tables\Columns\BadgeColumn::make('approval_status')
+                    ->label('Estado')
+                    ->colors([
+                        'warning' => 'pending',
+                        'success' => 'approved',
+                        'danger' => 'rejected',
+                    ])
+                    ->formatStateUsing(fn (?string $state): string => match ($state) {
+                        'pending' => 'Pendiente',
+                        'approved' => 'Aprobado',
+                        'rejected' => 'Rechazado',
+                        default => $state ?? 'Pendiente',
+                    }),
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Activo')
-                    ->boolean(),
+                    ->boolean()
+                    ->visible($isAdmin),
             ])
             ->filters([
+                Tables\Filters\SelectFilter::make('approval_status')
+                    ->label('Aprobación')
+                    ->options([
+                        'pending' => 'Pendiente',
+                        'approved' => 'Aprobado',
+                        'rejected' => 'Rechazado',
+                    ])
+                    ->visible($isAdmin),
                 Tables\Filters\TernaryFilter::make('is_active')
-                    ->label('Activo'),
+                    ->label('Activo')
+                    ->visible($isAdmin),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->visible($isAdmin),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                ])->visible($isAdmin),
             ]);
     }
 

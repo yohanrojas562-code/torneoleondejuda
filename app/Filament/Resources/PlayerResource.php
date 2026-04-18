@@ -11,18 +11,23 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 
 class PlayerResource extends Resource
 {
     protected static ?string $model = Player::class;
-    protected static ?string $navigationIcon = 'heroicon-o-user-group';
-    protected static ?string $navigationGroup = 'Torneo';
-    protected static ?int $navigationSort = 3;
+    protected static ?string $navigationIcon = 'heroicon-o-identification';
+    protected static ?string $navigationGroup = 'Equipos';
+    protected static ?int $navigationSort = 4;
     protected static ?string $modelLabel = 'Jugador';
     protected static ?string $pluralModelLabel = 'Jugadores';
 
     public static function form(Form $form): Form
     {
+        $user = auth()->user();
+        $isAdmin = $user?->hasRole('admin');
+        $isLider = $user?->hasRole('lider_equipo');
+
         return $form->schema([
             Forms\Components\Section::make('Datos Personales')->schema([
                 Forms\Components\TextInput::make('first_name')
@@ -55,10 +60,7 @@ class PlayerResource extends Resource
                     ->label('Fecha de nacimiento')
                     ->required()
                     ->maxDate(now())
-                    ->reactive()
-                    ->afterStateUpdated(function (Forms\Set $set, ?string $state) {
-                        // La edad se calcula automáticamente en el modelo
-                    }),
+                    ->reactive(),
                 Forms\Components\Placeholder::make('age_display')
                     ->label('Edad')
                     ->content(function (Forms\Get $get): string {
@@ -120,7 +122,7 @@ class PlayerResource extends Resource
                         ->directory('players/parental')
                         ->disk('public')
                         ->maxSize(5120)
-                        ->helperText('Obligatorio para menores de 18 años. Sube el PDF firmado por los padres o tutores.'),
+                        ->helperText('Obligatorio para menores de 18 años.'),
                 ])
                 ->visible(fn (Forms\Get $get): bool => $get('birth_date') && Carbon::parse($get('birth_date'))->age < 18),
 
@@ -130,12 +132,20 @@ class PlayerResource extends Resource
                     ->relationship('team', 'name')
                     ->searchable()
                     ->preload()
-                    ->required(),
+                    ->required()
+                    ->visible($isAdmin),
                 Forms\Components\TextInput::make('jersey_number')
-                    ->label('Dorsal')
+                    ->label('Número de dorsal')
                     ->numeric()
                     ->minValue(1)
-                    ->maxValue(99),
+                    ->maxValue(99)
+                    ->required(),
+                Forms\Components\TextInput::make('jersey_name')
+                    ->label('Nombre en dorsal')
+                    ->maxLength(50)
+                    ->placeholder('Nombre que aparece en la camiseta')
+                    ->extraInputAttributes(['style' => 'text-transform: uppercase;'])
+                    ->dehydrateStateUsing(fn (?string $state) => $state ? mb_strtoupper($state) : null),
                 Forms\Components\Select::make('position')
                     ->label('Posición')
                     ->options([
@@ -143,11 +153,51 @@ class PlayerResource extends Resource
                         'defensa' => 'Defensa',
                         'mediocampista' => 'Mediocampista',
                         'delantero' => 'Delantero',
-                    ]),
+                    ])
+                    ->required(),
+                Forms\Components\TextInput::make('height')
+                    ->label('Estatura (cm)')
+                    ->numeric()
+                    ->minValue(100)
+                    ->maxValue(250)
+                    ->placeholder('Ej: 175')
+                    ->suffix('cm'),
+                Forms\Components\TextInput::make('weight')
+                    ->label('Peso (kg)')
+                    ->numeric()
+                    ->minValue(30)
+                    ->maxValue(200)
+                    ->placeholder('Ej: 70')
+                    ->suffix('kg'),
+                Forms\Components\Toggle::make('is_captain')
+                    ->label('¿Es capitán del equipo?')
+                    ->default(false),
                 Forms\Components\Toggle::make('is_active')
                     ->label('Activo')
-                    ->default(true),
+                    ->default(true)
+                    ->visible($isAdmin),
             ])->columns(2),
+
+            // Solicitud especial (jugador extra, más de 12)
+            Forms\Components\Section::make('Solicitud Especial')
+                ->schema([
+                    Forms\Components\Toggle::make('special_request')
+                        ->label('¿Es solicitud especial? (jugador adicional)')
+                        ->default(false)
+                        ->reactive(),
+                    Forms\Components\Textarea::make('special_request_reason')
+                        ->label('Motivo de la solicitud especial')
+                        ->rows(2)
+                        ->required(fn (Forms\Get $get): bool => (bool) $get('special_request'))
+                        ->visible(fn (Forms\Get $get): bool => (bool) $get('special_request'))
+                        ->placeholder('Explica por qué necesitas inscribir un jugador adicional'),
+                ])
+                ->visible(function (Forms\Get $get) use ($isLider, $user) {
+                    if (!$isLider) return false;
+                    $team = Team::where('leader_id', $user?->id)->first();
+                    if (!$team) return false;
+                    return $team->players()->count() >= 12;
+                }),
 
             Forms\Components\Section::make('Aprobación')
                 ->schema([
@@ -159,64 +209,73 @@ class PlayerResource extends Resource
                             'rejected' => 'Rechazado',
                         ])
                         ->default('pending')
-                        ->required(),
+                        ->disabled(!$isAdmin),
                     Forms\Components\Textarea::make('rejection_reason')
                         ->label('Motivo de rechazo')
                         ->rows(2)
-                        ->visible(fn (Forms\Get $get): bool => $get('approval_status') === 'rejected'),
-                ])->columns(2),
+                        ->visible(fn (Forms\Get $get): bool => $get('approval_status') === 'rejected')
+                        ->disabled(!$isAdmin),
+                    // Vista para líder de equipo
+                    Forms\Components\Placeholder::make('status_display')
+                        ->label('Estado de la solicitud')
+                        ->content(function ($record) {
+                            if (!$record) return '⏳ Se creará como pendiente de aprobación';
+                            return match ($record->approval_status) {
+                                'pending' => '⏳ Solicitud enviada - Pendiente de revisión',
+                                'approved' => '✅ Jugador aprobado',
+                                'rejected' => '❌ Rechazado: ' . ($record->rejection_reason ?? 'Sin motivo especificado'),
+                                default => 'Pendiente',
+                            };
+                        })
+                        ->visible(!$isAdmin),
+                ])->columns(1),
 
-            Forms\Components\Section::make('Observaciones')->schema([
-                Forms\Components\Textarea::make('observations')
-                    ->label('Observaciones generales')
-                    ->rows(3)
-                    ->columnSpanFull(),
-                Forms\Components\Textarea::make('sanctions')
-                    ->label('Sanciones')
-                    ->rows(2)
-                    ->columnSpanFull(),
-            ]),
+            Forms\Components\Section::make('Observaciones')
+                ->schema([
+                    Forms\Components\Textarea::make('observations')
+                        ->label('Observaciones generales')
+                        ->rows(3)
+                        ->columnSpanFull(),
+                    Forms\Components\Textarea::make('sanctions')
+                        ->label('Sanciones')
+                        ->rows(2)
+                        ->columnSpanFull()
+                        ->visible($isAdmin),
+                ])
+                ->visible($isAdmin),
 
             Forms\Components\Section::make('Estadísticas del Torneo')
                 ->description('Se calculan automáticamente desde la planilla de partidos.')
                 ->schema([
                     Forms\Components\TextInput::make('total_matches')
-                        ->label('Partidos jugados')
-                        ->numeric()
-                        ->default(0)
-                        ->disabled(),
+                        ->label('Partidos jugados')->numeric()->default(0)->disabled(),
                     Forms\Components\TextInput::make('total_goals')
-                        ->label('Goles')
-                        ->numeric()
-                        ->default(0)
-                        ->disabled(),
+                        ->label('Goles')->numeric()->default(0)->disabled(),
                     Forms\Components\TextInput::make('yellow_cards')
-                        ->label('Tarjetas amarillas')
-                        ->numeric()
-                        ->default(0)
-                        ->disabled(),
+                        ->label('Tarjetas amarillas')->numeric()->default(0)->disabled(),
                     Forms\Components\TextInput::make('blue_cards')
-                        ->label('Tarjetas azules')
-                        ->numeric()
-                        ->default(0)
-                        ->disabled(),
+                        ->label('Tarjetas azules')->numeric()->default(0)->disabled(),
                     Forms\Components\TextInput::make('red_cards')
-                        ->label('Tarjetas rojas')
-                        ->numeric()
-                        ->default(0)
-                        ->disabled(),
+                        ->label('Tarjetas rojas')->numeric()->default(0)->disabled(),
                     Forms\Components\TextInput::make('total_fouls')
-                        ->label('Faltas')
-                        ->numeric()
-                        ->default(0)
-                        ->disabled(),
-                ])->columns(3),
+                        ->label('Faltas')->numeric()->default(0)->disabled(),
+                ])->columns(3)
+                ->visible($isAdmin),
         ]);
     }
 
     public static function table(Table $table): Table
     {
+        $user = auth()->user();
+        $isAdmin = $user?->hasRole('admin');
+
         return $table
+            ->modifyQueryUsing(function (Builder $query) use ($user, $isAdmin) {
+                if (!$isAdmin && $user?->hasRole('lider_equipo')) {
+                    $teamIds = Team::where('leader_id', $user->id)->pluck('id');
+                    $query->whereIn('team_id', $teamIds);
+                }
+            })
             ->columns([
                 Tables\Columns\ImageColumn::make('photo')
                     ->label('Foto')
@@ -231,19 +290,20 @@ class PlayerResource extends Resource
                     ->label('Apellidos')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('document_type')
-                    ->label('Tipo Doc.')
-                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('document_number')
                     ->label('Documento')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('team.name')
                     ->label('Equipo')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->visible($isAdmin),
                 Tables\Columns\TextColumn::make('jersey_number')
                     ->label('#')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('jersey_name')
+                    ->label('Dorsal')
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('position')
                     ->label('Posición')
                     ->formatStateUsing(fn (?string $state): string => match ($state) {
@@ -253,13 +313,15 @@ class PlayerResource extends Resource
                         'delantero' => 'DEL',
                         default => $state ?? '-',
                     }),
+                Tables\Columns\IconColumn::make('is_captain')
+                    ->label('Cap.')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-star')
+                    ->falseIcon('heroicon-o-minus'),
                 Tables\Columns\TextColumn::make('birth_date')
                     ->label('Edad')
                     ->formatStateUsing(fn ($record) => $record->age ? "{$record->age} años" : '-')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('church')
-                    ->label('Iglesia')
-                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\BadgeColumn::make('approval_status')
                     ->label('Estado')
                     ->colors([
@@ -268,41 +330,28 @@ class PlayerResource extends Resource
                         'danger' => 'rejected',
                     ])
                     ->formatStateUsing(fn (?string $state): string => match ($state) {
-                        'pending' => 'Pendiente',
+                        'pending' => $isAdmin ? 'Pendiente' : 'Solicitud enviada',
                         'approved' => 'Aprobado',
                         'rejected' => 'Rechazado',
                         default => $state ?? 'Pendiente',
                     }),
-                Tables\Columns\TextColumn::make('yellow_cards')
-                    ->label('TA')
-                    ->sortable()
-                    ->toggleable(),
-                Tables\Columns\TextColumn::make('blue_cards')
-                    ->label('TAz')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('red_cards')
-                    ->label('TR')
-                    ->sortable()
-                    ->toggleable(),
                 Tables\Columns\TextColumn::make('total_matches')
                     ->label('PJ')
                     ->sortable()
-                    ->toggleable(),
+                    ->toggleable()
+                    ->visible($isAdmin),
                 Tables\Columns\TextColumn::make('total_goals')
                     ->label('Goles')
                     ->sortable()
-                    ->toggleable(),
-                Tables\Columns\IconColumn::make('is_active')
-                    ->label('Activo')
-                    ->boolean()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable()
+                    ->visible($isAdmin),
             ])
             ->defaultSort('first_name')
             ->filters([
                 Tables\Filters\SelectFilter::make('team_id')
                     ->label('Equipo')
-                    ->relationship('team', 'name'),
+                    ->relationship('team', 'name')
+                    ->visible($isAdmin),
                 Tables\Filters\SelectFilter::make('approval_status')
                     ->label('Aprobación')
                     ->options([
@@ -318,18 +367,17 @@ class PlayerResource extends Resource
                         'mediocampista' => 'Mediocampista',
                         'delantero' => 'Delantero',
                     ]),
-                Tables\Filters\TernaryFilter::make('is_active')
-                    ->label('Activo'),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->visible($isAdmin),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                ])->visible($isAdmin),
             ]);
     }
 

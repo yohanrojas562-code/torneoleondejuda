@@ -19,6 +19,11 @@ class VenueResource extends Resource
     protected static ?string $modelLabel = 'Escenario';
     protected static ?string $pluralModelLabel = 'Escenarios';
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->hasRole('admin');
+    }
+
     public static function form(Form $form): Form
     {
         return $form->schema([

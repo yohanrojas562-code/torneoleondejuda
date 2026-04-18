@@ -17,6 +17,9 @@ class PlayersRelationManager extends RelationManager
 
     public function form(Form $form): Form
     {
+        $user = auth()->user();
+        $isAdmin = $user?->hasRole('admin');
+
         return $form->schema([
             Forms\Components\TextInput::make('first_name')
                 ->label('Nombre')
@@ -64,10 +67,16 @@ class PlayersRelationManager extends RelationManager
                 ->extraInputAttributes(['style' => 'text-transform: capitalize;'])
                 ->dehydrateStateUsing(fn (?string $state) => $state ? ucwords(mb_strtolower($state)) : null),
             Forms\Components\TextInput::make('jersey_number')
-                ->label('Dorsal')
+                ->label('Número de dorsal')
                 ->numeric()
                 ->minValue(1)
-                ->maxValue(99),
+                ->maxValue(99)
+                ->required(),
+            Forms\Components\TextInput::make('jersey_name')
+                ->label('Nombre en dorsal')
+                ->maxLength(50)
+                ->extraInputAttributes(['style' => 'text-transform: uppercase;'])
+                ->dehydrateStateUsing(fn (?string $state) => $state ? mb_strtoupper($state) : null),
             Forms\Components\Select::make('position')
                 ->label('Posición')
                 ->options([
@@ -75,7 +84,21 @@ class PlayersRelationManager extends RelationManager
                     'defensa' => 'Defensa',
                     'mediocampista' => 'Mediocampista',
                     'delantero' => 'Delantero',
-                ]),
+                ])
+                ->required(),
+            Forms\Components\TextInput::make('height')
+                ->label('Estatura (cm)')
+                ->numeric()
+                ->placeholder('Ej: 175')
+                ->suffix('cm'),
+            Forms\Components\TextInput::make('weight')
+                ->label('Peso (kg)')
+                ->numeric()
+                ->placeholder('Ej: 70')
+                ->suffix('kg'),
+            Forms\Components\Toggle::make('is_captain')
+                ->label('¿Es capitán?')
+                ->default(false),
             Forms\Components\FileUpload::make('photo')
                 ->label('Foto')
                 ->image()
@@ -117,10 +140,12 @@ class PlayersRelationManager extends RelationManager
                     'approved' => 'Aprobado',
                     'rejected' => 'Rechazado',
                 ])
-                ->default('pending'),
+                ->default('pending')
+                ->disabled(!$isAdmin),
             Forms\Components\Toggle::make('is_active')
                 ->label('Activo')
-                ->default(true),
+                ->default(true)
+                ->visible($isAdmin),
         ]);
     }
 
@@ -136,6 +161,9 @@ class PlayersRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('jersey_number')
                     ->label('#')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('jersey_name')
+                    ->label('Dorsal')
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('first_name')
                     ->label('Nombre')
                     ->searchable(),
@@ -145,12 +173,17 @@ class PlayersRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('position')
                     ->label('Posición')
                     ->formatStateUsing(fn (?string $state): string => match ($state) {
-                        'portero' => 'Portero',
-                        'defensa' => 'Defensa',
-                        'mediocampista' => 'Mediocampista',
-                        'delantero' => 'Delantero',
+                        'portero' => 'POR',
+                        'defensa' => 'DEF',
+                        'mediocampista' => 'MED',
+                        'delantero' => 'DEL',
                         default => $state ?? '-',
                     }),
+                Tables\Columns\IconColumn::make('is_captain')
+                    ->label('Cap.')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-star')
+                    ->falseIcon('heroicon-o-minus'),
                 Tables\Columns\TextColumn::make('document_number')
                     ->label('Documento'),
                 Tables\Columns\TextColumn::make('birth_date')

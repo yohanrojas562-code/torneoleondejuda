@@ -19,6 +19,11 @@ class StandingResource extends Resource
     protected static ?string $modelLabel = 'Clasificación';
     protected static ?string $pluralModelLabel = 'Tabla de Posiciones';
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->hasRole('admin');
+    }
+
     public static function form(Form $form): Form
     {
         return $form->schema([

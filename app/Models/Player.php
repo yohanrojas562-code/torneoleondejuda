@@ -12,12 +12,14 @@ class Player extends Model
     protected $fillable = [
         'team_id', 'user_id', 'first_name', 'last_name',
         'document_type', 'document_number', 'birth_date', 'photo',
-        'jersey_number', 'position', 'is_active',
+        'jersey_number', 'jersey_name', 'position', 'is_active',
+        'height', 'weight', 'is_captain',
         'eps_certificate', 'no_eps_consent', 'has_eps',
         'parental_consent', 'church',
         'approval_status', 'rejection_reason', 'observations',
         'total_matches', 'total_goals', 'yellow_cards', 'blue_cards',
         'red_cards', 'total_fouls', 'sanctions',
+        'special_request', 'special_request_reason',
     ];
 
     protected function casts(): array
@@ -26,6 +28,10 @@ class Player extends Model
             'birth_date' => 'date',
             'is_active' => 'boolean',
             'has_eps' => 'boolean',
+            'is_captain' => 'boolean',
+            'special_request' => 'boolean',
+            'height' => 'decimal:2',
+            'weight' => 'decimal:2',
         ];
     }
 

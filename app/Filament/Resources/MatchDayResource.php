@@ -19,6 +19,11 @@ class MatchDayResource extends Resource
     protected static ?string $modelLabel = 'Jornada';
     protected static ?string $pluralModelLabel = 'Jornadas';
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->hasRole('admin');
+    }
+
     public static function form(Form $form): Form
     {
         return $form->schema([

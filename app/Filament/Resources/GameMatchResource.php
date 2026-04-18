@@ -22,6 +22,11 @@ class GameMatchResource extends Resource
     protected static ?string $modelLabel = 'Partido';
     protected static ?string $pluralModelLabel = 'Partidos';
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->hasRole('admin');
+    }
+
     public static function form(Form $form): Form
     {
         return $form->schema([
