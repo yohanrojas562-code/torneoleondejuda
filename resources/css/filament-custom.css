@@ -1,0 +1,81 @@
+/* ===== Sidebar oscuro con acentos dorados ===== */
+
+/* Sidebar fondo negro */
+.fi-sidebar {
+    background-color: #0a0a0a !important;
+    border-right: 1px solid #1a1a1a !important;
+}
+
+/* Links del sidebar - texto blanco */
+.fi-sidebar-nav-groups .fi-sidebar-item a,
+.fi-sidebar-nav-groups .fi-sidebar-item button {
+    color: #e5e5e5 !important;
+}
+
+/* Iconos del sidebar blancos */
+.fi-sidebar-nav-groups .fi-sidebar-item-icon {
+    color: #D68F03 !important;
+}
+
+/* Hover en items del sidebar - fondo dorado */
+.fi-sidebar-nav-groups .fi-sidebar-item a:hover,
+.fi-sidebar-nav-groups .fi-sidebar-item button:hover {
+    background-color: #D68F03 !important;
+    color: #000000 !important;
+}
+.fi-sidebar-nav-groups .fi-sidebar-item a:hover .fi-sidebar-item-icon,
+.fi-sidebar-nav-groups .fi-sidebar-item button:hover .fi-sidebar-item-icon {
+    color: #000000 !important;
+}
+
+/* Item activo del sidebar */
+.fi-sidebar-item-active > a,
+.fi-sidebar-item-active > button {
+    background-color: #D68F03 !important;
+    color: #000000 !important;
+}
+.fi-sidebar-item-active .fi-sidebar-item-icon {
+    color: #000000 !important;
+}
+
+/* Grupo del sidebar - títulos dorados */
+.fi-sidebar-group-label {
+    color: #D68F03 !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    font-size: 0.7rem !important;
+    letter-spacing: 0.05em !important;
+}
+
+/* Header del sidebar (logo area) */
+.fi-sidebar-header {
+    border-bottom: 1px solid #1f1f1f !important;
+}
+
+/* Botón de colapsar sidebar */
+.fi-sidebar-nav-collapse-btn {
+    color: #a3a3a3 !important;
+}
+.fi-sidebar-nav-collapse-btn:hover {
+    color: #D68F03 !important;
+}
+
+/* Top bar oscura */
+.fi-topbar {
+    background-color: #0f0f0f !important;
+    border-bottom: 1px solid #1f1f1f !important;
+}
+.fi-topbar nav {
+    background-color: #0f0f0f !important;
+}
+
+/* Breadcrumb blanco */
+.fi-breadcrumbs ol li a,
+.fi-breadcrumbs ol li span {
+    color: #d4d4d4 !important;
+}
+
+/* User menu en topbar */
+.fi-topbar .fi-dropdown-trigger button span {
+    color: #e5e5e5 !important;
+}
