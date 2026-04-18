@@ -35,7 +35,7 @@ class AdminPanelProvider extends PanelProvider
             ->brandName('León de Judá')
             ->brandLogo(fn () => view('filament.components.brand-logo'))
             ->darkModeBrandLogo(fn () => view('filament.components.brand-logo'))
-            ->brandLogoHeight('2.5rem')
+            ->brandLogoHeight('5rem')
             ->favicon(asset('storage/site/01KPGXECZX5VF8YQAA8AD210WM.png'))
             ->colors([
                 'primary' => [
