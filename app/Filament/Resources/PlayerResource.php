@@ -56,6 +56,20 @@ class PlayerResource extends Resource
                     ->label('Número de documento')
                     ->required()
                     ->maxLength(20),
+                Forms\Components\Select::make('blood_type')
+                    ->label('Tipo de sangre (RH)')
+                    ->options([
+                        'O+' => 'O+',
+                        'O-' => 'O-',
+                        'A+' => 'A+',
+                        'A-' => 'A-',
+                        'B+' => 'B+',
+                        'B-' => 'B-',
+                        'AB+' => 'AB+',
+                        'AB-' => 'AB-',
+                    ])
+                    ->required()
+                    ->searchable(),
                 Forms\Components\DatePicker::make('birth_date')
                     ->label('Fecha de nacimiento')
                     ->required()
@@ -91,6 +105,18 @@ class PlayerResource extends Resource
                     ->maxSize(3072)
                     ->openable()
                     ->downloadable(),
+            ]),
+
+            Forms\Components\Section::make('Documento de Identidad')->schema([
+                Forms\Components\FileUpload::make('document_file')
+                    ->label('Foto o archivo del documento de identidad')
+                    ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png'])
+                    ->directory('players/documents')
+                    ->disk('public')
+                    ->maxSize(5120)
+                    ->openable()
+                    ->downloadable()
+                    ->helperText('Sube una foto o PDF del documento de identidad del jugador.'),
             ]),
 
             Forms\Components\Section::make('Documentación EPS')->schema([
@@ -318,6 +344,10 @@ class PlayerResource extends Resource
                 Tables\Columns\TextColumn::make('document_number')
                     ->label('Documento')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('blood_type')
+                    ->label('RH')
+                    ->sortable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('team.name')
                     ->label('Equipo')
                     ->sortable()
@@ -396,6 +426,13 @@ class PlayerResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('downloadCard')
+                    ->label('Carnet')
+                    ->icon('heroicon-o-identification')
+                    ->color('success')
+                    ->visible(fn ($record) => $record->approval_status === 'approved')
+                    ->url(fn ($record) => route('player.card.download', $record))
+                    ->openUrlInNewTab(),
                 Tables\Actions\DeleteAction::make()
                     ->visible($isAdmin),
             ])
