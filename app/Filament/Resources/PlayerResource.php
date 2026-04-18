@@ -88,7 +88,9 @@ class PlayerResource extends Resource
                     ->imageCropAspectRatio('3:4')
                     ->imageResizeTargetWidth('300')
                     ->imageResizeTargetHeight('400')
-                    ->maxSize(3072),
+                    ->maxSize(3072)
+                    ->openable()
+                    ->downloadable(),
             ]),
 
             Forms\Components\Section::make('Documentación EPS')->schema([
@@ -102,6 +104,8 @@ class PlayerResource extends Resource
                     ->directory('players/eps')
                     ->disk('public')
                     ->maxSize(5120)
+                    ->openable()
+                    ->downloadable()
                     ->visible(fn (Forms\Get $get): bool => (bool) $get('has_eps'))
                     ->helperText('Sube el PDF o foto del certificado de EPS'),
                 Forms\Components\FileUpload::make('no_eps_consent')
@@ -110,6 +114,8 @@ class PlayerResource extends Resource
                     ->directory('players/consents')
                     ->disk('public')
                     ->maxSize(5120)
+                    ->openable()
+                    ->downloadable()
                     ->visible(fn (Forms\Get $get): bool => !(bool) $get('has_eps'))
                     ->helperText('Si no tiene EPS, sube el PDF firmado de consentimiento'),
             ])->columns(2),
@@ -122,6 +128,8 @@ class PlayerResource extends Resource
                         ->directory('players/parental')
                         ->disk('public')
                         ->maxSize(5120)
+                        ->openable()
+                        ->downloadable()
                         ->helperText('Obligatorio para menores de 18 años.'),
                 ])
                 ->visible(fn (Forms\Get $get): bool => $get('birth_date') && Carbon::parse($get('birth_date'))->age < 18),
