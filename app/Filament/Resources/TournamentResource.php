@@ -143,9 +143,6 @@ class TournamentResource extends Resource
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Activo')
                     ->boolean(),
-                Tables\Columns\TextColumn::make('seasons_count')
-                    ->label('Temporadas')
-                    ->counts('seasons'),
                 Tables\Columns\TextColumn::make('start_date')
                     ->label('Inicio')
                     ->date('d/m/Y')
@@ -175,9 +172,7 @@ class TournamentResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            TournamentResource\RelationManagers\SeasonsRelationManager::class,
-        ];
+        return [];
     }
 
     public static function getPages(): array
