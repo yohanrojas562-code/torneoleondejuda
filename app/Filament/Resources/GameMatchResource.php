@@ -6,6 +6,7 @@ use App\Filament\Resources\GameMatchResource\Pages;
 use App\Filament\Resources\GameMatchResource\RelationManagers;
 use App\Models\GameMatch;
 use App\Models\Team;
+use App\Models\Venue;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -79,9 +80,21 @@ class GameMatchResource extends Resource
             Forms\Components\Section::make('Programación')->schema([
                 Forms\Components\DateTimePicker::make('scheduled_at')
                     ->label('Fecha y hora'),
-                Forms\Components\TextInput::make('venue')
-                    ->label('Cancha / Sede')
-                    ->maxLength(255),
+                Forms\Components\Select::make('venue_id')
+                    ->label('Escenario')
+                    ->relationship('venue', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->nullable()
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('name')
+                            ->label('Nombre del escenario')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('address')
+                            ->label('Dirección')
+                            ->maxLength(255),
+                    ]),
             ])->columns(2),
 
             Forms\Components\Section::make('Marcador')->schema([
@@ -168,6 +181,10 @@ class GameMatchResource extends Resource
                     ->label('Fecha')
                     ->dateTime('d/m/Y H:i')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('venue.name')
+                    ->label('Escenario')
+                    ->toggleable()
+                    ->limit(25),
                 Tables\Columns\TextColumn::make('referee.name')
                     ->label('Árbitro')
                     ->toggleable(isToggledHiddenByDefault: true),

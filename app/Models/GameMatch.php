@@ -12,7 +12,7 @@ class GameMatch extends Model
 
     protected $fillable = [
         'season_id', 'match_day_id', 'home_team_id', 'away_team_id',
-        'referee_id', 'scheduled_at', 'venue',
+        'referee_id', 'scheduled_at', 'venue', 'venue_id',
         'home_score', 'away_score', 'home_penalty_score', 'away_penalty_score',
         'status', 'observations',
     ];
@@ -45,6 +45,11 @@ class GameMatch extends Model
     public function referee(): BelongsTo
     {
         return $this->belongsTo(User::class, 'referee_id');
+    }
+
+    public function venue(): BelongsTo
+    {
+        return $this->belongsTo(Venue::class);
     }
 
     public function lineups(): HasMany
