@@ -207,6 +207,23 @@ class PlayerResource extends Resource
                     return $team->players()->count() >= 12;
                 }),
 
+            Forms\Components\Section::make('Términos y Condiciones')
+                ->description('Es obligatorio aceptar ambos consentimientos para inscribir al jugador.')
+                ->schema([
+                    Forms\Components\Toggle::make('image_consent')
+                        ->label('Autorización de uso de imagen')
+                        ->helperText('Autorizo el uso de fotografías y videos del jugador para fines relacionados con el torneo, redes sociales y material promocional de la iglesia.')
+                        ->required()
+                        ->accepted()
+                        ->default(false),
+                    Forms\Components\Toggle::make('habeas_data')
+                        ->label('Habeas Data - Tratamiento de datos personales')
+                        ->helperText('Autorizo el tratamiento de los datos personales proporcionados en este formulario conforme a la Ley 1581 de 2012. Los datos serán utilizados exclusivamente para la gestión del torneo.')
+                        ->required()
+                        ->accepted()
+                        ->default(false),
+                ])->columns(1),
+
             Forms\Components\Section::make('Aprobación')
                 ->schema([
                     Forms\Components\Select::make('approval_status')

@@ -17,21 +17,34 @@ class HomeController extends Controller
     {
         // Active season with tournament
         $activeSeason = Season::with(['tournament'])
-            ->where('status', 'in_progress')
-            ->orWhere('status', 'upcoming')
-            ->orderByRaw("CASE WHEN status = 'in_progress' THEN 0 ELSE 1 END")
+            ->whereIn('status', ['registration', 'group_stage', 'knockout'])
+            ->orderByRaw("CASE WHEN status = 'group_stage' THEN 0 WHEN status = 'knockout' THEN 1 ELSE 2 END")
             ->first();
+
+        // Fallback: if no active season, try getting latest non-draft season
+        if (!$activeSeason) {
+            $activeSeason = Season::with(['tournament'])
+                ->where('status', '!=', 'draft')
+                ->latest('id')
+                ->first();
+        }
 
         $seasonId = $activeSeason?->id;
 
-        // Approved teams in active season with approved player count
+        // Approved teams in active season (or all approved if no season pivot yet)
         $teams = $seasonId
-            ? Team::whereHas('seasons', fn ($q) => $q->where('seasons.id', $seasonId))
+            ? Team::where(function ($q) use ($seasonId) {
+                    $q->whereHas('seasons', fn ($sq) => $sq->where('seasons.id', $seasonId))
+                      ->orWhereDoesntHave('seasons');
+                })
                 ->where('approval_status', 'approved')
                 ->withCount(['players' => fn ($q) => $q->where('approval_status', 'approved')])
                 ->orderBy('name')
                 ->get(['id', 'name', 'short_name', 'logo', 'primary_color', 'secondary_color'])
-            : collect();
+            : Team::where('approval_status', 'approved')
+                ->withCount(['players' => fn ($q) => $q->where('approval_status', 'approved')])
+                ->orderBy('name')
+                ->get(['id', 'name', 'short_name', 'logo', 'primary_color', 'secondary_color']);
 
         // Standings
         $standings = $seasonId

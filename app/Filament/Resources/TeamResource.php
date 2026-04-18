@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\TeamResource\Pages;
 use App\Filament\Resources\TeamResource\RelationManagers;
+use App\Models\Season;
 use App\Models\Team;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -64,6 +65,29 @@ class TeamResource extends Resource
                     ->default(true)
                     ->visible($isAdmin),
             ])->columns(2),
+
+            Forms\Components\Section::make('Torneo / Temporada')
+                ->description('Selecciona el torneo en el que participará tu equipo')
+                ->schema([
+                    Forms\Components\Select::make('season_id')
+                        ->label('Temporada del torneo')
+                        ->options(function () {
+                            return Season::with('tournament')
+                                ->whereIn('status', ['registration', 'group_stage', 'knockout', 'draft'])
+                                ->get()
+                                ->mapWithKeys(fn (Season $s) => [$s->id => $s->tournament->name . ' - ' . $s->name]);
+                        })
+                        ->required()
+                        ->searchable()
+                        ->preload()
+                        ->helperText('Elige la temporada activa del torneo al que deseas inscribirte')
+                        ->afterStateHydrated(function (Forms\Components\Select $component, $record) {
+                            if ($record) {
+                                $seasonId = $record->seasons()->first()?->id;
+                                $component->state($seasonId);
+                            }
+                        }),
+                ])->columns(1),
 
             Forms\Components\Section::make('Responsables')
                 ->schema([

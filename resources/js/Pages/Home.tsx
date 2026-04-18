@@ -75,20 +75,20 @@ function Navbar({ canLogin, canRegister, auth }: { canLogin: boolean; canRegiste
                 </div>
                 <div className="flex items-center gap-2">
                     {auth.user ? (
-                        <Link href="/admin" className="bg-brand-gold hover:bg-brand-gold-light text-black font-semibold px-4 py-2 rounded-lg text-sm transition">
+                        <a href="/admin" className="bg-brand-gold hover:bg-brand-gold-light text-black font-semibold px-4 py-2 rounded-lg text-sm transition">
                             Panel <ArrowRight className="inline w-4 h-4 ml-1" />
-                        </Link>
+                        </a>
                     ) : (
                         <>
                             {canLogin && (
-                                <Link href="/admin/login" className="text-gray-300 hover:text-white px-3 py-2 text-sm flex items-center gap-1 transition">
+                                <a href="/admin/login" className="text-gray-300 hover:text-white px-3 py-2 text-sm flex items-center gap-1 transition">
                                     <LogIn className="w-4 h-4" /> Ingresar
-                                </Link>
+                                </a>
                             )}
                             {canRegister && (
-                                <Link href="/admin/register" className="bg-brand-gold hover:bg-brand-gold-light text-black font-semibold px-4 py-2 rounded-lg text-sm transition">
+                                <a href="/admin/register" className="bg-brand-gold hover:bg-brand-gold-light text-black font-semibold px-4 py-2 rounded-lg text-sm transition">
                                     <UserPlus className="inline w-4 h-4 mr-1" /> Inscribirse
-                                </Link>
+                                </a>
                             )}
                         </>
                     )}
@@ -142,9 +142,9 @@ function Hero({ settings, activeSeason }: { settings: Record<string, string | nu
                     <a href="#torneo" className="bg-brand-gold hover:bg-brand-gold-light text-black font-bold px-8 py-3 rounded-xl text-sm transition transform hover:scale-105 flex items-center gap-2">
                         <Swords className="w-5 h-5" /> Ver Torneo
                     </a>
-                    <Link href="/admin/register" className="border border-brand-gold/40 text-brand-gold hover:bg-brand-gold/10 font-semibold px-8 py-3 rounded-xl text-sm transition flex items-center gap-2">
+                    <a href="/admin/register" className="border border-brand-gold/40 text-brand-gold hover:bg-brand-gold/10 font-semibold px-8 py-3 rounded-xl text-sm transition flex items-center gap-2">
                         <UserPlus className="w-5 h-5" /> Inscribir Equipo
-                    </Link>
+                    </a>
                 </motion.div>
             </div>
 

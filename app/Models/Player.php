@@ -20,6 +20,7 @@ class Player extends Model
         'total_matches', 'total_goals', 'yellow_cards', 'blue_cards',
         'red_cards', 'total_fouls', 'sanctions',
         'special_request', 'special_request_reason',
+        'image_consent', 'habeas_data',
     ];
 
     protected function casts(): array
@@ -30,6 +31,8 @@ class Player extends Model
             'has_eps' => 'boolean',
             'is_captain' => 'boolean',
             'special_request' => 'boolean',
+            'image_consent' => 'boolean',
+            'habeas_data' => 'boolean',
             'height' => 'decimal:2',
             'weight' => 'decimal:2',
         ];

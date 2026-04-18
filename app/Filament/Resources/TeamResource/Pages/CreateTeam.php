@@ -28,6 +28,14 @@ class CreateTeam extends CreateRecord
         return $data;
     }
 
+    protected function afterCreate(): void
+    {
+        $seasonId = $this->data['season_id'] ?? null;
+        if ($seasonId) {
+            $this->record->seasons()->syncWithoutDetaching([$seasonId => ['status' => 'registered']]);
+        }
+    }
+
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');

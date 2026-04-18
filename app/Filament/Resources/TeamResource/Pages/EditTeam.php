@@ -14,4 +14,12 @@ class EditTeam extends EditRecord
     {
         return [Actions\DeleteAction::make()];
     }
+
+    protected function afterSave(): void
+    {
+        $seasonId = $this->data['season_id'] ?? null;
+        if ($seasonId) {
+            $this->record->seasons()->syncWithoutDetaching([$seasonId => ['status' => 'registered']]);
+        }
+    }
 }
