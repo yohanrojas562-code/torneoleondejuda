@@ -21,11 +21,15 @@ class PlayersRelationManager extends RelationManager
             Forms\Components\TextInput::make('first_name')
                 ->label('Nombre')
                 ->required()
-                ->maxLength(255),
+                ->maxLength(255)
+                ->extraInputAttributes(['style' => 'text-transform: capitalize;'])
+                ->dehydrateStateUsing(fn (?string $state) => $state ? ucwords(mb_strtolower($state)) : null),
             Forms\Components\TextInput::make('last_name')
                 ->label('Apellido')
                 ->required()
-                ->maxLength(255),
+                ->maxLength(255)
+                ->extraInputAttributes(['style' => 'text-transform: capitalize;'])
+                ->dehydrateStateUsing(fn (?string $state) => $state ? ucwords(mb_strtolower($state)) : null),
             Forms\Components\Select::make('document_type')
                 ->label('Tipo de documento')
                 ->options([
@@ -56,7 +60,9 @@ class PlayersRelationManager extends RelationManager
                 }),
             Forms\Components\TextInput::make('church')
                 ->label('Iglesia')
-                ->maxLength(255),
+                ->maxLength(255)
+                ->extraInputAttributes(['style' => 'text-transform: capitalize;'])
+                ->dehydrateStateUsing(fn (?string $state) => $state ? ucwords(mb_strtolower($state)) : null),
             Forms\Components\TextInput::make('jersey_number')
                 ->label('Dorsal')
                 ->numeric()

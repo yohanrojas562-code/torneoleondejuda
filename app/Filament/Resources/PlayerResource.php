@@ -28,11 +28,15 @@ class PlayerResource extends Resource
                 Forms\Components\TextInput::make('first_name')
                     ->label('Nombres')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->extraInputAttributes(['style' => 'text-transform: capitalize;'])
+                    ->dehydrateStateUsing(fn (?string $state) => $state ? ucwords(mb_strtolower($state)) : null),
                 Forms\Components\TextInput::make('last_name')
                     ->label('Apellidos')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->extraInputAttributes(['style' => 'text-transform: capitalize;'])
+                    ->dehydrateStateUsing(fn (?string $state) => $state ? ucwords(mb_strtolower($state)) : null),
                 Forms\Components\Select::make('document_type')
                     ->label('Tipo de documento')
                     ->options([
@@ -67,7 +71,9 @@ class PlayerResource extends Resource
                 Forms\Components\TextInput::make('church')
                     ->label('Iglesia a la que pertenece')
                     ->maxLength(255)
-                    ->placeholder('Ej: CFE Manrique La Salle'),
+                    ->placeholder('Ej: CFE Manrique La Salle')
+                    ->extraInputAttributes(['style' => 'text-transform: capitalize;'])
+                    ->dehydrateStateUsing(fn (?string $state) => $state ? ucwords(mb_strtolower($state)) : null),
             ])->columns(2),
 
             Forms\Components\Section::make('Foto del Jugador')->schema([
@@ -172,37 +178,38 @@ class PlayerResource extends Resource
             ]),
 
             Forms\Components\Section::make('Estadísticas del Torneo')
+                ->description('Se calculan automáticamente desde la planilla de partidos.')
                 ->schema([
                     Forms\Components\TextInput::make('total_matches')
                         ->label('Partidos jugados')
                         ->numeric()
                         ->default(0)
-                        ->minValue(0),
+                        ->disabled(),
                     Forms\Components\TextInput::make('total_goals')
                         ->label('Goles')
                         ->numeric()
                         ->default(0)
-                        ->minValue(0),
+                        ->disabled(),
                     Forms\Components\TextInput::make('yellow_cards')
                         ->label('Tarjetas amarillas')
                         ->numeric()
                         ->default(0)
-                        ->minValue(0),
+                        ->disabled(),
                     Forms\Components\TextInput::make('blue_cards')
                         ->label('Tarjetas azules')
                         ->numeric()
                         ->default(0)
-                        ->minValue(0),
+                        ->disabled(),
                     Forms\Components\TextInput::make('red_cards')
                         ->label('Tarjetas rojas')
                         ->numeric()
                         ->default(0)
-                        ->minValue(0),
+                        ->disabled(),
                     Forms\Components\TextInput::make('total_fouls')
                         ->label('Faltas')
                         ->numeric()
                         ->default(0)
-                        ->minValue(0),
+                        ->disabled(),
                 ])->columns(3),
         ]);
     }
