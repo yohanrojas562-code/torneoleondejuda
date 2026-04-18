@@ -23,13 +23,17 @@ class PlayerCardService
             'jersey' => $player->jersey_number,
         ]);
 
-        // Generate QR as SVG then convert to base64 PNG
+        // Generate QR as SVG string (inline, not as img - DomPDF supports inline SVG)
         $qrSvg = QrCode::format('svg')
             ->size(200)
+            ->margin(0)
             ->errorCorrection('H')
+            ->backgroundColor(255, 255, 255)
+            ->color(0, 0, 0)
             ->generate($qrData);
 
-        $qrBase64 = 'data:image/svg+xml;base64,' . base64_encode($qrSvg);
+        // Clean SVG for inline embedding
+        $qrSvgStr = (string) $qrSvg;
 
         // Player photo
         $photoBase64 = null;
@@ -57,7 +61,7 @@ class PlayerCardService
 
         $pdf = Pdf::loadView('pdf.player-card', [
             'player' => $player,
-            'qrBase64' => $qrBase64,
+            'qrSvg' => $qrSvgStr,
             'photoBase64' => $photoBase64,
             'logoBase64' => $logoBase64,
             'tournamentName' => $tournamentName,

@@ -89,6 +89,24 @@ class TeamResource extends Resource
                         }),
                 ])->columns(1),
 
+            Forms\Components\Section::make('Autorización Pastoral')
+                ->description('El pastor de la iglesia debe autorizar la participación del equipo.')
+                ->schema([
+                    Forms\Components\TextInput::make('pastor_name')
+                        ->label('Nombre del pastor que autoriza')
+                        ->required()
+                        ->maxLength(255)
+                        ->placeholder('Nombre completo del pastor')
+                        ->extraInputAttributes(['style' => 'text-transform: capitalize;'])
+                        ->dehydrateStateUsing(fn (?string $state) => $state ? ucwords(mb_strtolower($state)) : null),
+                    Forms\Components\Toggle::make('pastor_authorization')
+                        ->label('¿El pastor autoriza la participación del equipo?')
+                        ->required()
+                        ->accepted()
+                        ->default(false)
+                        ->helperText('Confirmo que el pastor de nuestra iglesia autoriza la participación de este equipo en el torneo.'),
+                ])->columns(1),
+
             Forms\Components\Section::make('Responsables')
                 ->schema([
                     Forms\Components\Select::make('leader_id')
@@ -169,6 +187,10 @@ class TeamResource extends Resource
                 Tables\Columns\TextColumn::make('leader.name')
                     ->label('Líder')
                     ->visible($isAdmin),
+                Tables\Columns\TextColumn::make('pastor_name')
+                    ->label('Pastor')
+                    ->toggleable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('players_count')
                     ->label('Jugadores')
                     ->counts('players'),

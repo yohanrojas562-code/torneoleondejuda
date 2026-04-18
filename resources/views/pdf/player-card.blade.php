@@ -184,14 +184,16 @@
             width: 58pt;
             height: 58pt;
             margin: 0 auto 2pt auto;
-            padding: 3pt;
+            padding: 2pt;
             background: #ffffff;
             border-radius: 3pt;
+            overflow: hidden;
         }
 
-        .qr-frame img {
-            width: 100%;
-            height: 100%;
+        .qr-frame svg {
+            width: 100% !important;
+            height: 100% !important;
+            display: block;
         }
 
         .qr-label {
@@ -297,6 +299,10 @@
                         </div>
                     </div>
                     <div class="info-row">
+                        <div class="info-label">Iglesia</div>
+                        <div class="info-value">{{ $player->church ?? '-' }}</div>
+                    </div>
+                    <div class="info-row">
                         <div class="info-label">Dorsal</div>
                         <div class="info-value">{{ $player->jersey_name ?? '-' }}</div>
                     </div>
@@ -306,7 +312,7 @@
             {{-- Right: QR --}}
             <div class="right-col">
                 <div class="qr-frame">
-                    <img src="{{ $qrBase64 }}" alt="QR Code">
+                    {!! $qrSvg !!}
                 </div>
                 <div class="qr-label">Escanear para verificar</div>
             </div>

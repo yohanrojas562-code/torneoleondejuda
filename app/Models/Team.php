@@ -14,12 +14,14 @@ class Team extends Model
         'primary_color', 'secondary_color',
         'leader_id', 'captain_id', 'is_active',
         'approval_status', 'rejection_reason',
+        'pastor_name', 'pastor_authorization',
     ];
 
     protected function casts(): array
     {
         return [
             'is_active' => 'boolean',
+            'pastor_authorization' => 'boolean',
         ];
     }
 
