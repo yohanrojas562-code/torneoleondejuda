@@ -8,8 +8,16 @@
 
 /* Links del sidebar - texto blanco */
 .fi-sidebar-nav-groups .fi-sidebar-item a,
-.fi-sidebar-nav-groups .fi-sidebar-item button {
-    color: #e5e5e5 !important;
+.fi-sidebar-nav-groups .fi-sidebar-item button,
+.fi-sidebar-nav-groups .fi-sidebar-item a span,
+.fi-sidebar-nav-groups .fi-sidebar-item button span,
+.fi-sidebar-item-label,
+.fi-sidebar a,
+.fi-sidebar button,
+.fi-sidebar span,
+.fi-sidebar .fi-sidebar-item-label,
+[class*="fi-sidebar"] span {
+    color: #ffffff !important;
 }
 
 /* Iconos del sidebar blancos */
