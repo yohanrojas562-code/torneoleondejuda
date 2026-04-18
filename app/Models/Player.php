@@ -6,11 +6,12 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class Player extends Model
 {
     protected $fillable = [
-        'team_id', 'user_id', 'first_name', 'last_name',
+        'team_id', 'user_id', 'unique_code', 'first_name', 'last_name',
         'document_type', 'document_number', 'document_file', 'birth_date', 'blood_type', 'photo',
         'jersey_number', 'jersey_name', 'position', 'is_active',
         'height', 'weight', 'is_captain',
@@ -36,6 +37,15 @@ class Player extends Model
             'height' => 'decimal:2',
             'weight' => 'decimal:2',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function (Player $player) {
+            if (empty($player->unique_code)) {
+                $player->unique_code = 'LDJ-' . strtoupper(Str::random(8));
+            }
+        });
     }
 
     public function team(): BelongsTo

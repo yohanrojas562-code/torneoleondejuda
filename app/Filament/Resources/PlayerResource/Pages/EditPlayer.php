@@ -5,6 +5,7 @@ namespace App\Filament\Resources\PlayerResource\Pages;
 use App\Filament\Resources\PlayerResource;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Actions;
+use Illuminate\Support\Facades\URL;
 
 class EditPlayer extends EditRecord
 {
@@ -26,12 +27,15 @@ class EditPlayer extends EditRecord
                 ->icon('heroicon-o-share')
                 ->color('info')
                 ->visible(fn () => $this->record->approval_status === 'approved')
-                ->url(fn () => 'https://wa.me/?text=' . urlencode(
-                    "\xF0\x9F\x8F\x86 *Carnet de Jugador - {$this->record->full_name}*\n" .
-                    "\xF0\x9F\x91\x95 Equipo: {$this->record->team?->name}\n" .
-                    "\xF0\x9F\x93\x84 Descarga el carnet aqu\u00ed:\n" .
-                    route('player.card.download', $this->record)
-                ))
+                ->url(function () {
+                    $signedUrl = URL::signedRoute('player.card.public', ['player' => $this->record->id]);
+                    return 'https://wa.me/?text=' . urlencode(
+                        "\xF0\x9F\x8F\x86 *Carnet de Jugador - {$this->record->full_name}*\n" .
+                        "\xF0\x9F\x91\x95 Equipo: {$this->record->team?->name}\n" .
+                        "\xF0\x9F\x93\x84 Descarga el carnet aqu\u00ed:\n" .
+                        $signedUrl
+                    );
+                })
                 ->openUrlInNewTab(),
 
             Actions\ViewAction::make(),

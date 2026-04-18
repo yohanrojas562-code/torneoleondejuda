@@ -4,7 +4,8 @@ namespace App\Services;
 
 use App\Models\Player;
 use Barryvdh\DomPDF\Facade\Pdf;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use chillerlan\QRCode\QRCode;
+use chillerlan\QRCode\QROptions;
 
 class PlayerCardService
 {
@@ -12,28 +13,29 @@ class PlayerCardService
     {
         $player->load(['team.seasons.tournament', 'team.seasons.category']);
 
-        // Build QR data
+        // Build QR data with unique_code for identification
         $qrData = json_encode([
+            'code' => $player->unique_code,
             'id' => $player->id,
             'name' => $player->full_name,
             'doc_type' => $player->document_type,
             'doc' => $player->document_number,
             'rh' => $player->blood_type,
             'team' => $player->team?->name,
+            'team_id' => $player->team_id,
             'jersey' => $player->jersey_number,
         ]);
 
-        // Generate QR as SVG string (inline, not as img - DomPDF supports inline SVG)
-        $qrSvg = QrCode::format('svg')
-            ->size(200)
-            ->margin(0)
-            ->errorCorrection('H')
-            ->backgroundColor(255, 255, 255)
-            ->color(0, 0, 0)
-            ->generate($qrData);
+        // Generate QR as PNG base64 using chillerlan/php-qrcode (GD, no imagick needed)
+        $options = new QROptions([
+            'outputType' => QRCode::OUTPUT_IMAGE_PNG,
+            'eccLevel' => QRCode::ECC_H,
+            'scale' => 10,
+            'imageBase64' => true,
+            'quietzoneSize' => 1,
+        ]);
 
-        // Clean SVG for inline embedding
-        $qrSvgStr = (string) $qrSvg;
+        $qrBase64 = (new QRCode($options))->render($qrData);
 
         // Player photo
         $photoBase64 = null;
@@ -61,7 +63,7 @@ class PlayerCardService
 
         $pdf = Pdf::loadView('pdf.player-card', [
             'player' => $player,
-            'qrSvg' => $qrSvgStr,
+            'qrBase64' => $qrBase64,
             'photoBase64' => $photoBase64,
             'logoBase64' => $logoBase64,
             'tournamentName' => $tournamentName,

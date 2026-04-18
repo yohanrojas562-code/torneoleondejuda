@@ -190,10 +190,9 @@
             overflow: hidden;
         }
 
-        .qr-frame svg {
-            width: 100% !important;
-            height: 100% !important;
-            display: block;
+        .qr-frame img {
+            width: 54pt;
+            height: 54pt;
         }
 
         .qr-label {
@@ -312,9 +311,9 @@
             {{-- Right: QR --}}
             <div class="right-col">
                 <div class="qr-frame">
-                    {!! $qrSvg !!}
+                    <img src="{{ $qrBase64 }}" alt="QR">
                 </div>
-                <div class="qr-label">Escanear para verificar</div>
+                <div class="qr-label">{{ $player->unique_code ?? '' }}</div>
             </div>
 
             <div class="bottom-bar"></div>

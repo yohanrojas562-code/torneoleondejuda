@@ -30,4 +30,20 @@ class PlayerCardController extends Controller
 
         return $pdf->download($filename);
     }
+
+    /**
+     * Public download via signed URL (no auth required).
+     */
+    public function publicDownload(Player $player)
+    {
+        if ($player->approval_status !== 'approved') {
+            abort(403, 'El jugador debe estar aprobado para generar el carnet.');
+        }
+
+        $pdf = PlayerCardService::generateCard($player);
+
+        $filename = 'carnet-' . str($player->full_name)->slug() . '.pdf';
+
+        return $pdf->download($filename);
+    }
 }

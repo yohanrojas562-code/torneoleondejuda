@@ -21,4 +21,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/player/{player}/card', [PlayerCardController::class, 'download'])->name('player.card.download');
 });
 
+// Public signed URL for sharing player card via WhatsApp
+Route::get('/player/{player}/card/share', [PlayerCardController::class, 'publicDownload'])
+    ->name('player.card.public')
+    ->middleware('signed');
+
 require __DIR__.'/auth.php';
