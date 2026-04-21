@@ -68,6 +68,16 @@
     color: #D68F03 !important;
 }
 
+/* Botón de colapsar sidebar en modo claro */
+html.light .fi-sidebar-nav-collapse-btn,
+:root:not(.dark) .fi-sidebar-nav-collapse-btn {
+    color: #1a1a1a !important;
+}
+html.light .fi-sidebar-nav-collapse-btn:hover,
+:root:not(.dark) .fi-sidebar-nav-collapse-btn:hover {
+    color: #D68F03 !important;
+}
+
 /* Top bar oscura */
 .fi-topbar {
     background-color: #0f0f0f !important;
@@ -94,5 +104,13 @@
 .fi-topbar .fi-dropdown-trigger svg,
 .fi-topbar button svg,
 .fi-topbar .fi-icon-btn svg {
+    color: #ffffff !important;
+}
+
+/* Botón toggle sidebar (hamburguesa) en móvil */
+.fi-sidebar-toggle-btn svg,
+.fi-topbar .fi-sidebar-toggle-btn svg,
+button[x-on\:click*="sidebar"] svg,
+[x-data*="sidebar"] button svg {
     color: #ffffff !important;
 }
