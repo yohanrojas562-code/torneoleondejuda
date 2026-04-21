@@ -39,11 +39,18 @@ function formatDateTime(d: string) {
 }
 
 function statusLabel(s: string) {
-    const map: Record<string, string> = { in_progress: 'En curso', upcoming: 'Próximamente', completed: 'Finalizada', scheduled: 'Programado' };
+    const map: Record<string, string> = {
+        scheduled: 'Programado', warmup: 'Calentando', first_half: '1er Tiempo',
+        halftime: 'Descanso', second_half: '2do Tiempo', extra_time: 'Prórroga',
+        penalties: 'Penales', finished: 'Finalizado', suspended: 'Suspendido',
+        cancelled: 'Cancelado', postponed: 'Aplazado',
+    };
     return map[s] || s;
 }
 function statusColor(s: string) {
-    const map: Record<string, string> = { in_progress: 'bg-green-500', upcoming: 'bg-yellow-500', completed: 'bg-gray-500', scheduled: 'bg-blue-500' };
+    const liveStatuses = ['first_half', 'halftime', 'second_half', 'extra_time', 'penalties', 'warmup'];
+    if (liveStatuses.includes(s)) return 'bg-green-500';
+    const map: Record<string, string> = { scheduled: 'bg-blue-500', finished: 'bg-gray-500', suspended: 'bg-red-500', cancelled: 'bg-red-700', postponed: 'bg-yellow-600' };
     return map[s] || 'bg-gray-500';
 }
 
@@ -261,8 +268,8 @@ function MatchesSection({ upcomingMatches, recentMatches }: { upcomingMatches: G
     if (upcomingMatches.length === 0 && recentMatches.length === 0) return null;
 
     function MatchCard({ match }: { match: GameMatch }) {
-        const isCompleted = match.status === 'completed';
-        const isLive = match.status === 'in_progress';
+        const isCompleted = match.status === 'finished';
+        const isLive = ['first_half', 'halftime', 'second_half', 'extra_time', 'penalties', 'warmup'].includes(match.status);
         return (
             <div className={`bg-white/5 border rounded-xl p-4 transition ${isLive ? 'border-green-500/50 shadow-[0_0_20px_rgba(34,197,94,0.1)]' : 'border-white/10 hover:border-brand-gold/30'}`}>
                 {match.match_day && <p className="text-gray-500 text-xs mb-3 text-center">{match.match_day.name}</p>}
