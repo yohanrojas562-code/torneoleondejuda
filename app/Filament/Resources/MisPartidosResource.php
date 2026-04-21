@@ -10,7 +10,6 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Filters\SelectFilter;
-use Illuminate\Database\Eloquent\Builder;
 
 class MisPartidosResource extends Resource
 {
@@ -42,20 +41,6 @@ class MisPartidosResource extends Resource
     public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
     {
         return false;
-    }
-
-    public static function getEloquentQuery(): Builder
-    {
-        $userId = auth()->id();
-        $teamIds = $userId
-            ? Team::where('leader_id', $userId)->pluck('id')
-            : collect();
-
-        return parent::getEloquentQuery()
-            ->where(function (Builder $q) use ($teamIds) {
-                $q->whereIn('home_team_id', $teamIds)
-                  ->orWhereIn('away_team_id', $teamIds);
-            });
     }
 
     public static function table(Table $table): Table
