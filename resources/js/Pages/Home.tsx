@@ -439,7 +439,7 @@ function TabbedSection({ upcomingMatches, recentMatches, standings }: {
                                             <h3 className="text-brand-gold font-semibold text-xs uppercase tracking-wider mb-3">{groupName}</h3>
                                         )}
                                         <div className="overflow-x-auto rounded-xl border border-white/10">
-                                            <table className="w-full text-sm">
+                                            <table className="min-w-full text-sm">
                                                 <thead>
                                                     <tr className="bg-white/5 text-gray-500 text-[11px] uppercase tracking-wider">
                                                         <th className="py-3 px-4 text-left w-10">#</th>
@@ -448,10 +448,10 @@ function TabbedSection({ upcomingMatches, recentMatches, standings }: {
                                                         <th className="py-3 px-3 text-center">G</th>
                                                         <th className="py-3 px-3 text-center">E</th>
                                                         <th className="py-3 px-3 text-center">P</th>
-                                                        <th className="py-3 px-3 text-center hidden sm:table-cell">GF</th>
-                                                        <th className="py-3 px-3 text-center hidden sm:table-cell">GC</th>
-                                                        <th className="py-3 px-3 text-center hidden sm:table-cell">DG</th>
-                                                        <th className="py-3 px-3 text-center hidden sm:table-cell" title="Fair Play (amarilla -1, azul -3, roja -5)">FP</th>
+                                                        <th className="py-3 px-3 text-center">GF</th>
+                                                        <th className="py-3 px-3 text-center">GC</th>
+                                                        <th className="py-3 px-3 text-center">DG</th>
+                                                        <th className="py-3 px-3 text-center" title="Fair Play (amarilla -1, azul -3, roja -5)">FP</th>
                                                         <th className="py-3 px-3 text-center font-bold text-white">PTS</th>
                                                     </tr>
                                                 </thead>
@@ -466,17 +466,17 @@ function TabbedSection({ upcomingMatches, recentMatches, standings }: {
                                                             <td className="py-3 px-3">
                                                                 <div className="flex items-center gap-2">
                                                                     <TeamLogo team={s.team} size={22} />
-                                                                    <span className="text-white font-medium text-sm">{s.team.name}</span>
+                                                                    <span className="text-white font-medium text-sm whitespace-nowrap">{s.team.name}</span>
                                                                 </div>
                                                             </td>
                                                             <td className="py-3 px-3 text-center text-gray-400">{s.played}</td>
                                                             <td className="py-3 px-3 text-center text-gray-400">{s.won}</td>
                                                             <td className="py-3 px-3 text-center text-gray-400">{s.drawn}</td>
                                                             <td className="py-3 px-3 text-center text-gray-400">{s.lost}</td>
-                                                            <td className="py-3 px-3 text-center text-gray-400 hidden sm:table-cell">{s.goals_for}</td>
-                                                            <td className="py-3 px-3 text-center text-gray-400 hidden sm:table-cell">{s.goals_against}</td>
-                                                            <td className="py-3 px-3 text-center text-gray-400 hidden sm:table-cell">{s.goal_difference}</td>
-                                                            <td className="py-3 px-3 text-center hidden sm:table-cell">
+                                                            <td className="py-3 px-3 text-center text-gray-400">{s.goals_for}</td>
+                                                            <td className="py-3 px-3 text-center text-gray-400">{s.goals_against}</td>
+                                                            <td className="py-3 px-3 text-center text-gray-400">{s.goal_difference}</td>
+                                                            <td className="py-3 px-3 text-center">
                                                                 <span className={(s.fair_play_points ?? 0) < 0 ? 'text-red-400' : 'text-gray-400'}>{s.fair_play_points ?? 0}</span>
                                                             </td>
                                                             <td className="py-3 px-3 text-center text-white font-extrabold">{s.points}</td>
