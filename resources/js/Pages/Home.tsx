@@ -555,10 +555,10 @@ export default function Home({ auth, activeSeason, teams, standings, upcomingMat
             <div className="bg-brand-black min-h-screen">
                 <Navbar canLogin={canLogin} canRegister={canRegister} auth={auth} settings={settings} />
                 <Hero settings={settings} activeSeason={activeSeason} />
+                <TabbedSection upcomingMatches={upcomingMatches} recentMatches={recentMatches} standings={standings} />
                 <ValuesSection />
                 <TournamentWidget activeSeason={activeSeason} teams={teams} />
                 <TeamsCarousel teams={teams} />
-                <TabbedSection upcomingMatches={upcomingMatches} recentMatches={recentMatches} standings={standings} />
                 <VenuesSection venues={venues} />
                 <Footer settings={settings} />
             </div>
