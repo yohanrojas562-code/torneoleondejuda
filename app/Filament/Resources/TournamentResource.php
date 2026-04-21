@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\TournamentResource\Pages;
+use App\Filament\Resources\TournamentResource\RelationManagers\SeasonsRelationManager;
 use App\Models\Tournament;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -177,7 +178,9 @@ class TournamentResource extends Resource
 
     public static function getRelations(): array
     {
-        return [];
+        return [
+            SeasonsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array
