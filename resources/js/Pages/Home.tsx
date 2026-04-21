@@ -280,11 +280,14 @@ function MatchesSection({ upcomingMatches, recentMatches }: { upcomingMatches: G
                     </div>
                     <div className="flex-shrink-0 text-center px-2">
                         {isCompleted || isLive ? (
-                            <div className="flex items-center gap-1">
-                                <span className="text-white text-2xl font-extrabold">{match.home_score}</span>
-                                <span className="text-gray-600 text-lg">-</span>
-                                <span className="text-white text-2xl font-extrabold">{match.away_score}</span>
-                            </div>
+                            <>
+                                <div className="flex items-center gap-1">
+                                    <span className="text-white text-2xl font-extrabold">{match.home_score}</span>
+                                    <span className="text-gray-600 text-lg">-</span>
+                                    <span className="text-white text-2xl font-extrabold">{match.away_score}</span>
+                                </div>
+                                <p className="text-gray-500 text-[10px] mt-1">{formatDateTime(match.scheduled_at)}</p>
+                            </>
                         ) : (
                             <div className="text-brand-gold text-xs font-semibold">
                                 {formatDateTime(match.scheduled_at)}
