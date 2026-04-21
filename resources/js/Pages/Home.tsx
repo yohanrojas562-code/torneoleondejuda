@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { PageProps } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { motion } from 'framer-motion';
@@ -231,189 +232,255 @@ function TournamentWidget({ activeSeason, teams }: { activeSeason: Season | null
     );
 }
 
-function TeamsSection({ teams }: { teams: Team[] }) {
+function TeamsCarousel({ teams }: { teams: Team[] }) {
     if (teams.length === 0) return null;
+    const items = teams.length < 8 ? [...teams, ...teams, ...teams] : [...teams, ...teams];
+    const dur = `${Math.max(22, teams.length * 3)}s`;
     return (
-        <section id="equipos" className="bg-[#0d0d0d] py-20 px-4">
-            <div className="max-w-6xl mx-auto">
-                <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-12">
+        <section id="equipos" className="bg-[#0a0a0a] py-16 overflow-hidden">
+            <style>{`@keyframes _mqs{from{transform:translateX(0)}to{transform:translateX(-50%)}}.mq-run{animation:_mqs ${dur} linear infinite;will-change:transform}.mq-run:hover{animation-play-state:paused}`}</style>
+            <div className="max-w-6xl mx-auto px-4 mb-10">
+                <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center">
                     <span className="text-brand-gold text-sm font-semibold uppercase tracking-wider">Participantes</span>
                     <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-2">Equipos Inscritos</h2>
                 </motion.div>
-
-                <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-50px' }}
-                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                    {teams.map(team => (
-                        <motion.div key={team.id} variants={fadeUp}
-                            className="bg-white/5 border border-white/10 rounded-2xl p-6 flex items-center gap-4 hover:border-brand-gold/40 transition group">
-                            <TeamLogo team={team} size={64} />
-                            <div className="flex-1 min-w-0">
-                                <h4 className="text-white font-bold text-base truncate">{team.name}</h4>
-                                {team.short_name && <p className="text-gray-500 text-xs">{team.short_name}</p>}
-                                <div className="flex items-center gap-1 mt-2">
-                                    <Users className="w-3.5 h-3.5 text-brand-gold" />
-                                    <span className="text-gray-400 text-xs">{team.players_count} jugadores aprobados</span>
-                                </div>
-                            </div>
-                            <div className="w-3 h-8 rounded-full opacity-60" style={{ backgroundColor: team.primary_color || '#D68F03' }} />
-                        </motion.div>
-                    ))}
-                </motion.div>
+            </div>
+            <div className="mq-run flex gap-4" style={{ width: 'max-content', paddingInline: '1rem' }}>
+                {items.map((team, i) => (
+                    <div key={i} className="flex flex-col items-center bg-white/5 border border-white/10 rounded-xl p-4 flex-shrink-0 hover:border-brand-gold/40 transition-colors" style={{ width: '8.5rem' }}>
+                        <TeamLogo team={team} size={50} />
+                        <p className="text-white font-semibold text-xs mt-2.5 text-center leading-tight line-clamp-2">{team.name}</p>
+                        <p className="text-gray-500 text-[10px] mt-1.5 flex items-center gap-1"><Users className="w-2.5 h-2.5" />{team.players_count} jug.</p>
+                    </div>
+                ))}
             </div>
         </section>
     );
 }
 
-function MatchesSection({ upcomingMatches, recentMatches }: { upcomingMatches: GameMatch[]; recentMatches: GameMatch[] }) {
-    if (upcomingMatches.length === 0 && recentMatches.length === 0) return null;
+function TabbedSection({ upcomingMatches, recentMatches, standings }: {
+    upcomingMatches: GameMatch[];
+    recentMatches: GameMatch[];
+    standings: Standing[];
+}) {
+    const [tab, setTab] = useState<'partidos' | 'posiciones'>('partidos');
 
-    function MatchCard({ match }: { match: GameMatch }) {
-        const isCompleted = match.status === 'finished';
+    const sortedUpcoming = [...upcomingMatches].sort(
+        (a, b) => new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime()
+    );
+    const sortedRecent = [...recentMatches].sort(
+        (a, b) => new Date(b.scheduled_at).getTime() - new Date(a.scheduled_at).getTime()
+    );
+
+    const groupByDate = (matches: GameMatch[]) => {
+        const groups: Record<string, GameMatch[]> = {};
+        matches.forEach(m => {
+            const key = new Date(m.scheduled_at).toLocaleDateString('es-CO', {
+                weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC',
+            });
+            if (!groups[key]) groups[key] = [];
+            groups[key].push(m);
+        });
+        return groups;
+    };
+
+    const upcomingGrouped = groupByDate(sortedUpcoming);
+    const recentGrouped = groupByDate(sortedRecent);
+
+    const standingsGrouped: Record<string, Standing[]> = {};
+    standings.forEach(s => {
+        const g = s.group?.name || 'General';
+        if (!standingsGrouped[g]) standingsGrouped[g] = [];
+        standingsGrouped[g].push(s);
+    });
+
+    function MatchRow({ match }: { match: GameMatch }) {
+        const isFinished = match.status === 'finished';
         const isLive = ['first_half', 'halftime', 'second_half', 'extra_time', 'penalties', 'warmup'].includes(match.status);
         return (
-            <div className={`bg-white/5 border rounded-xl p-4 transition ${isLive ? 'border-green-500/50 shadow-[0_0_20px_rgba(34,197,94,0.1)]' : 'border-white/10 hover:border-brand-gold/30'}`}>
-                {match.match_day && <p className="text-gray-500 text-xs mb-3 text-center">{match.match_day.name}</p>}
-                <div className="flex items-center justify-between gap-2">
-                    <div className="flex-1 flex flex-col items-center text-center min-w-0">
-                        <TeamLogo team={match.home_team} size={36} />
-                        <span className="text-white text-xs font-medium mt-1.5 truncate w-full">{match.home_team.short_name || match.home_team.name}</span>
-                    </div>
-                    <div className="flex-shrink-0 text-center px-2">
-                        {isCompleted || isLive ? (
-                            <>
-                                <div className="flex items-center gap-1">
-                                    <span className="text-white text-2xl font-extrabold">{match.home_score}</span>
-                                    <span className="text-gray-600 text-lg">-</span>
-                                    <span className="text-white text-2xl font-extrabold">{match.away_score}</span>
-                                </div>
-                                <p className="text-gray-500 text-[10px] mt-1">{formatDateTime(match.scheduled_at)}</p>
-                            </>
-                        ) : (
-                            <div className="text-brand-gold text-xs font-semibold">
-                                {formatDateTime(match.scheduled_at)}
-                            </div>
-                        )}
-                        {isLive && (
-                            <span className="text-green-400 text-[10px] font-bold uppercase flex items-center justify-center gap-1 mt-1">
-                                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" /> EN VIVO
-                            </span>
-                        )}
-                    </div>
-                    <div className="flex-1 flex flex-col items-center text-center min-w-0">
-                        <TeamLogo team={match.away_team} size={36} />
-                        <span className="text-white text-xs font-medium mt-1.5 truncate w-full">{match.away_team.short_name || match.away_team.name}</span>
-                    </div>
+            <div className={`flex items-center py-3.5 px-4 hover:bg-white/[0.04] transition-colors ${isLive ? 'bg-green-950/30' : ''}`}>
+                <div className="flex-1 flex items-center justify-end gap-2 min-w-0 pr-3">
+                    <span className="text-white text-sm font-medium truncate text-right">{match.home_team.short_name || match.home_team.name}</span>
+                    <TeamLogo team={match.home_team} size={26} />
                 </div>
-                {match.venue && <p className="text-gray-600 text-[10px] text-center mt-3 flex items-center justify-center gap-1"><MapPin className="w-3 h-3" />{match.venue.name}</p>}
+                <div className="flex-shrink-0 w-24 text-center">
+                    {isFinished || isLive ? (
+                        <div>
+                            <div className={`flex items-center justify-center gap-1 font-extrabold text-lg ${isLive ? 'text-green-400' : 'text-white'}`}>
+                                <span>{match.home_score}</span>
+                                <span className="text-gray-600 font-normal mx-0.5 text-base">-</span>
+                                <span>{match.away_score}</span>
+                            </div>
+                            {isLive ? (
+                                <div className="flex items-center justify-center gap-1 mt-0.5">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                                    <span className="text-green-400 text-[9px] font-bold uppercase">{statusLabel(match.status)}</span>
+                                </div>
+                            ) : (
+                                <span className="text-gray-600 text-[9px] block">Final</span>
+                            )}
+                        </div>
+                    ) : (
+                        <div>
+                            <span className="text-brand-gold font-bold text-sm">
+                                {new Date(match.scheduled_at).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })}
+                            </span>
+                            {match.match_day && <p className="text-gray-600 text-[9px] mt-0.5 truncate">{match.match_day.name}</p>}
+                        </div>
+                    )}
+                </div>
+                <div className="flex-1 flex items-center gap-2 min-w-0 pl-3">
+                    <TeamLogo team={match.away_team} size={26} />
+                    <span className="text-white text-sm font-medium truncate">{match.away_team.short_name || match.away_team.name}</span>
+                </div>
+                {match.venue && (
+                    <div className="hidden lg:flex items-center gap-1 ml-4 text-gray-600 text-[10px] flex-shrink-0 max-w-[110px]">
+                        <MapPin className="w-2.5 h-2.5 flex-shrink-0" />
+                        <span className="truncate">{match.venue.name}</span>
+                    </div>
+                )}
             </div>
         );
     }
 
     return (
-        <section id="partidos" className="bg-brand-black py-20 px-4">
-            <div className="max-w-6xl mx-auto">
-                <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-12">
-                    <span className="text-brand-gold text-sm font-semibold uppercase tracking-wider">Calendario</span>
-                    <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-2">Partidos</h2>
+        <section id="partidos" className="bg-[#0a0a0a] py-16 px-4">
+            <span id="posiciones" aria-hidden="true" className="block -mt-16 pt-16 pointer-events-none" />
+            <div className="max-w-5xl mx-auto">
+                <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+                    <div className="flex border-b border-white/10 mb-8">
+                        <button
+                            onClick={() => setTab('partidos')}
+                            className={`flex items-center gap-2 px-6 py-4 text-sm font-semibold border-b-2 -mb-px transition-colors ${
+                                tab === 'partidos' ? 'text-brand-gold border-brand-gold' : 'text-gray-500 border-transparent hover:text-gray-200'
+                            }`}
+                        >
+                            <Calendar className="w-4 h-4" /> Calendario
+                        </button>
+                        <button
+                            onClick={() => setTab('posiciones')}
+                            className={`flex items-center gap-2 px-6 py-4 text-sm font-semibold border-b-2 -mb-px transition-colors ${
+                                tab === 'posiciones' ? 'text-brand-gold border-brand-gold' : 'text-gray-500 border-transparent hover:text-gray-200'
+                            }`}
+                        >
+                            <Trophy className="w-4 h-4" /> Tabla de Posiciones
+                        </button>
+                    </div>
                 </motion.div>
 
-                {upcomingMatches.length > 0 && (
-                    <div className="mb-10">
-                        <h3 className="text-white font-semibold text-lg mb-4 flex items-center gap-2">
-                            <Calendar className="w-5 h-5 text-brand-gold" /> Próximos Partidos
-                        </h3>
-                        <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}
-                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {upcomingMatches.map(m => <motion.div key={m.id} variants={fadeUp}><MatchCard match={m} /></motion.div>)}
-                        </motion.div>
-                    </div>
-                )}
-
-                {recentMatches.length > 0 && (
-                    <div>
-                        <h3 className="text-white font-semibold text-lg mb-4 flex items-center gap-2">
-                            <Clock className="w-5 h-5 text-gray-400" /> Resultados Recientes
-                        </h3>
-                        <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}
-                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {recentMatches.map(m => <motion.div key={m.id} variants={fadeUp}><MatchCard match={m} /></motion.div>)}
-                        </motion.div>
-                    </div>
-                )}
-            </div>
-        </section>
-    );
-}
-
-function StandingsSection({ standings }: { standings: Standing[] }) {
-    if (standings.length === 0) return null;
-
-    // Group standings by group
-    const grouped: Record<string, Standing[]> = {};
-    standings.forEach(s => {
-        const gName = s.group?.name || 'General';
-        if (!grouped[gName]) grouped[gName] = [];
-        grouped[gName].push(s);
-    });
-
-    return (
-        <section id="posiciones" className="bg-[#0d0d0d] py-20 px-4">
-            <div className="max-w-6xl mx-auto">
-                <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-12">
-                    <span className="text-brand-gold text-sm font-semibold uppercase tracking-wider">Clasificación</span>
-                    <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-2">Tabla de Posiciones</h2>
-                </motion.div>
-
-                <div className="space-y-8">
-                    {Object.entries(grouped).map(([groupName, rows]) => (
-                        <motion.div key={groupName} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-                            {Object.keys(grouped).length > 1 && (
-                                <h3 className="text-brand-gold font-semibold text-sm uppercase tracking-wider mb-3">{groupName}</h3>
-                            )}
-                            <div className="overflow-x-auto rounded-xl border border-white/10">
-                                <table className="w-full text-sm">
-                                    <thead>
-                                        <tr className="bg-white/5 text-gray-400 text-xs uppercase tracking-wider">
-                                            <th className="py-3 px-4 text-left">#</th>
-                                            <th className="py-3 px-4 text-left">Equipo</th>
-                                            <th className="py-3 px-2 text-center">PJ</th>
-                                            <th className="py-3 px-2 text-center">G</th>
-                                            <th className="py-3 px-2 text-center">E</th>
-                                            <th className="py-3 px-2 text-center">P</th>
-                                            <th className="py-3 px-2 text-center hidden sm:table-cell">GF</th>
-                                            <th className="py-3 px-2 text-center hidden sm:table-cell">GC</th>
-                                            <th className="py-3 px-2 text-center hidden sm:table-cell">DG</th>
-                                            <th className="py-3 px-2 text-center hidden sm:table-cell" title="Total tarjetas (amarillas + azules + rojas)">TJ</th>
-                                            <th className="py-3 px-2 text-center font-bold">PTS</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {rows.map((s, i) => (
-                                            <tr key={s.id} className={`border-t border-white/5 hover:bg-white/5 transition ${i < 2 ? 'border-l-2 border-l-brand-gold' : ''}`}>
-                                                <td className="py-3 px-4 text-gray-400 font-medium">{s.position || i + 1}</td>
-                                                <td className="py-3 px-4">
-                                                    <div className="flex items-center gap-2">
-                                                        <TeamLogo team={s.team} size={24} />
-                                                        <span className="text-white font-medium text-sm">{s.team.short_name || s.team.name}</span>
-                                                    </div>
-                                                </td>
-                                                <td className="py-3 px-2 text-center text-gray-300">{s.played}</td>
-                                                <td className="py-3 px-2 text-center text-gray-300">{s.won}</td>
-                                                <td className="py-3 px-2 text-center text-gray-300">{s.drawn}</td>
-                                                <td className="py-3 px-2 text-center text-gray-300">{s.lost}</td>
-                                                <td className="py-3 px-2 text-center text-gray-300 hidden sm:table-cell">{s.goals_for}</td>
-                                                <td className="py-3 px-2 text-center text-gray-300 hidden sm:table-cell">{s.goals_against}</td>
-                                                <td className="py-3 px-2 text-center text-gray-300 hidden sm:table-cell">{s.goal_difference}</td>
-                                                <td className="py-3 px-2 text-center text-gray-300 hidden sm:table-cell">{(s.yellow_cards ?? 0) + (s.blue_cards ?? 0) + (s.red_cards ?? 0)}</td>
-                                                <td className="py-3 px-2 text-center text-white font-extrabold text-base">{s.points}</td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                {tab === 'partidos' && (
+                    <motion.div key="partidos" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
+                        {sortedUpcoming.length === 0 && sortedRecent.length === 0 ? (
+                            <div className="text-center py-20 text-gray-600">
+                                <Calendar className="w-14 h-14 mx-auto mb-4 opacity-20" />
+                                <p className="text-sm">No hay partidos registrados aún.</p>
                             </div>
-                        </motion.div>
-                    ))}
-                </div>
+                        ) : (
+                            <>
+                                {sortedUpcoming.length > 0 && (
+                                    <div className="mb-10">
+                                        <h3 className="flex items-center gap-2 text-gray-300 font-bold text-xs uppercase tracking-widest mb-5">
+                                            <span className="w-2 h-2 rounded-full bg-brand-gold flex-shrink-0" /> Próximos Encuentros
+                                        </h3>
+                                        <div className="space-y-3">
+                                            {Object.entries(upcomingGrouped).map(([date, matches]) => (
+                                                <div key={date}>
+                                                    <p className="text-gray-600 text-[10px] uppercase tracking-wider font-medium px-2 py-1.5 capitalize">{date}</p>
+                                                    <div className="bg-white/[0.03] rounded-xl border border-white/5 divide-y divide-white/5 overflow-hidden">
+                                                        {matches.map(m => <MatchRow key={m.id} match={m} />)}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                                {sortedRecent.length > 0 && (
+                                    <div>
+                                        <h3 className="flex items-center gap-2 text-gray-300 font-bold text-xs uppercase tracking-widest mb-5">
+                                            <span className="w-2 h-2 rounded-full bg-gray-500 flex-shrink-0" /> Resultados Recientes
+                                        </h3>
+                                        <div className="space-y-3">
+                                            {Object.entries(recentGrouped).map(([date, matches]) => (
+                                                <div key={date}>
+                                                    <p className="text-gray-600 text-[10px] uppercase tracking-wider font-medium px-2 py-1.5 capitalize">{date}</p>
+                                                    <div className="bg-white/[0.03] rounded-xl border border-white/5 divide-y divide-white/5 overflow-hidden">
+                                                        {matches.map(m => <MatchRow key={m.id} match={m} />)}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </>
+                        )}
+                    </motion.div>
+                )}
+
+                {tab === 'posiciones' && (
+                    <motion.div key="posiciones" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
+                        {standings.length === 0 ? (
+                            <div className="text-center py-20 text-gray-600">
+                                <Trophy className="w-14 h-14 mx-auto mb-4 opacity-20" />
+                                <p className="text-sm">La tabla se actualizará cuando haya partidos finalizados.</p>
+                            </div>
+                        ) : (
+                            <div className="space-y-8">
+                                {Object.entries(standingsGrouped).map(([groupName, rows]) => (
+                                    <div key={groupName}>
+                                        {Object.keys(standingsGrouped).length > 1 && (
+                                            <h3 className="text-brand-gold font-semibold text-xs uppercase tracking-wider mb-3">{groupName}</h3>
+                                        )}
+                                        <div className="overflow-x-auto rounded-xl border border-white/10">
+                                            <table className="w-full text-sm">
+                                                <thead>
+                                                    <tr className="bg-white/5 text-gray-500 text-[11px] uppercase tracking-wider">
+                                                        <th className="py-3 px-4 text-left w-10">#</th>
+                                                        <th className="py-3 px-3 text-left">Equipo</th>
+                                                        <th className="py-3 px-3 text-center">PJ</th>
+                                                        <th className="py-3 px-3 text-center">G</th>
+                                                        <th className="py-3 px-3 text-center">E</th>
+                                                        <th className="py-3 px-3 text-center">P</th>
+                                                        <th className="py-3 px-3 text-center hidden sm:table-cell">GF</th>
+                                                        <th className="py-3 px-3 text-center hidden sm:table-cell">GC</th>
+                                                        <th className="py-3 px-3 text-center hidden sm:table-cell">DG</th>
+                                                        <th className="py-3 px-3 text-center hidden sm:table-cell" title="Total tarjetas">TJ</th>
+                                                        <th className="py-3 px-3 text-center font-bold text-white">PTS</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {rows.map((s, i) => (
+                                                        <tr key={s.id} className={`border-t border-white/5 hover:bg-white/[0.04] transition-colors ${i === 0 ? 'bg-brand-gold/[0.06]' : ''}`}>
+                                                            <td className="py-3 px-4">
+                                                                <span className={`inline-flex items-center justify-center w-6 h-6 rounded text-xs font-bold ${
+                                                                    i === 0 ? 'bg-brand-gold text-black' : i < 3 ? 'text-brand-gold' : 'text-gray-600'
+                                                                }`}>{s.position || i + 1}</span>
+                                                            </td>
+                                                            <td className="py-3 px-3">
+                                                                <div className="flex items-center gap-2">
+                                                                    <TeamLogo team={s.team} size={22} />
+                                                                    <span className="text-white font-medium text-sm">{s.team.short_name || s.team.name}</span>
+                                                                </div>
+                                                            </td>
+                                                            <td className="py-3 px-3 text-center text-gray-400">{s.played}</td>
+                                                            <td className="py-3 px-3 text-center text-gray-400">{s.won}</td>
+                                                            <td className="py-3 px-3 text-center text-gray-400">{s.drawn}</td>
+                                                            <td className="py-3 px-3 text-center text-gray-400">{s.lost}</td>
+                                                            <td className="py-3 px-3 text-center text-gray-400 hidden sm:table-cell">{s.goals_for}</td>
+                                                            <td className="py-3 px-3 text-center text-gray-400 hidden sm:table-cell">{s.goals_against}</td>
+                                                            <td className="py-3 px-3 text-center text-gray-400 hidden sm:table-cell">{s.goal_difference}</td>
+                                                            <td className="py-3 px-3 text-center text-gray-400 hidden sm:table-cell">{(s.yellow_cards ?? 0) + (s.blue_cards ?? 0) + (s.red_cards ?? 0)}</td>
+                                                            <td className="py-3 px-3 text-center text-white font-extrabold">{s.points}</td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </motion.div>
+                )}
             </div>
         </section>
     );
@@ -490,9 +557,8 @@ export default function Home({ auth, activeSeason, teams, standings, upcomingMat
                 <Hero settings={settings} activeSeason={activeSeason} />
                 <ValuesSection />
                 <TournamentWidget activeSeason={activeSeason} teams={teams} />
-                <TeamsSection teams={teams} />
-                <MatchesSection upcomingMatches={upcomingMatches} recentMatches={recentMatches} />
-                <StandingsSection standings={standings} />
+                <TeamsCarousel teams={teams} />
+                <TabbedSection upcomingMatches={upcomingMatches} recentMatches={recentMatches} standings={standings} />
                 <VenuesSection venues={venues} />
                 <Footer settings={settings} />
             </div>
