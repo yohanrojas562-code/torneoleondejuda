@@ -21,41 +21,41 @@ class ListMisPartidos extends ListRecords
     {
         return [
             'proximos' => Tab::make('Próximos')
-                ->modifyQueryUsing(function (Builder $q) {
+                ->modifyQueryUsing(function (Builder $query) {
                     $teamIds = Team::where('leader_id', auth()->id())->pluck('id');
-                    $q->whereIn('status', [
+                    $query->whereIn('status', [
                             'scheduled', 'warmup', 'first_half', 'halftime',
                             'second_half', 'extra_time', 'penalties',
                             'postponed', 'suspended', 'cancelled',
                         ])
-                      ->where(fn (Builder $inner) => $inner
-                          ->whereIn('home_team_id', $teamIds)
-                          ->orWhereIn('away_team_id', $teamIds)
-                      )
-                      ->orderBy('scheduled_at', 'asc');
+                        ->where(function ($inner) use ($teamIds) {
+                            $inner->whereIn('home_team_id', $teamIds)
+                                  ->orWhereIn('away_team_id', $teamIds);
+                        })
+                        ->orderBy('scheduled_at', 'asc');
                 })
                 ->icon('heroicon-m-calendar'),
 
             'finalizados' => Tab::make('Finalizados')
-                ->modifyQueryUsing(function (Builder $q) {
+                ->modifyQueryUsing(function (Builder $query) {
                     $teamIds = Team::where('leader_id', auth()->id())->pluck('id');
-                    $q->where('status', 'finished')
-                      ->where(fn (Builder $inner) => $inner
-                          ->whereIn('home_team_id', $teamIds)
-                          ->orWhereIn('away_team_id', $teamIds)
-                      )
-                      ->orderByDesc('scheduled_at');
+                    $query->where('status', 'finished')
+                        ->where(function ($inner) use ($teamIds) {
+                            $inner->whereIn('home_team_id', $teamIds)
+                                  ->orWhereIn('away_team_id', $teamIds);
+                        })
+                        ->orderByDesc('scheduled_at');
                 })
                 ->icon('heroicon-m-check-circle'),
 
             'todos' => Tab::make('Todos')
-                ->modifyQueryUsing(function (Builder $q) {
+                ->modifyQueryUsing(function (Builder $query) {
                     $teamIds = Team::where('leader_id', auth()->id())->pluck('id');
-                    $q->where(fn (Builder $inner) => $inner
-                          ->whereIn('home_team_id', $teamIds)
-                          ->orWhereIn('away_team_id', $teamIds)
-                      )
-                      ->orderByDesc('scheduled_at');
+                    $query->where(function ($inner) use ($teamIds) {
+                            $inner->whereIn('home_team_id', $teamIds)
+                                  ->orWhereIn('away_team_id', $teamIds);
+                        })
+                        ->orderByDesc('scheduled_at');
                 })
                 ->icon('heroicon-m-list-bullet'),
         ];
