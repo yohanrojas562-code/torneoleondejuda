@@ -14,7 +14,7 @@ class Team extends Model
         'primary_color', 'secondary_color',
         'leader_id', 'captain_id', 'is_active',
         'approval_status', 'rejection_reason',
-        'pastor_name', 'pastor_authorization',
+        'pastor_name', 'pastor_authorization', 'pastor_letter_path',
     ];
 
     protected function casts(): array

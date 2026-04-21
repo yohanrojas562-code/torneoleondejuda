@@ -105,6 +105,14 @@ class TeamResource extends Resource
                         ->accepted()
                         ->default(false)
                         ->helperText('Confirmo que el pastor de nuestra iglesia autoriza la participación de este equipo en el torneo.'),
+                    Forms\Components\FileUpload::make('pastor_letter_path')
+                        ->label('Carta de autorización pastoral')
+                        ->helperText('Suba la carta firmada por el pastor autorizando la participación del equipo (PDF, JPG o PNG).')
+                        ->directory('teams/pastor-letters')
+                        ->disk('public')
+                        ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png'])
+                        ->maxSize(5120)
+                        ->nullable(),
                 ])->columns(1),
 
             Forms\Components\Section::make('Responsables')
