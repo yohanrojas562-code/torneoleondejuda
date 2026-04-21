@@ -453,7 +453,7 @@ function TabbedSection({ upcomingMatches, recentMatches, standings }: {
                                                             <td className="py-3 px-4">
                                                                 <span className={`inline-flex items-center justify-center w-6 h-6 rounded text-xs font-bold ${
                                                                     i === 0 ? 'bg-brand-gold text-black' : i < 3 ? 'text-brand-gold' : 'text-gray-600'
-                                                                }`}>{s.position || i + 1}</span>
+                                                                }`}>{i + 1}</span>
                                                             </td>
                                                             <td className="py-3 px-3">
                                                                 <div className="flex items-center gap-2">
