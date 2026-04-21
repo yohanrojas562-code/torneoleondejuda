@@ -259,7 +259,7 @@ function TabbedSection({ upcomingMatches, recentMatches, standings }: {
     recentMatches: GameMatch[];
     standings: Standing[];
 }) {
-    const [tab, setTab] = useState<'partidos' | 'posiciones'>('partidos');
+    const [tab, setTab] = useState<'partidos' | 'proximos' | 'posiciones'>('proximos');
 
     const sortedUpcoming = [...upcomingMatches].sort(
         (a, b) => new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime()
@@ -354,12 +354,20 @@ function TabbedSection({ upcomingMatches, recentMatches, standings }: {
                 <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
                     <div className="flex border-b border-white/10 mb-8">
                         <button
+                            onClick={() => setTab('proximos')}
+                            className={`flex items-center gap-2 px-6 py-4 text-sm font-semibold border-b-2 -mb-px transition-colors ${
+                                tab === 'proximos' ? 'text-brand-gold border-brand-gold' : 'text-gray-500 border-transparent hover:text-gray-200'
+                            }`}
+                        >
+                            <Calendar className="w-4 h-4" /> Próximos Partidos
+                        </button>
+                        <button
                             onClick={() => setTab('partidos')}
                             className={`flex items-center gap-2 px-6 py-4 text-sm font-semibold border-b-2 -mb-px transition-colors ${
                                 tab === 'partidos' ? 'text-brand-gold border-brand-gold' : 'text-gray-500 border-transparent hover:text-gray-200'
                             }`}
                         >
-                            <Calendar className="w-4 h-4" /> Calendario
+                            <Clock className="w-4 h-4" /> Calendario
                         </button>
                         <button
                             onClick={() => setTab('posiciones')}
@@ -372,50 +380,46 @@ function TabbedSection({ upcomingMatches, recentMatches, standings }: {
                     </div>
                 </motion.div>
 
-                {tab === 'partidos' && (
-                    <motion.div key="partidos" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
-                        {sortedUpcoming.length === 0 && sortedRecent.length === 0 ? (
+                {tab === 'proximos' && (
+                    <motion.div key="proximos" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
+                        {sortedUpcoming.length === 0 ? (
                             <div className="text-center py-20 text-gray-600">
                                 <Calendar className="w-14 h-14 mx-auto mb-4 opacity-20" />
-                                <p className="text-sm">No hay partidos registrados aún.</p>
+                                <p className="text-sm">No hay próximos partidos programados.</p>
                             </div>
                         ) : (
-                            <>
-                                {sortedUpcoming.length > 0 && (
-                                    <div className="mb-10">
-                                        <h3 className="flex items-center gap-2 text-gray-300 font-bold text-xs uppercase tracking-widest mb-5">
-                                            <span className="w-2 h-2 rounded-full bg-brand-gold flex-shrink-0" /> Próximos Encuentros
-                                        </h3>
-                                        <div className="space-y-3">
-                                            {Object.entries(upcomingGrouped).map(([date, matches]) => (
-                                                <div key={date}>
-                                                    <p className="text-gray-600 text-[10px] uppercase tracking-wider font-medium px-2 py-1.5 capitalize">{date}</p>
-                                                    <div className="bg-white/[0.03] rounded-xl border border-white/5 divide-y divide-white/5 overflow-hidden">
-                                                        {matches.map(m => <MatchRow key={m.id} match={m} />)}
-                                                    </div>
-                                                </div>
-                                            ))}
+                            <div className="space-y-3">
+                                {Object.entries(upcomingGrouped).map(([date, matches]) => (
+                                    <div key={date}>
+                                        <p className="text-gray-600 text-[10px] uppercase tracking-wider font-medium px-2 py-1.5 capitalize">{date}</p>
+                                        <div className="bg-white/[0.03] rounded-xl border border-white/5 divide-y divide-white/5 overflow-hidden">
+                                            {matches.map(m => <MatchRow key={m.id} match={m} />)}
                                         </div>
                                     </div>
-                                )}
-                                {sortedRecent.length > 0 && (
-                                    <div>
-                                        <h3 className="flex items-center gap-2 text-gray-300 font-bold text-xs uppercase tracking-widest mb-5">
-                                            <span className="w-2 h-2 rounded-full bg-gray-500 flex-shrink-0" /> Resultados Recientes
-                                        </h3>
-                                        <div className="space-y-3">
-                                            {Object.entries(recentGrouped).map(([date, matches]) => (
-                                                <div key={date}>
-                                                    <p className="text-gray-600 text-[10px] uppercase tracking-wider font-medium px-2 py-1.5 capitalize">{date}</p>
-                                                    <div className="bg-white/[0.03] rounded-xl border border-white/5 divide-y divide-white/5 overflow-hidden">
-                                                        {matches.map(m => <MatchRow key={m.id} match={m} />)}
-                                                    </div>
-                                                </div>
-                                            ))}
+                                ))}
+                            </div>
+                        )}
+                    </motion.div>
+                )}
+
+                {tab === 'partidos' && (
+                    <motion.div key="partidos" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
+                        {sortedRecent.length === 0 ? (
+                            <div className="text-center py-20 text-gray-600">
+                                <Calendar className="w-14 h-14 mx-auto mb-4 opacity-20" />
+                                <p className="text-sm">No hay partidos finalizados aún.</p>
+                            </div>
+                        ) : (
+                            <div className="space-y-3">
+                                {Object.entries(recentGrouped).map(([date, matches]) => (
+                                    <div key={date}>
+                                        <p className="text-gray-600 text-[10px] uppercase tracking-wider font-medium px-2 py-1.5 capitalize">{date}</p>
+                                        <div className="bg-white/[0.03] rounded-xl border border-white/5 divide-y divide-white/5 overflow-hidden">
+                                            {matches.map(m => <MatchRow key={m.id} match={m} />)}
                                         </div>
                                     </div>
-                                )}
-                            </>
+                                ))}
+                            </div>
                         )}
                     </motion.div>
                 )}
