@@ -296,7 +296,7 @@ function TabbedSection({ upcomingMatches, recentMatches, standings }: {
         return (
             <div className={`flex items-center py-3.5 px-4 hover:bg-white/[0.04] transition-colors ${isLive ? 'bg-green-950/30' : ''}`}>
                 <div className="flex-1 flex items-center justify-end gap-2 min-w-0 pr-3">
-                    <span className="text-white text-sm font-medium truncate text-right">{match.home_team.short_name || match.home_team.name}</span>
+                    <span className="text-white text-sm font-medium truncate text-right">{match.home_team.name}</span>
                     <TeamLogo team={match.home_team} size={26} />
                 </div>
                 <div className="flex-shrink-0 w-24 text-center">
@@ -327,7 +327,7 @@ function TabbedSection({ upcomingMatches, recentMatches, standings }: {
                 </div>
                 <div className="flex-1 flex items-center gap-2 min-w-0 pl-3">
                     <TeamLogo team={match.away_team} size={26} />
-                    <span className="text-white text-sm font-medium truncate">{match.away_team.short_name || match.away_team.name}</span>
+                    <span className="text-white text-sm font-medium truncate">{match.away_team.name}</span>
                 </div>
                 {match.venue && (
                     <div className="hidden lg:flex items-center gap-1 ml-4 text-gray-600 text-[10px] flex-shrink-0 max-w-[110px]">
