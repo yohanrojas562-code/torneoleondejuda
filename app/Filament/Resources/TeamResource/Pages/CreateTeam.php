@@ -19,8 +19,8 @@ class CreateTeam extends CreateRecord
             $data['slug'] = Str::slug($data['name']);
         }
 
-        // Si es líder de equipo, asignar automáticamente como líder y estado pendiente
-        if ($user->hasRole('lider_equipo')) {
+        // Si es líder de equipo (pero NO admin), asignar automáticamente como líder y estado pendiente
+        if (!$user->hasRole('admin') && $user->hasRole('lider_equipo')) {
             $data['leader_id'] = $user->id;
             $data['approval_status'] = 'pending';
         }
