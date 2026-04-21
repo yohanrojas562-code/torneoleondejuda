@@ -547,7 +547,9 @@ function Footer({ settings }: { settings: Record<string, string | null> }) {
 export default function Home({ auth, activeSeason, teams, standings, upcomingMatches, recentMatches, venues, settings, canLogin, canRegister }: Props) {
     return (
         <>
-            <Head title={settings.site_name || 'Torneo León de Judá'} />
+            <Head>
+                <title>{settings.site_name || 'Torneo León de Judá'}</title>
+            </Head>
             <div className="bg-brand-black min-h-screen">
                 <Navbar canLogin={canLogin} canRegister={canRegister} auth={auth} settings={settings} />
                 <Hero settings={settings} activeSeason={activeSeason} />
