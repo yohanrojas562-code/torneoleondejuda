@@ -4,7 +4,34 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title inertia>{{ config('app.name', 'Laravel') }}</title>
+        @php
+            $siteName        = \App\Models\SiteSetting::get('site_name', 'Torneo León de Judá');
+            $siteDescription = \App\Models\SiteSetting::get('site_description', 'Torneo de fútbol León de Judá — inscripciones, equipos, resultados y más.');
+            $logoPath        = \App\Models\SiteSetting::get('logo');
+            $ogImage         = $logoPath ? asset('storage/' . $logoPath) : null;
+        @endphp
+
+        <title inertia>{{ $siteName }}</title>
+        <meta name="description" content="{{ $siteDescription }}">
+
+        <!-- Open Graph / WhatsApp / Facebook -->
+        <meta property="og:type"        content="website">
+        <meta property="og:url"         content="{{ url('/') }}">
+        <meta property="og:title"       content="{{ $siteName }}">
+        <meta property="og:description" content="{{ $siteDescription }}">
+        @if($ogImage)
+        <meta property="og:image"       content="{{ $ogImage }}">
+        <meta property="og:image:width"  content="800">
+        <meta property="og:image:height" content="800">
+        @endif
+
+        <!-- Twitter Card -->
+        <meta name="twitter:card"        content="summary">
+        <meta name="twitter:title"       content="{{ $siteName }}">
+        <meta name="twitter:description" content="{{ $siteDescription }}">
+        @if($ogImage)
+        <meta name="twitter:image"       content="{{ $ogImage }}">
+        @endif
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
