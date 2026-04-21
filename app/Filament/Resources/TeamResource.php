@@ -119,10 +119,11 @@ class TeamResource extends Resource
                 ->schema([
                     Forms\Components\Select::make('leader_id')
                         ->label('Líder de equipo')
-                        ->relationship('leader', 'name')
+                        ->relationship('leader', 'name', fn ($query) => $query->whereHas('roles', fn ($q) => $q->where('name', 'lider_equipo')))
                         ->searchable()
                         ->preload()
                         ->nullable()
+                        ->helperText('Solo muestra usuarios con rol Líder de Equipo.')
                         ->visible($isAdmin),
                     Forms\Components\Select::make('captain_id')
                         ->label('Capitán')
