@@ -99,10 +99,12 @@ class MisPartidosResource extends Resource
                         }
                         return 'vs';
                     })
-                    ->color(fn (GameMatch $record): string => match ($record->status) {
-                        'finished' => 'success',
-                        'first_half', 'halftime', 'second_half', 'extra_time', 'penalties' => 'warning',
-                        default => 'gray',
+                    ->color(function ($state, $record): string {
+                        return match ($record->status) {
+                            'finished' => 'success',
+                            'first_half', 'halftime', 'second_half', 'extra_time', 'penalties' => 'warning',
+                            default => 'gray',
+                        };
                     }),
 
                 Tables\Columns\TextColumn::make('awayTeam.name')
@@ -114,15 +116,23 @@ class MisPartidosResource extends Resource
                             : $state;
                     }),
 
-                Tables\Columns\BadgeColumn::make('status')
+                Tables\Columns\TextColumn::make('status')
                     ->label('Estado')
-                    ->colors([
-                        'gray'    => 'scheduled',
-                        'warning' => fn ($state) => in_array($state, ['warmup', 'halftime', 'postponed']),
-                        'success' => fn ($state) => in_array($state, ['first_half', 'second_half', 'extra_time', 'penalties']),
-                        'primary' => 'finished',
-                        'danger'  => fn ($state) => in_array($state, ['suspended', 'cancelled']),
-                    ])
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'scheduled'   => 'gray',
+                        'warmup'      => 'warning',
+                        'first_half'  => 'success',
+                        'halftime'    => 'warning',
+                        'second_half' => 'success',
+                        'extra_time'  => 'success',
+                        'penalties'   => 'success',
+                        'finished'    => 'primary',
+                        'suspended'   => 'danger',
+                        'cancelled'   => 'danger',
+                        'postponed'   => 'warning',
+                        default       => 'gray',
+                    })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'scheduled'    => 'Programado',
                         'warmup'       => 'Calentamiento',
