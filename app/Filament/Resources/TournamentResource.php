@@ -46,11 +46,6 @@ class TournamentResource extends Resource
                     ->searchable()
                     ->preload()
                     ->placeholder('Selecciona una categoría'),
-                Forms\Components\TextInput::make('season_label')
-                    ->label('Temporada')
-                    ->maxLength(20)
-                    ->placeholder('Ej: 2026-1')
-                    ->helperText('Identificador de la temporada (año-número)'),
                 Forms\Components\Textarea::make('description')
                     ->label('Descripción')
                     ->rows(3)
@@ -122,10 +117,6 @@ class TournamentResource extends Resource
                     ->label('Categoría')
                     ->sortable()
                     ->placeholder('Sin categoría'),
-                Tables\Columns\TextColumn::make('season_label')
-                    ->label('Temporada')
-                    ->sortable()
-                    ->placeholder('-'),
                 Tables\Columns\TextColumn::make('venue')
                     ->label('Sede')
                     ->searchable(),
