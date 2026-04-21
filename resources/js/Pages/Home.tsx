@@ -553,7 +553,6 @@ export default function Home({ auth, activeSeason, teams, standings, upcomingMat
                 <Hero settings={settings} activeSeason={activeSeason} />
                 <TabbedSection upcomingMatches={upcomingMatches} recentMatches={recentMatches} standings={standings} />
                 <ValuesSection />
-                <TournamentWidget activeSeason={activeSeason} teams={teams} />
                 <TeamsCarousel teams={teams} />
                 <VenuesSection venues={venues} />
                 <Footer settings={settings} />
