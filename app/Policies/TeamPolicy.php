@@ -21,6 +21,7 @@ class TeamPolicy
 
     public function create(User $user): bool
     {
+        if ($user->hasRole('admin')) return true;
         if ($user->hasRole('lider_equipo')) {
             // Solo puede crear 1 equipo
             return !Team::where('leader_id', $user->id)->exists();
