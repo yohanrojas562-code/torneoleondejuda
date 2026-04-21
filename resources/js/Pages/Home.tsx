@@ -134,7 +134,7 @@ function Hero({ settings, activeSeason }: { settings: Record<string, string | nu
 
                 <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.6 }}
                     className="text-gray-400 text-sm sm:text-base max-w-2xl mx-auto mb-8 leading-relaxed">
-                    {settings.site_description || 'Un espacio donde la fe, la disciplina y el deporte se encuentran. Más que un torneo, es una familia unida en Cristo.'}
+                    {settings.site_description || '¿Buscas un torneo de fútbol de salón en Medellín? Participa en nuestra copa de microfútbol diseñada para unir a la comunidad a través del deporte y los valores cristianos. Disfruta de una competencia organizada con el mejor talento local, promoviendo el juego limpio y la integración.'}
                 </motion.p>
 
                 {activeSeason && (
@@ -458,7 +458,7 @@ function TabbedSection({ upcomingMatches, recentMatches, standings }: {
                                                             <td className="py-3 px-3">
                                                                 <div className="flex items-center gap-2">
                                                                     <TeamLogo team={s.team} size={22} />
-                                                                    <span className="text-white font-medium text-sm">{s.team.short_name || s.team.name}</span>
+                                                                    <span className="text-white font-medium text-sm">{s.team.name}</span>
                                                                 </div>
                                                             </td>
                                                             <td className="py-3 px-3 text-center text-gray-400">{s.played}</td>
