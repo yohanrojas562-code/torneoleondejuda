@@ -33,6 +33,14 @@
         <meta name="twitter:image"       content="{{ $ogImage }}">
         @endif
 
+        <!-- Favicon -->
+        @if($logoPath)
+        <link rel="icon" type="image/png" href="{{ asset('storage/' . $logoPath) }}">
+        <link rel="apple-touch-icon" href="{{ asset('storage/' . $logoPath) }}">
+        @else
+        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+        @endif
+
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
