@@ -10,7 +10,6 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Filters\SelectFilter;
-use Illuminate\Database\Eloquent\Builder;
 
 class MisPartidosResource extends Resource
 {
@@ -50,14 +49,6 @@ class MisPartidosResource extends Resource
         $teamIds = Team::where('leader_id', $user?->id)->pluck('id');
 
         return $table
-            ->modifyQueryUsing(fn (Builder $query) => $query
-                ->with(['homeTeam', 'awayTeam', 'venue', 'matchDay', 'season'])
-                ->where(function (Builder $q) use ($teamIds) {
-                    $q->whereIn('home_team_id', $teamIds)
-                      ->orWhereIn('away_team_id', $teamIds);
-                })
-                ->orderByDesc('scheduled_at')
-            )
             ->columns([
                 Tables\Columns\TextColumn::make('season.name')
                     ->label('Temporada')
