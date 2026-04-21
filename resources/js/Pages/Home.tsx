@@ -293,6 +293,7 @@ function TabbedSection({ upcomingMatches, recentMatches, standings }: {
     function MatchRow({ match }: { match: GameMatch }) {
         const isFinished = match.status === 'finished';
         const isLive = ['first_half', 'halftime', 'second_half', 'extra_time', 'penalties', 'warmup'].includes(match.status);
+        const isPostponed = ['suspended', 'cancelled', 'postponed'].includes(match.status);
         return (
             <div className={`flex items-center py-3.5 px-4 hover:bg-white/[0.04] transition-colors ${isLive ? 'bg-green-950/30' : ''}`}>
                 <div className="flex-1 flex items-center justify-end gap-2 min-w-0 pr-3">
@@ -313,14 +314,21 @@ function TabbedSection({ upcomingMatches, recentMatches, standings }: {
                                     <span className="text-green-400 text-[9px] font-bold uppercase">{statusLabel(match.status)}</span>
                                 </div>
                             ) : (
-                                <span className="text-gray-600 text-[9px] block">Final</span>
+                                <span className="text-gray-600 text-[9px] block">Finalizado</span>
                             )}
                         </div>
                     ) : (
                         <div>
-                            <span className="text-brand-gold font-bold text-sm">
-                                {new Date(match.scheduled_at).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })}
-                            </span>
+                            {isPostponed ? (
+                                <span className="text-red-400 font-bold text-[10px] uppercase">Pospuesto</span>
+                            ) : (
+                                <>
+                                    <span className="text-brand-gold font-bold text-sm">
+                                        {new Date(match.scheduled_at).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })}
+                                    </span>
+                                    <p className="text-gray-600 text-[9px] mt-0.5">Próximo</p>
+                                </>
+                            )}
                             {match.match_day && <p className="text-gray-600 text-[9px] mt-0.5 truncate">{match.match_day.name}</p>}
                         </div>
                     )}
