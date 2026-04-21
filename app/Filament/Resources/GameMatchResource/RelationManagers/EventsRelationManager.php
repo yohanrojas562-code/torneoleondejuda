@@ -21,17 +21,29 @@ class EventsRelationManager extends RelationManager
             Forms\Components\Select::make('type')
                 ->label('Tipo')
                 ->options([
-                    'goal' => 'Gol',
-                    'own_goal' => 'Autogol',
-                    'penalty_goal' => 'Gol de penal',
-                    'penalty_miss' => 'Penal fallado',
-                    'yellow_card' => 'Tarjeta amarilla',
-                    'red_card' => 'Tarjeta roja',
-                    'second_yellow' => 'Doble amarilla',
-                    'substitution' => 'Sustitución',
-                    'injury' => 'Lesión',
+                    'Goles' => [
+                        'goal'          => 'Gol',
+                        'own_goal'      => 'Autogol',
+                        'penalty_goal'  => 'Gol de penal',
+                        'penalty_miss'  => 'Penal fallado',
+                    ],
+                    'Tarjetas' => [
+                        'yellow_card'   => 'Tarjeta amarilla',
+                        'blue_card'     => 'Tarjeta azul',
+                        'red_card'      => 'Tarjeta roja',
+                        'second_yellow' => 'Doble amarilla',
+                    ],
+                    'Faltas' => [
+                        'foul'          => 'Falta individual',
+                        'team_foul'     => 'Falta de equipo (acumulativa)',
+                    ],
+                    'Otros' => [
+                        'substitution'  => 'Sustitución',
+                        'injury'        => 'Lesión',
+                    ],
                 ])
-                ->required(),
+                ->required()
+                ->reactive(),
             Forms\Components\Select::make('team_id')
                 ->label('Equipo')
                 ->options(function (RelationManager $livewire) {
@@ -100,21 +112,24 @@ class EventsRelationManager extends RelationManager
                     ->colors([
                         'success' => fn ($state) => in_array($state, ['goal', 'penalty_goal']),
                         'warning' => fn ($state) => in_array($state, ['yellow_card', 'second_yellow', 'own_goal']),
-                        'danger' => fn ($state) => in_array($state, ['red_card']),
-                        'info' => fn ($state) => in_array($state, ['substitution']),
-                        'gray' => fn ($state) => in_array($state, ['penalty_miss', 'injury']),
+                        'danger'  => fn ($state) => in_array($state, ['red_card']),
+                        'info'    => fn ($state) => in_array($state, ['substitution', 'blue_card']),
+                        'gray'    => fn ($state) => in_array($state, ['penalty_miss', 'injury', 'foul', 'team_foul']),
                     ])
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'goal' => 'Gol',
-                        'own_goal' => 'Autogol',
-                        'penalty_goal' => 'Penal',
-                        'penalty_miss' => 'Penal fallado',
-                        'yellow_card' => 'Amarilla',
-                        'red_card' => 'Roja',
+                        'goal'          => 'Gol',
+                        'own_goal'      => 'Autogol',
+                        'penalty_goal'  => 'Penal',
+                        'penalty_miss'  => 'Penal fallado',
+                        'yellow_card'   => 'Amarilla',
+                        'blue_card'     => 'Azul',
+                        'red_card'      => 'Roja',
                         'second_yellow' => 'Doble amarilla',
-                        'substitution' => 'Cambio',
-                        'injury' => 'Lesión',
-                        default => $state,
+                        'substitution'  => 'Cambio',
+                        'injury'        => 'Lesión',
+                        'foul'          => 'Falta individual',
+                        'team_foul'     => 'Falta equipo',
+                        default         => $state,
                     }),
                 Tables\Columns\TextColumn::make('team.name')
                     ->label('Equipo'),

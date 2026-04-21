@@ -59,7 +59,7 @@ class HomeController extends Controller
         $upcomingMatches = $seasonId
             ? GameMatch::with(['homeTeam:id,name,short_name,logo', 'awayTeam:id,name,short_name,logo', 'venue:id,name', 'matchDay:id,name'])
                 ->where('season_id', $seasonId)
-                ->whereIn('status', ['scheduled', 'in_progress'])
+                ->whereIn('status', ['scheduled', 'warmup', 'first_half', 'halftime', 'second_half', 'extra_time', 'penalties'])
                 ->orderBy('scheduled_at')
                 ->limit(6)
                 ->get()
@@ -68,7 +68,7 @@ class HomeController extends Controller
         $recentMatches = $seasonId
             ? GameMatch::with(['homeTeam:id,name,short_name,logo', 'awayTeam:id,name,short_name,logo', 'venue:id,name', 'matchDay:id,name'])
                 ->where('season_id', $seasonId)
-                ->where('status', 'completed')
+                ->where('status', 'finished')
                 ->orderByDesc('scheduled_at')
                 ->limit(6)
                 ->get()

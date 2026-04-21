@@ -10,7 +10,7 @@ import {
 interface Tournament { id: number; name: string; logo: string | null; banner: string | null; description: string | null; }
 interface Season { id: number; name: string; status: string; start_date: string; end_date: string; tournament: Tournament; }
 interface Team { id: number; name: string; short_name: string | null; logo: string | null; primary_color: string | null; secondary_color: string | null; players_count: number; }
-interface Standing { id: number; team: { id: number; name: string; short_name: string | null; logo: string | null }; group: { id: number; name: string } | null; played: number; won: number; drawn: number; lost: number; goals_for: number; goals_against: number; goal_difference: number; points: number; position: number; }
+interface Standing { id: number; team: { id: number; name: string; short_name: string | null; logo: string | null }; group: { id: number; name: string } | null; played: number; won: number; drawn: number; lost: number; goals_for: number; goals_against: number; goal_difference: number; points: number; position: number; yellow_cards: number; blue_cards: number; red_cards: number; }
 interface MatchTeam { id: number; name: string; short_name: string | null; logo: string | null; }
 interface GameMatch { id: number; home_team: MatchTeam; away_team: MatchTeam; home_score: number | null; away_score: number | null; scheduled_at: string; status: string; venue: { id: number; name: string } | null; match_day: { id: number; name: string } | null; }
 interface Venue { id: number; name: string; address: string | null; city: string | null; image: string | null; surface_type: string | null; capacity: number | null; }
@@ -373,6 +373,7 @@ function StandingsSection({ standings }: { standings: Standing[] }) {
                                             <th className="py-3 px-2 text-center hidden sm:table-cell">GF</th>
                                             <th className="py-3 px-2 text-center hidden sm:table-cell">GC</th>
                                             <th className="py-3 px-2 text-center hidden sm:table-cell">DG</th>
+                                            <th className="py-3 px-2 text-center hidden sm:table-cell" title="Total tarjetas (amarillas + azules + rojas)">TJ</th>
                                             <th className="py-3 px-2 text-center font-bold">PTS</th>
                                         </tr>
                                     </thead>
@@ -393,6 +394,7 @@ function StandingsSection({ standings }: { standings: Standing[] }) {
                                                 <td className="py-3 px-2 text-center text-gray-300 hidden sm:table-cell">{s.goals_for}</td>
                                                 <td className="py-3 px-2 text-center text-gray-300 hidden sm:table-cell">{s.goals_against}</td>
                                                 <td className="py-3 px-2 text-center text-gray-300 hidden sm:table-cell">{s.goal_difference}</td>
+                                                <td className="py-3 px-2 text-center text-gray-300 hidden sm:table-cell">{(s.yellow_cards ?? 0) + (s.blue_cards ?? 0) + (s.red_cards ?? 0)}</td>
                                                 <td className="py-3 px-2 text-center text-white font-extrabold text-base">{s.points}</td>
                                             </tr>
                                         ))}
