@@ -131,7 +131,7 @@ class StandingsService
 
         $matchIds = $matches->pluck('id')->toArray();
 
-        // Sort by: 1.Points 2.Goal diff 3.Goals for 4.Goals against 5.Total cards (fair play)
+        // Sort by: 1.Puntos 2.DG 3.Fair Play 4.GF 5.GC 6.Partidos perdidos
         uasort($stats, static function (array $a, array $b): int {
             if ($b['points'] !== $a['points']) {
                 return $b['points'] - $a['points'];
@@ -139,14 +139,18 @@ class StandingsService
             if ($b['goal_difference'] !== $a['goal_difference']) {
                 return $b['goal_difference'] - $a['goal_difference'];
             }
+            // Fair play: más alto (más cercano a 0) = mejor posición
+            if ($b['fair_play_points'] !== $a['fair_play_points']) {
+                return $b['fair_play_points'] - $a['fair_play_points'];
+            }
             if ($b['goals_for'] !== $a['goals_for']) {
                 return $b['goals_for'] - $a['goals_for'];
             }
             if ($a['goals_against'] !== $b['goals_against']) {
                 return $a['goals_against'] - $b['goals_against'];
             }
-            // Higher fair_play_points (closer to 0) = better position
-            return $b['fair_play_points'] - $a['fair_play_points'];
+            // Menos partidos perdidos = mejor posición
+            return $a['lost'] - $b['lost'];
         });
 
         // Assign positions and persist
