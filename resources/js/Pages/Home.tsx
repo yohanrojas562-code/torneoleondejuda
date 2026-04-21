@@ -114,7 +114,7 @@ function Hero({ settings, activeSeason }: { settings: Record<string, string | nu
             </div>
             <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-brand-black via-brand-black/90 to-brand-black" />
 
-            <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
+            <div className="relative z-10 text-center px-4 max-w-4xl mx-auto pt-24">
                 <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6 }}>
                     {settings.logo
                         ? <img src={`/storage/${settings.logo}`} alt="León de Judá" className="w-32 h-32 sm:w-40 sm:h-40 mx-auto mb-6 object-contain drop-shadow-[0_0_30px_rgba(214,143,3,0.3)]" />
