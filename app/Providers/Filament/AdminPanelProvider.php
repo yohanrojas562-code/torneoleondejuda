@@ -36,7 +36,7 @@ class AdminPanelProvider extends PanelProvider
             ->brandLogo(fn () => view('filament.components.brand-logo'))
             ->darkModeBrandLogo(fn () => view('filament.components.brand-logo'))
             ->brandLogoHeight('5rem')
-            ->favicon(asset('storage/site/01KPGXECZX5VF8YQAA8AD210WM.png'))
+            ->favicon(fn () => ($logo = \App\Models\SiteSetting::get('logo')) ? asset('storage/' . $logo) : null)
             ->colors([
                 'primary' => [
                     50 => '#FFF9E6',

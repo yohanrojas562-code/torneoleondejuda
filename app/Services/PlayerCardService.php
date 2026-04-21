@@ -49,11 +49,15 @@ class PlayerCardService
             }
         }
 
-        // Logo
+        // Logo dinámico desde Configuración del sitio
         $logoBase64 = null;
-        $logoPath = storage_path('app/public/site/01KPGXECZX5VF8YQAA8AD210WM.png');
-        if (file_exists($logoPath)) {
-            $logoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
+        $logoValue = \App\Models\SiteSetting::get('logo');
+        if ($logoValue) {
+            $logoPath = storage_path('app/public/' . $logoValue);
+            if (file_exists($logoPath)) {
+                $ext = strtolower(pathinfo($logoPath, PATHINFO_EXTENSION)) ?: 'png';
+                $logoBase64 = 'data:image/' . $ext . ';base64,' . base64_encode(file_get_contents($logoPath));
+            }
         }
 
         // Tournament & category info

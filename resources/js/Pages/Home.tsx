@@ -58,12 +58,16 @@ function TeamLogo({ team, size = 40 }: { team: { logo: string | null; name: stri
 
 /* ───── sections ───── */
 
-function Navbar({ canLogin, canRegister, auth }: { canLogin: boolean; canRegister: boolean; auth: { user: any } }) {
+function Navbar({ canLogin, canRegister, auth, settings }: { canLogin: boolean; canRegister: boolean; auth: { user: any }; settings: Record<string, string | null> }) {
+    const logoUrl = settings.logo ? `/storage/${settings.logo}` : null;
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 bg-brand-black/95 backdrop-blur-sm border-b border-brand-gold/20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
                 <Link href="/" className="flex items-center gap-3">
-                    <img src="/storage/site/01KPGXECZX5VF8YQAA8AD210WM.png" alt="León de Judá" className="h-10 w-10 object-contain" />
+                    {logoUrl
+                        ? <img src={logoUrl} alt="León de Judá" className="h-10 w-10 object-contain" />
+                        : <span className="text-brand-gold font-bold text-xl">LJ</span>
+                    }
                     <span className="text-white font-bold text-lg hidden sm:block">León de Judá</span>
                 </Link>
                 <div className="hidden md:flex items-center gap-6 text-sm">
@@ -104,7 +108,10 @@ function Hero({ settings, activeSeason }: { settings: Record<string, string | nu
 
             <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
                 <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6 }}>
-                    <img src="/storage/site/01KPGXECZX5VF8YQAA8AD210WM.png" alt="León de Judá" className="w-32 h-32 sm:w-40 sm:h-40 mx-auto mb-6 object-contain drop-shadow-[0_0_30px_rgba(214,143,3,0.3)]" />
+                    {settings.logo
+                        ? <img src={`/storage/${settings.logo}`} alt="León de Judá" className="w-32 h-32 sm:w-40 sm:h-40 mx-auto mb-6 object-contain drop-shadow-[0_0_30px_rgba(214,143,3,0.3)]" />
+                        : <div className="w-32 h-32 sm:w-40 sm:h-40 mx-auto mb-6 flex items-center justify-center"><span className="text-brand-gold font-extrabold text-6xl">LJ</span></div>
+                    }
                 </motion.div>
 
                 <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.6 }}
@@ -445,7 +452,10 @@ function Footer({ settings }: { settings: Record<string, string | null> }) {
         <footer className="bg-brand-black border-t border-white/10 py-10 px-4">
             <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                    <img src="/storage/site/01KPGXECZX5VF8YQAA8AD210WM.png" alt="León de Judá" className="w-8 h-8 object-contain" />
+                    {settings.logo
+                        ? <img src={`/storage/${settings.logo}`} alt="León de Judá" className="w-8 h-8 object-contain" />
+                        : <span className="text-brand-gold font-bold text-sm">LJ</span>
+                    }
                     <div>
                         <p className="text-white font-semibold text-sm">{settings.site_name || 'Torneo León de Judá'}</p>
                         <p className="text-gray-600 text-xs">{settings.church_name || 'Centro de Fe y Esperanza'}</p>
@@ -464,7 +474,7 @@ export default function Home({ auth, activeSeason, teams, standings, upcomingMat
         <>
             <Head title={settings.site_name || 'Torneo León de Judá'} />
             <div className="bg-brand-black min-h-screen">
-                <Navbar canLogin={canLogin} canRegister={canRegister} auth={auth} />
+                <Navbar canLogin={canLogin} canRegister={canRegister} auth={auth} settings={settings} />
                 <Hero settings={settings} activeSeason={activeSeason} />
                 <ValuesSection />
                 <TournamentWidget activeSeason={activeSeason} teams={teams} />
