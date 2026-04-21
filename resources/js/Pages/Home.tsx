@@ -148,11 +148,7 @@ function Hero({ settings, activeSeason }: { settings: Record<string, string | nu
                     </motion.div>
                 )}
 
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8, duration: 0.6 }} className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                    <a href="#torneo" className="bg-brand-gold hover:bg-brand-gold-light text-black font-bold px-8 py-3 rounded-xl text-sm transition transform hover:scale-105 flex items-center gap-2">
-                        <Swords className="w-5 h-5" /> Ver Torneo
-                    </a>
-                </motion.div>
+
             </div>
 
             {/* Decorative bottom gradient */}
@@ -540,7 +536,7 @@ function Footer({ settings }: { settings: Record<string, string | null> }) {
                         <p className="text-gray-600 text-xs">{settings.church_name || 'Centro de Fe y Esperanza'}</p>
                     </div>
                 </div>
-                <p className="text-gray-600 text-xs">© {new Date().getFullYear()} Torneo León de Judá. Todos los derechos reservados.</p>
+                <p className="text-gray-600 text-xs">© {new Date().getFullYear()} Torneo León de Judá. Todos los derechos reservados. Impulsado por <a href="https://agenciamundiweb.com/" target="_blank" rel="noopener noreferrer" className="text-brand-gold hover:underline">MundiWeb – Agencia Digital</a>.</p>
             </div>
         </footer>
     );
