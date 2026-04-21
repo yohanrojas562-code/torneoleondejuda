@@ -45,7 +45,7 @@ class TeamResource extends Resource
                     ->visible($isAdmin),
                 Forms\Components\TextInput::make('short_name')
                     ->label('Nombre corto')
-                    ->maxLength(5)
+                    ->maxLength(8)
                     ->placeholder('EJ: LEO'),
                 Forms\Components\FileUpload::make('logo')
                     ->label('Escudo')
