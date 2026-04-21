@@ -125,6 +125,39 @@ class GameMatchResource extends Resource
                     ->nullable(),
             ])->columns(4),
 
+            Forms\Components\Section::make('Tarjetas por Equipo')->schema([
+                Forms\Components\TextInput::make('home_yellow_cards')
+                    ->label('Amarillas local')
+                    ->numeric()
+                    ->minValue(0)
+                    ->default(0),
+                Forms\Components\TextInput::make('home_blue_cards')
+                    ->label('Azules local')
+                    ->numeric()
+                    ->minValue(0)
+                    ->default(0),
+                Forms\Components\TextInput::make('home_red_cards')
+                    ->label('Rojas local')
+                    ->numeric()
+                    ->minValue(0)
+                    ->default(0),
+                Forms\Components\TextInput::make('away_yellow_cards')
+                    ->label('Amarillas visitante')
+                    ->numeric()
+                    ->minValue(0)
+                    ->default(0),
+                Forms\Components\TextInput::make('away_blue_cards')
+                    ->label('Azules visitante')
+                    ->numeric()
+                    ->minValue(0)
+                    ->default(0),
+                Forms\Components\TextInput::make('away_red_cards')
+                    ->label('Rojas visitante')
+                    ->numeric()
+                    ->minValue(0)
+                    ->default(0),
+            ])->columns(6),
+
             Forms\Components\Section::make('Observaciones')->schema([
                 Forms\Components\Textarea::make('observations')
                     ->label('Notas')

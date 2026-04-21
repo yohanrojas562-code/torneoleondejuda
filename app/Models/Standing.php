@@ -12,7 +12,7 @@ class Standing extends Model
         'played', 'won', 'drawn', 'lost',
         'goals_for', 'goals_against', 'goal_difference',
         'points', 'position', 'form',
-        'yellow_cards', 'blue_cards', 'red_cards',
+        'yellow_cards', 'blue_cards', 'red_cards', 'fair_play_points',
     ];
 
     protected function casts(): array

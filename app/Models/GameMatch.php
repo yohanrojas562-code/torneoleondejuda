@@ -14,6 +14,8 @@ class GameMatch extends Model
         'season_id', 'match_day_id', 'home_team_id', 'away_team_id',
         'referee_id', 'scheduled_at', 'venue', 'venue_id',
         'home_score', 'away_score', 'home_penalty_score', 'away_penalty_score',
+        'home_yellow_cards', 'home_blue_cards', 'home_red_cards',
+        'away_yellow_cards', 'away_blue_cards', 'away_red_cards',
         'status', 'observations',
     ];
 

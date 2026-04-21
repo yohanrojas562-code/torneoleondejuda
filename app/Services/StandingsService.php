@@ -51,6 +51,7 @@ class StandingsService
                 'yellow_cards'     => 0,
                 'blue_cards'       => 0,
                 'red_cards'        => 0,
+                'fair_play_points' => 0,
                 'form'             => [],
             ];
         }
@@ -103,28 +104,32 @@ class StandingsService
         }
         unset($teamStats);
 
-        // Aggregate card totals from match events
-        $matchIds = $matches->pluck('id')->toArray();
-        if (!empty($matchIds)) {
-            $cardRows = MatchEvent::whereIn('match_id', $matchIds)
-                ->whereIn('type', ['yellow_card', 'second_yellow', 'blue_card', 'red_card'])
-                ->select('team_id', 'type', DB::raw('COUNT(*) as total'))
-                ->groupBy('team_id', 'type')
-                ->get();
-
-            foreach ($cardRows as $row) {
-                if (!isset($stats[$row->team_id])) {
-                    continue;
-                }
-                if (in_array($row->type, ['yellow_card', 'second_yellow'])) {
-                    $stats[$row->team_id]['yellow_cards'] += $row->total;
-                } elseif ($row->type === 'blue_card') {
-                    $stats[$row->team_id]['blue_cards'] += $row->total;
-                } elseif ($row->type === 'red_card') {
-                    $stats[$row->team_id]['red_cards'] += $row->total;
-                }
+        // Aggregate card totals from match direct fields
+        foreach ($matches as $match) {
+            $homeId = $match->home_team_id;
+            $awayId = $match->away_team_id;
+            if (isset($stats[$homeId])) {
+                $stats[$homeId]['yellow_cards'] += $match->home_yellow_cards ?? 0;
+                $stats[$homeId]['blue_cards']   += $match->home_blue_cards   ?? 0;
+                $stats[$homeId]['red_cards']    += $match->home_red_cards    ?? 0;
+            }
+            if (isset($stats[$awayId])) {
+                $stats[$awayId]['yellow_cards'] += $match->away_yellow_cards ?? 0;
+                $stats[$awayId]['blue_cards']   += $match->away_blue_cards   ?? 0;
+                $stats[$awayId]['red_cards']    += $match->away_red_cards    ?? 0;
             }
         }
+
+        // Calculate fair play points: yellow=-1, blue=-3, red=-5
+        foreach ($stats as &$teamStats) {
+            $teamStats['fair_play_points'] =
+                ($teamStats['yellow_cards'] * -1) +
+                ($teamStats['blue_cards']   * -3) +
+                ($teamStats['red_cards']    * -5);
+        }
+        unset($teamStats);
+
+        $matchIds = $matches->pluck('id')->toArray();
 
         // Sort by: 1.Points 2.Goal diff 3.Goals for 4.Goals against 5.Total cards (fair play)
         uasort($stats, static function (array $a, array $b): int {
@@ -140,9 +145,8 @@ class StandingsService
             if ($a['goals_against'] !== $b['goals_against']) {
                 return $a['goals_against'] - $b['goals_against'];
             }
-            $aCards = $a['yellow_cards'] + $a['blue_cards'] + $a['red_cards'];
-            $bCards = $b['yellow_cards'] + $b['blue_cards'] + $b['red_cards'];
-            return $aCards - $bCards; // fewer cards = better fair-play position
+            // Higher fair_play_points (closer to 0) = better position
+            return $b['fair_play_points'] - $a['fair_play_points'];
         });
 
         // Assign positions and persist
