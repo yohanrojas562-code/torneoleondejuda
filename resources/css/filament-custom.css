@@ -93,13 +93,26 @@ html.light .fi-sidebar-nav-collapse-btn:hover svg,
 }
 
 /* Botón collapse en topbar en modo claro */
-:root:not(.dark) .fi-icon-btn.text-gray-400 {
+:root:not(.dark) button[x-on\:click*="sidebar"] svg,
+html:not(.dark) button[x-on\:click*="sidebar"] svg,
+html.light button[x-on\:click*="sidebar"] svg {
+    stroke: #000000 !important;
     color: #000000 !important;
 }
-:root:not(.dark) .fi-icon-btn.text-gray-400:hover {
+:root:not(.dark) button[x-on\:click*="sidebar"],
+html:not(.dark) button[x-on\:click*="sidebar"],
+html.light button[x-on\:click*="sidebar"] {
+    color: #000000 !important;
+}
+:root:not(.dark) button[x-on\:click*="sidebar"]:hover,
+html:not(.dark) button[x-on\:click*="sidebar"]:hover,
+html.light button[x-on\:click*="sidebar"]:hover {
     color: #1a1a1a !important;
 }
-:root:not(.dark) .hover\:text-gray-500:hover {
+:root:not(.dark) button[x-on\:click*="sidebar"]:hover svg,
+html:not(.dark) button[x-on\:click*="sidebar"]:hover svg,
+html.light button[x-on\:click*="sidebar"]:hover svg {
+    stroke: #1a1a1a !important;
     color: #1a1a1a !important;
 }
 
