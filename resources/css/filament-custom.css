@@ -68,14 +68,28 @@
     color: #D68F03 !important;
 }
 
-/* Botón de colapsar sidebar en modo claro: icono negro */
-html:not(.dark) .fi-sidebar-nav-collapse-btn,
-html:not(.dark) .fi-sidebar-nav-collapse-btn svg {
-    color: #111827 !important;
+/* Botón de colapsar sidebar en modo claro */
+html.light .fi-sidebar-nav-collapse-btn,
+:root:not(.dark) .fi-sidebar-nav-collapse-btn {
+    color: #1a1a1a !important;
 }
-html:not(.dark) .fi-sidebar-nav-collapse-btn:hover,
-html:not(.dark) .fi-sidebar-nav-collapse-btn:hover svg {
+html.light .fi-sidebar-nav-collapse-btn svg,
+:root:not(.dark) .fi-sidebar-nav-collapse-btn svg,
+html.light .fi-sidebar-nav-collapse-btn svg path,
+:root:not(.dark) .fi-sidebar-nav-collapse-btn svg path {
+    color: #1a1a1a !important;
+    stroke: #1a1a1a !important;
+}
+html.light .fi-sidebar-nav-collapse-btn:hover,
+:root:not(.dark) .fi-sidebar-nav-collapse-btn:hover {
     color: #D68F03 !important;
+}
+html.light .fi-sidebar-nav-collapse-btn:hover svg,
+:root:not(.dark) .fi-sidebar-nav-collapse-btn:hover svg,
+html.light .fi-sidebar-nav-collapse-btn:hover svg path,
+:root:not(.dark) .fi-sidebar-nav-collapse-btn:hover svg path {
+    color: #D68F03 !important;
+    stroke: #D68F03 !important;
 }
 
 /* Top bar oscura */
