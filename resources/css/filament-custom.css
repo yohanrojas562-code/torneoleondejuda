@@ -92,6 +92,14 @@ html.light .fi-sidebar-nav-collapse-btn:hover svg,
     stroke: #D68F03 !important;
 }
 
+/* Botón collapse en topbar en modo claro */
+:root:not(.dark) .fi-icon-btn.fi-color-gray {
+    color: #000000 !important;
+}
+:root:not(.dark) .fi-icon-btn.fi-color-gray:hover {
+    color: #1a1a1a !important;
+}
+
 /* Top bar oscura */
 .fi-topbar {
     background-color: #0f0f0f !important;
