@@ -93,10 +93,13 @@ html.light .fi-sidebar-nav-collapse-btn:hover svg,
 }
 
 /* Botón collapse en topbar en modo claro */
-:root:not(.dark) .fi-icon-btn.fi-color-gray {
+:root:not(.dark) .fi-icon-btn.text-gray-400 {
     color: #000000 !important;
 }
-:root:not(.dark) .fi-icon-btn.fi-color-gray:hover {
+:root:not(.dark) .fi-icon-btn.text-gray-400:hover {
+    color: #1a1a1a !important;
+}
+:root:not(.dark) .hover\:text-gray-500:hover {
     color: #1a1a1a !important;
 }
 
