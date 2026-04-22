@@ -68,6 +68,16 @@
     color: #D68F03 !important;
 }
 
+/* Botón de colapsar sidebar en modo claro: icono negro */
+html:not(.dark) .fi-sidebar-nav-collapse-btn,
+html:not(.dark) .fi-sidebar-nav-collapse-btn svg {
+    color: #111827 !important;
+}
+html:not(.dark) .fi-sidebar-nav-collapse-btn:hover,
+html:not(.dark) .fi-sidebar-nav-collapse-btn:hover svg {
+    color: #D68F03 !important;
+}
+
 /* Top bar oscura */
 .fi-topbar {
     background-color: #0f0f0f !important;

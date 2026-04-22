@@ -68,18 +68,14 @@
     color: #D68F03 !important;
 }
 
-/* Botón de colapsar sidebar en modo claro: forzar icono negro */
+/* Botón de colapsar sidebar en modo claro: icono negro */
 html:not(.dark) .fi-sidebar-nav-collapse-btn,
-html:not(.dark) .fi-sidebar-nav-collapse-btn svg,
-html:not(.dark) .fi-sidebar-nav-collapse-btn svg path {
+html:not(.dark) .fi-sidebar-nav-collapse-btn svg {
     color: #111827 !important;
-    stroke: #111827 !important;
 }
 html:not(.dark) .fi-sidebar-nav-collapse-btn:hover,
-html:not(.dark) .fi-sidebar-nav-collapse-btn:hover svg,
-html:not(.dark) .fi-sidebar-nav-collapse-btn:hover svg path {
+html:not(.dark) .fi-sidebar-nav-collapse-btn:hover svg {
     color: #D68F03 !important;
-    stroke: #D68F03 !important;
 }
 
 /* Top bar oscura */
