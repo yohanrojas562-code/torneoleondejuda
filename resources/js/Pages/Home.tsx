@@ -182,6 +182,66 @@ function ValuesSection() {
     );
 }
 
+function AboutTournamentSection({ settings, activeSeason }: { settings: Record<string, string | null>; activeSeason: Season | null }) {
+    if (!activeSeason) return null;
+    
+    const highlights = [
+        { icon: <Trophy className="w-6 h-6" />, label: 'Torneo', value: activeSeason.tournament.name },
+        { icon: <Users className="w-6 h-6" />, label: 'Iglesia', value: settings.church_name || 'Centro de Fe y Esperanza' },
+        { icon: <Calendar className="w-6 h-6" />, label: 'Temporada', value: activeSeason.name },
+        { icon: <Swords className="w-6 h-6" />, label: 'Disciplina', value: 'Fútbol de Salón' },
+    ];
+    
+    return (
+        <section id="torneo" className="bg-white/[0.02] py-20 px-4 border-y border-white/10">
+            <div className="max-w-6xl mx-auto">
+                <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-12">
+                    <span className="text-brand-gold text-sm font-semibold uppercase tracking-wider">Conoce</span>
+                    <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-2">Sobre el Torneo</h2>
+                </motion.div>
+                
+                <div className="grid md:grid-cols-2 gap-12 items-center">
+                    <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+                        <p className="text-gray-300 text-lg leading-relaxed mb-6">
+                            {settings.site_description || 'Un torneo diseñado para unir la comunidad a través del deporte y los valores cristianos.'}
+                        </p>
+                        <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }} className="space-y-4">
+                            {highlights.map((h, i) => (
+                                <motion.div key={i} variants={fadeUp} className="flex items-center gap-4 bg-white/5 border border-white/10 rounded-lg p-4 hover:border-brand-gold/40 transition">
+                                    <div className="text-brand-gold flex-shrink-0">{h.icon}</div>
+                                    <div>
+                                        <p className="text-gray-500 text-xs uppercase tracking-wider">{h.label}</p>
+                                        <p className="text-white font-semibold">{h.value}</p>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </motion.div>
+                    </motion.div>
+                    
+                    <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="grid grid-cols-2 gap-4">
+                        <div className="bg-gradient-to-br from-brand-gold/10 to-brand-gold/5 border border-brand-gold/30 rounded-2xl p-6 text-center hover:border-brand-gold/60 transition">
+                            <p className="text-brand-gold text-2xl font-bold">∞</p>
+                            <p className="text-white font-semibold text-sm mt-2">Fe Inquebrantable</p>
+                        </div>
+                        <div className="bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10 rounded-2xl p-6 text-center hover:border-brand-gold/40 transition">
+                            <p className="text-white text-2xl font-bold">+</p>
+                            <p className="text-gray-400 font-semibold text-sm mt-2">Comunidad Unida</p>
+                        </div>
+                        <div className="bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10 rounded-2xl p-6 text-center hover:border-brand-gold/40 transition">
+                            <p className="text-white text-2xl font-bold">=</p>
+                            <p className="text-gray-400 font-semibold text-sm mt-2">Valores en Acción</p>
+                        </div>
+                        <div className="bg-gradient-to-br from-brand-gold/10 to-brand-gold/5 border border-brand-gold/30 rounded-2xl p-6 text-center hover:border-brand-gold/60 transition">
+                            <p className="text-brand-gold text-2xl font-bold">✓</p>
+                            <p className="text-white font-semibold text-sm mt-2">Excelencia Total</p>
+                        </div>
+                    </motion.div>
+                </div>
+            </div>
+        </section>
+    );
+}
+
 function TournamentWidget({ activeSeason, teams }: { activeSeason: Season | null; teams: Team[] }) {
     if (!activeSeason) return (
         <section id="torneo" className="bg-brand-black py-20 px-4">
@@ -567,6 +627,7 @@ export default function Home({ auth, activeSeason, teams, standings, upcomingMat
             <div className="bg-brand-black min-h-screen">
                 <Navbar canLogin={canLogin} canRegister={canRegister} auth={auth} settings={settings} />
                 <Hero settings={settings} activeSeason={activeSeason} />
+                <AboutTournamentSection settings={settings} activeSeason={activeSeason} />
                 <TabbedSection upcomingMatches={upcomingMatches} recentMatches={recentMatches} standings={standings} />
                 <ValuesSection />
                 <TeamsCarousel teams={teams} />
