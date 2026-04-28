@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\StandingsController;
 use App\Http\Controllers\PlayerCardController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
@@ -8,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', HomeController::class);
+Route::get('/standings', StandingsController::class);
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
