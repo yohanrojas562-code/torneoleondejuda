@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Season;
 use App\Models\SiteSetting;
 use App\Models\Standing;
+use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 class StandingsController extends Controller
@@ -37,14 +38,14 @@ class StandingsController extends Controller
             : collect();
 
         // Site settings
-        $settings = SiteSetting::pluck('value', 'key')->toArray();
+        $settings = SiteSetting::pluck('value', 'key');
 
         return Inertia::render('Standings', [
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
             'activeSeason' => $activeSeason,
             'standings' => $standings,
-            'settings' => $settings ?: [],
-            'canLogin' => false,
-            'canRegister' => false,
+            'settings' => $settings,
         ]);
     }
 }
