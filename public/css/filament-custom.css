@@ -68,27 +68,6 @@
     color: #D68F03 !important;
 }
 
-/* Botón de colapsar sidebar en modo claro */
-html.light .fi-sidebar-nav-collapse-btn,
-:root:not(.dark) .fi-sidebar-nav-collapse-btn {
-    color: #1a1a1a !important;
-}
-html.light .fi-sidebar-nav-collapse-btn svg,
-:root:not(.dark) .fi-sidebar-nav-collapse-btn svg,
-html.light .fi-sidebar-nav-collapse-btn svg path,
-:root:not(.dark) .fi-sidebar-nav-collapse-btn svg path {
-    color: #1a1a1a !important;
-    stroke: #1a1a1a !important;
-}
-html.light .fi-sidebar-nav-collapse-btn:hover,
-:root:not(.dark) .fi-sidebar-nav-collapse-btn:hover {
-    color: #D68F03 !important;
-}
-html.light .fi-sidebar-nav-collapse-btn:hover svg path,
-:root:not(.dark) .fi-sidebar-nav-collapse-btn:hover svg path {
-    stroke: #D68F03 !important;
-}
-
 /* Top bar oscura */
 .fi-topbar {
     background-color: #0f0f0f !important;

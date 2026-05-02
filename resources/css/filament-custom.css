@@ -93,35 +93,22 @@ html.light .fi-sidebar-nav-collapse-btn:hover svg,
 }
 
 /* Botón collapse en topbar en modo claro */
-html:not(.dark) button[x-on\:click*="sidebar"],
-:root:not(.dark) button[x-on\:click*="sidebar"] {
+button.fi-color-gray.text-gray-400[x-on\:click*="sidebar"] {
     color: #000000 !important;
 }
-html:not(.dark) button[x-on\:click*="sidebar"] svg,
-:root:not(.dark) button[x-on\:click*="sidebar"] svg {
+button.fi-color-gray.text-gray-400[x-on\:click*="sidebar"] svg {
     stroke: #000000 !important;
     color: #000000 !important;
 }
-html:not(.dark) button[x-on\:click*="sidebar"]:hover,
-:root:not(.dark) button[x-on\:click*="sidebar"]:hover {
+button.fi-color-gray.text-gray-400[x-on\:click*="sidebar"]:hover {
     color: #1a1a1a !important;
 }
-html:not(.dark) button[x-on\:click*="sidebar"]:hover svg,
-:root:not(.dark) button[x-on\:click*="sidebar"]:hover svg {
+button.fi-color-gray.text-gray-400[x-on\:click*="sidebar"]:hover svg {
     stroke: #1a1a1a !important;
     color: #1a1a1a !important;
 }
-
-/* Forzar override de Tailwind text-gray */
-html:not(.dark) .text-gray-400,
-:root:not(.dark) .text-gray-400,
-html:not(.dark) button.text-gray-400,
-:root:not(.dark) button.text-gray-400 {
-    color: #000000 !important;
-}
-html:not(.dark) button.hover\:text-gray-500:hover,
-:root:not(.dark) button.hover\:text-gray-500:hover {
-    color: #1a1a1a !important;
+button.fi-icon-btn.text-gray-400 svg path {
+    stroke: #000000 !important;
 }
 
 /* Top bar oscura */

@@ -29,9 +29,9 @@ function TeamLogo({ team, size = 40 }: { team: { logo: string | null; name: stri
     );
 }
 
-export default function Standings({ activeSeason, standings, settings }: Props) {
+export default function Standings({ activeSeason, standings = [], settings = {} }: Props) {
     const standingsGrouped: Record<string, Standing[]> = {};
-    standings.forEach(s => {
+    (standings || []).forEach((s: Standing) => {
         const g = s.group?.name || 'General';
         if (!standingsGrouped[g]) standingsGrouped[g] = [];
         standingsGrouped[g].push(s);
