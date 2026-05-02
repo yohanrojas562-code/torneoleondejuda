@@ -37,12 +37,12 @@ class StandingsController extends Controller
             : collect();
 
         // Site settings
-        $settings = SiteSetting::pluck('value', 'key');
+        $settings = SiteSetting::pluck('value', 'key')->toArray();
 
         return Inertia::render('Standings', [
             'activeSeason' => $activeSeason,
             'standings' => $standings,
-            'settings' => $settings,
+            'settings' => $settings ?: [],
             'canLogin' => false,
             'canRegister' => false,
         ]);
