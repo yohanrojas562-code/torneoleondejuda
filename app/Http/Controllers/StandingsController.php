@@ -35,15 +35,16 @@ class StandingsController extends Controller
                 ->orderBy('group_id')
                 ->orderBy('position')
                 ->get()
-            : collect();
+                ->toArray()
+            : [];
 
-        // Site settings - convert to array to prevent Inertia serialization issues
-        $settings = SiteSetting::pluck('value', 'key')->toArray();
+        // Site settings
+        $settings = SiteSetting::pluck('value', 'key')->toArray() ?? [];
 
         return Inertia::render('Standings', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
-            'activeSeason' => $activeSeason,
+            'activeSeason' => $activeSeason ? $activeSeason->toArray() : null,
             'standings' => $standings,
             'settings' => $settings,
         ]);
