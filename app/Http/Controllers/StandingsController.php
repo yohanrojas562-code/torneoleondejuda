@@ -37,8 +37,8 @@ class StandingsController extends Controller
                 ->get()
             : collect();
 
-        // Site settings
-        $settings = SiteSetting::pluck('value', 'key');
+        // Site settings - convert to array to prevent Inertia serialization issues
+        $settings = SiteSetting::pluck('value', 'key')->toArray();
 
         return Inertia::render('Standings', [
             'canLogin' => Route::has('login'),
