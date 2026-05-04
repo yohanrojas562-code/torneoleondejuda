@@ -83,9 +83,9 @@ export default function Standings({ activeSeason, standings = [], settings = {} 
                                 <p className="text-gray-600">La tabla se actualizará cuando haya partidos finalizados.</p>
                             </motion.div>
                         ) : (
-                            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-50px' }} className="space-y-8">
+                            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }} className="space-y-8">
                                 {Object.entries(standingsGrouped).map(([groupName, rows]) => (
-                                    <motion.div key={groupName} variants={fadeUp}>
+                                    <div key={groupName}>
                                         {Object.keys(standingsGrouped).length > 1 && (
                                             <h3 className="text-brand-gold font-semibold text-xs uppercase tracking-wider mb-3">{groupName}</h3>
                                         )}
@@ -136,7 +136,7 @@ export default function Standings({ activeSeason, standings = [], settings = {} 
                                                 </tbody>
                                             </table>
                                         </div>
-                                    </motion.div>
+                                    </div>
                                 ))}
                             </motion.div>
                         )}
