@@ -30,11 +30,17 @@ function TeamLogo({ team, size = 40 }: { team: { logo: string | null; name: stri
 }
 
 export default function Standings({ activeSeason, standings = [], settings = {} }: Props) {
+    const standingsData = Array.isArray(standings) ? standings : [];
     const standingsGrouped: Record<string, Standing[]> = {};
-    (standings || []).forEach((s: Standing) => {
-        const g = s.group?.name || 'General';
-        if (!standingsGrouped[g]) standingsGrouped[g] = [];
-        standingsGrouped[g].push(s);
+    
+    standingsData.forEach((s: Standing) => {
+        try {
+            const g = s?.group?.name || 'General';
+            if (!standingsGrouped[g]) standingsGrouped[g] = [];
+            standingsGrouped[g].push(s);
+        } catch (e) {
+            console.error('Error processing standing:', s, e);
+        }
     });
 
     return (
