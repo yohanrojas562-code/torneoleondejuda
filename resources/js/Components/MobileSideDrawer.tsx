@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, usePage } from '@inertiajs/react';
 import {
     Menu, X, Home, Calendar, Trophy, Target, MessageSquare, ArrowRight, LogIn,
@@ -14,6 +15,7 @@ const items = [
 
 export default function MobileSideDrawer({ className = '' }: { className?: string }) {
     const [open, setOpen] = useState(false);
+    const [mounted, setMounted] = useState(false);
     const { url, props } = usePage();
     const auth = (props as { auth?: { user?: { id: number; name: string } | null } })?.auth;
 
@@ -23,6 +25,10 @@ export default function MobileSideDrawer({ className = '' }: { className?: strin
         if (href === '/') return currentPath === '/';
         return currentPath === href || currentPath.startsWith(href + '/');
     };
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     useEffect(() => {
         const handler = (e: KeyboardEvent) => {
@@ -40,18 +46,8 @@ export default function MobileSideDrawer({ className = '' }: { className?: strin
         }
     }, [open]);
 
-    return (
+    const drawer = (
         <>
-            <button
-                type="button"
-                onClick={() => setOpen(true)}
-                className={`md:hidden inline-flex items-center justify-center w-10 h-10 rounded-lg text-gray-200 hover:bg-white/10 hover:text-brand-gold transition ${className}`}
-                aria-label="Abrir menú"
-                aria-expanded={open}
-            >
-                <Menu className="w-6 h-6" />
-            </button>
-
             <div
                 onClick={() => setOpen(false)}
                 aria-hidden="true"
@@ -129,6 +125,22 @@ export default function MobileSideDrawer({ className = '' }: { className?: strin
                     )}
                 </div>
             </aside>
+        </>
+    );
+
+    return (
+        <>
+            <button
+                type="button"
+                onClick={() => setOpen(true)}
+                className={`md:hidden inline-flex items-center justify-center w-10 h-10 rounded-lg text-gray-200 hover:bg-white/10 hover:text-brand-gold transition ${className}`}
+                aria-label="Abrir menú"
+                aria-expanded={open}
+            >
+                <Menu className="w-6 h-6" />
+            </button>
+
+            {mounted && createPortal(drawer, document.body)}
         </>
     );
 }
