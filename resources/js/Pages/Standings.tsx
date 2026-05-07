@@ -2,6 +2,7 @@ import { PageProps } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { Trophy, ArrowLeft } from 'lucide-react';
+import MobileBottomNav from '@/Components/MobileBottomNav';
 
 interface Tournament { id: number; name: string; logo: string | null; }
 interface Season { id: number; name: string; status: string; tournament: Tournament; }
@@ -178,6 +179,8 @@ export default function Standings({ activeSeason, standings = [], settings = {} 
                         </p>
                     </div>
                 </footer>
+
+                <MobileBottomNav />
             </div>
         </>
     );

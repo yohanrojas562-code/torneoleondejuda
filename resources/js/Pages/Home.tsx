@@ -6,6 +6,7 @@ import {
     Trophy, Users, MapPin, Calendar, Shield, ChevronRight,
     Clock, Star, Swords, ArrowRight, LogIn, UserPlus
 } from 'lucide-react';
+import MobileBottomNav from '@/Components/MobileBottomNav';
 
 /* ───── types ───── */
 interface Tournament { id: number; name: string; logo: string | null; banner: string | null; description: string | null; }
@@ -633,6 +634,7 @@ export default function Home({ auth, activeSeason, teams, standings, upcomingMat
                 <TeamsCarousel teams={teams} />
                 <VenuesSection venues={venues} />
                 <Footer settings={settings} />
+                <MobileBottomNav />
             </div>
         </>
     );

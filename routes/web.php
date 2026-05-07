@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\CalendarioController;
+use App\Http\Controllers\GoleadoresController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PlayerCardController;
 use App\Http\Controllers\ProfileController;
@@ -10,6 +12,8 @@ use Inertia\Inertia;
 
 Route::get('/', HomeController::class);
 Route::get('/tabla-de-posiciones', StandingsController::class)->name('standings');
+Route::get('/calendario', CalendarioController::class)->name('calendario');
+Route::get('/goleadores', GoleadoresController::class)->name('goleadores');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
