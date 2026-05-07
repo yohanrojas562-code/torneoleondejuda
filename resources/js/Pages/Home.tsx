@@ -7,6 +7,7 @@ import {
     Clock, Star, Swords, ArrowRight, LogIn, UserPlus
 } from 'lucide-react';
 import MobileBottomNav from '@/Components/MobileBottomNav';
+import MobileSideDrawer from '@/Components/MobileSideDrawer';
 
 /* ───── types ───── */
 interface Tournament { id: number; name: string; logo: string | null; banner: string | null; description: string | null; }
@@ -85,8 +86,10 @@ function Navbar({ canLogin, canRegister, auth, settings }: { canLogin: boolean; 
                     <a href="#partidos" className="text-gray-300 hover:text-brand-gold transition">Partidos</a>
                     <Link href="/tabla-de-posiciones" className="text-gray-300 hover:text-brand-gold transition">Posiciones</Link>
                     <a href="#escenarios" className="text-gray-300 hover:text-brand-gold transition">Escenarios</a>
+                    <Link href="/pqrs" className="text-gray-300 hover:text-brand-gold transition">PQRS</Link>
                 </div>
                 <div className="flex items-center gap-2">
+                    <MobileSideDrawer />
                     {auth.user ? (
                         <a href="/admin" className="bg-brand-gold hover:bg-brand-gold-light text-black font-semibold px-4 py-2 rounded-lg text-sm transition">
                             Panel <ArrowRight className="inline w-4 h-4 ml-1" />

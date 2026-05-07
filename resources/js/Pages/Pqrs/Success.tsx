@@ -4,6 +4,7 @@ import { Head, Link } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { CheckCircle2, Copy, ArrowLeft, Mail, Home as HomeIcon } from 'lucide-react';
 import MobileBottomNav from '@/Components/MobileBottomNav';
+import MobileSideDrawer from '@/Components/MobileSideDrawer';
 
 type Props = PageProps<{
     caseNumber: string;
@@ -52,11 +53,11 @@ export default function PqrsSuccess({ caseNumber, typeLabel, subject, submitterE
                             }
                             <span className="text-white font-bold text-base hidden sm:block">{siteName}</span>
                         </Link>
-                        <Link href="/" className="text-gray-300 hover:text-brand-gold transition flex items-center gap-1.5 text-sm">
+                        <Link href="/" className="hidden sm:flex text-gray-300 hover:text-brand-gold transition items-center gap-1.5 text-sm">
                             <ArrowLeft className="w-4 h-4" />
-                            <span className="hidden sm:inline">Volver al inicio</span>
-                            <span className="sm:hidden">Inicio</span>
+                            <span>Volver al inicio</span>
                         </Link>
+                        <MobileSideDrawer />
                     </div>
                 </header>
 

@@ -3,6 +3,7 @@ import { Head, Link } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { Target, ArrowLeft, Sparkles } from 'lucide-react';
 import MobileBottomNav from '@/Components/MobileBottomNav';
+import MobileSideDrawer from '@/Components/MobileSideDrawer';
 
 interface Tournament { id: number; name: string; logo: string | null; }
 interface Season { id: number; name: string; status: string; tournament: Tournament; }
@@ -35,11 +36,11 @@ export default function Goleadores({ activeSeason, settings = {} }: Props) {
                             }
                             <span className="text-white font-bold text-base hidden sm:block">{siteName}</span>
                         </Link>
-                        <Link href="/" className="text-gray-300 hover:text-brand-gold transition flex items-center gap-1.5 text-sm">
+                        <Link href="/" className="hidden sm:flex text-gray-300 hover:text-brand-gold transition items-center gap-1.5 text-sm">
                             <ArrowLeft className="w-4 h-4" />
-                            <span className="hidden sm:inline">Volver al inicio</span>
-                            <span className="sm:hidden">Inicio</span>
+                            <span>Volver al inicio</span>
                         </Link>
+                        <MobileSideDrawer />
                     </div>
                 </header>
 
