@@ -3,11 +3,13 @@
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PlayerCardController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StandingsController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', HomeController::class);
+Route::get('/tabla-de-posiciones', StandingsController::class)->name('standings');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
