@@ -4,6 +4,7 @@ use App\Http\Controllers\CalendarioController;
 use App\Http\Controllers\GoleadoresController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PlayerCardController;
+use App\Http\Controllers\PqrsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StandingsController;
 use Illuminate\Foundation\Application;
@@ -14,6 +15,10 @@ Route::get('/', HomeController::class);
 Route::get('/tabla-de-posiciones', StandingsController::class)->name('standings');
 Route::get('/calendario', CalendarioController::class)->name('calendario');
 Route::get('/goleadores', GoleadoresController::class)->name('goleadores');
+
+Route::get('/pqrs', [PqrsController::class, 'create'])->name('pqrs.create');
+Route::post('/pqrs', [PqrsController::class, 'store'])->middleware('throttle:5,1')->name('pqrs.store');
+Route::get('/pqrs/enviado/{caseNumber}', [PqrsController::class, 'success'])->name('pqrs.success');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
