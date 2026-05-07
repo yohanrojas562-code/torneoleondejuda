@@ -140,7 +140,7 @@ export default function Standings({ activeSeason, standings = [], settings = {} 
                                                         >
                                                             <td className="py-3 px-4">
                                                                 <span className={`inline-flex items-center justify-center w-6 h-6 rounded text-xs font-bold ${
-                                                                    i === 0 ? 'bg-brand-gold text-black' : i < 3 ? 'text-brand-gold' : 'text-gray-600'
+                                                                    i < 8 ? 'bg-green-500/15 text-green-400' : 'bg-red-500/10 text-red-400'
                                                                 }`}>{i + 1}</span>
                                                             </td>
                                                             <td className="py-3 px-3">
