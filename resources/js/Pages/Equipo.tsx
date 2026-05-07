@@ -1,0 +1,257 @@
+import { PageProps } from '@/types';
+import { Head, Link } from '@inertiajs/react';
+import { motion } from 'framer-motion';
+import { Users, ArrowLeft } from 'lucide-react';
+import MobileBottomNav from '@/Components/MobileBottomNav';
+import MobileSideDrawer from '@/Components/MobileSideDrawer';
+
+interface Member {
+    id: number;
+    name: string;
+    description: string | null;
+    photo: string | null;
+    roles: string[];
+    tier: number;
+    order: number;
+}
+
+type Props = PageProps<{
+    members: Member[];
+    roleLabels: Record<string, string>;
+    settings: Record<string, string | null>;
+}>;
+
+const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } };
+const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
+
+const tierTitles: Record<number, string> = {
+    1: 'Dirección',
+    2: 'Coordinación',
+    3: 'Áreas',
+};
+
+function MemberPhoto({ member, size }: { member: Member; size: 'lg' | 'md' | 'sm' }) {
+    const sizeClass = size === 'lg' ? 'w-32 h-32 sm:w-36 sm:h-36' : size === 'md' ? 'w-24 h-24 sm:w-28 sm:h-28' : 'w-20 h-20';
+    const fontSize = size === 'lg' ? 'text-4xl' : size === 'md' ? 'text-3xl' : 'text-2xl';
+
+    if (member.photo) {
+        return (
+            <img
+                src={`/storage/${member.photo}`}
+                alt={member.name}
+                className={`${sizeClass} rounded-2xl object-cover border-2 border-brand-gold/20 group-hover:border-brand-gold/60 transition`}
+            />
+        );
+    }
+    return (
+        <div className={`${sizeClass} rounded-2xl bg-brand-gold/10 border-2 border-brand-gold/20 group-hover:border-brand-gold/60 flex items-center justify-center transition`}>
+            <span className={`text-brand-gold font-extrabold ${fontSize}`}>{member.name.charAt(0).toUpperCase()}</span>
+        </div>
+    );
+}
+
+function RoleBadges({ roles, labels }: { roles: string[]; labels: Record<string, string> }) {
+    return (
+        <div className="flex flex-wrap gap-1.5 justify-center">
+            {roles.map((r) => (
+                <span
+                    key={r}
+                    className="text-[10px] font-bold uppercase tracking-wider text-brand-gold bg-brand-gold/10 border border-brand-gold/20 rounded-full px-2.5 py-1"
+                >
+                    {labels[r] || r}
+                </span>
+            ))}
+        </div>
+    );
+}
+
+function DirectionCard({ member, labels }: { member: Member; labels: Record<string, string> }) {
+    return (
+        <motion.div
+            variants={fadeUp}
+            className="group bg-gradient-to-b from-white/[0.04] to-transparent border border-white/10 hover:border-brand-gold/40 rounded-2xl p-6 sm:p-8 text-center transition-all hover:-translate-y-1 hover:shadow-[0_20px_40px_-15px_rgba(214,143,3,0.25)]"
+        >
+            <div className="flex flex-col items-center">
+                <MemberPhoto member={member} size="lg" />
+                <h3 className="mt-5 text-white font-extrabold text-xl">{member.name}</h3>
+                <div className="mt-3">
+                    <RoleBadges roles={member.roles} labels={labels} />
+                </div>
+                {member.description && (
+                    <p className="mt-4 text-gray-400 text-sm leading-relaxed max-w-md">{member.description}</p>
+                )}
+            </div>
+        </motion.div>
+    );
+}
+
+function CoordinatorCard({ member, labels }: { member: Member; labels: Record<string, string> }) {
+    return (
+        <motion.div
+            variants={fadeUp}
+            className="group bg-white/[0.03] border border-white/10 hover:border-brand-gold/30 rounded-2xl p-5 text-center transition-all hover:-translate-y-1"
+        >
+            <div className="flex flex-col items-center">
+                <MemberPhoto member={member} size="md" />
+                <h3 className="mt-4 text-white font-bold text-base">{member.name}</h3>
+                <div className="mt-2">
+                    <RoleBadges roles={member.roles} labels={labels} />
+                </div>
+                {member.description && (
+                    <p className="mt-3 text-gray-500 text-xs leading-relaxed">{member.description}</p>
+                )}
+            </div>
+        </motion.div>
+    );
+}
+
+function AreaCard({ member, labels }: { member: Member; labels: Record<string, string> }) {
+    return (
+        <motion.div
+            variants={fadeUp}
+            className="group bg-white/[0.02] border border-white/5 hover:border-brand-gold/25 rounded-xl p-4 text-center transition-all hover:-translate-y-0.5"
+        >
+            <div className="flex flex-col items-center">
+                <MemberPhoto member={member} size="sm" />
+                <h3 className="mt-3 text-white font-semibold text-sm leading-tight">{member.name}</h3>
+                <div className="mt-2">
+                    <RoleBadges roles={member.roles} labels={labels} />
+                </div>
+                {member.description && (
+                    <p className="mt-2 text-gray-500 text-[11px] leading-relaxed line-clamp-3">{member.description}</p>
+                )}
+            </div>
+        </motion.div>
+    );
+}
+
+function TierDivider({ label }: { label: string }) {
+    return (
+        <div className="flex items-center justify-center my-10">
+            <span className="h-px flex-1 bg-gradient-to-r from-transparent via-brand-gold/30 to-transparent max-w-xs" />
+            <span className="px-5 text-brand-gold text-xs font-bold uppercase tracking-[0.3em]">{label}</span>
+            <span className="h-px flex-1 bg-gradient-to-l from-transparent via-brand-gold/30 to-transparent max-w-xs" />
+        </div>
+    );
+}
+
+export default function Equipo({ members = [], roleLabels = {}, settings = {} }: Props) {
+    const data = Array.isArray(members) ? members : [];
+
+    const tier1 = data.filter((m) => m.tier === 1);
+    const tier2 = data.filter((m) => m.tier === 2);
+    const tier3 = data.filter((m) => m.tier === 3);
+
+    const siteName = settings.site_name || 'Torneo León de Judá';
+    const logoUrl = settings.logo ? `/storage/${settings.logo}` : null;
+
+    return (
+        <>
+            <Head>
+                <title>{`Equipo Organizador - ${siteName}`}</title>
+                <meta name="description" content={`Organigrama y equipo organizador del ${siteName}`} />
+            </Head>
+
+            <div className="bg-brand-black min-h-screen flex flex-col">
+                <header className="bg-brand-black/95 backdrop-blur-sm border-b border-brand-gold/20">
+                    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+                        <Link href="/" className="flex items-center gap-3">
+                            {logoUrl
+                                ? <img src={logoUrl} alt={siteName} className="h-10 w-10 object-contain" />
+                                : <span className="text-brand-gold font-bold text-xl">LJ</span>
+                            }
+                            <span className="text-white font-bold text-base hidden sm:block">{siteName}</span>
+                        </Link>
+                        <Link href="/" className="hidden sm:flex text-gray-300 hover:text-brand-gold transition items-center gap-1.5 text-sm">
+                            <ArrowLeft className="w-4 h-4" />
+                            <span>Volver al inicio</span>
+                        </Link>
+                        <MobileSideDrawer />
+                    </div>
+                </header>
+
+                <main className="flex-1 py-12 px-4">
+                    <div className="max-w-6xl mx-auto">
+                        <motion.div initial="hidden" animate="visible" variants={fadeUp} className="text-center mb-4">
+                            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-brand-gold/10 mb-4">
+                                <Users className="w-7 h-7 text-brand-gold" />
+                            </div>
+                            <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Nuestro Equipo Organizador</h1>
+                            <p className="text-gray-400 mt-2 text-sm max-w-xl mx-auto">
+                                Conoce a las personas que hacen posible este torneo.
+                            </p>
+                        </motion.div>
+
+                        {data.length === 0 ? (
+                            <div className="text-center py-20 text-gray-600">
+                                <Users className="w-14 h-14 mx-auto mb-4 opacity-20" />
+                                <p className="text-sm">Próximamente conocerás al equipo organizador.</p>
+                            </div>
+                        ) : (
+                            <div className="mt-8 space-y-2">
+                                {tier1.length > 0 && (
+                                    <>
+                                        <TierDivider label={tierTitles[1]} />
+                                        <motion.div
+                                            variants={stagger}
+                                            initial="hidden"
+                                            whileInView="visible"
+                                            viewport={{ once: true, margin: '-50px' }}
+                                            className={`grid gap-6 ${tier1.length === 1 ? 'grid-cols-1 max-w-md mx-auto' : 'grid-cols-1 sm:grid-cols-2 max-w-3xl mx-auto'}`}
+                                        >
+                                            {tier1.map((m) => (
+                                                <DirectionCard key={m.id} member={m} labels={roleLabels} />
+                                            ))}
+                                        </motion.div>
+                                    </>
+                                )}
+
+                                {tier2.length > 0 && (
+                                    <>
+                                        <TierDivider label={tierTitles[2]} />
+                                        <motion.div
+                                            variants={stagger}
+                                            initial="hidden"
+                                            whileInView="visible"
+                                            viewport={{ once: true, margin: '-50px' }}
+                                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-4xl mx-auto"
+                                        >
+                                            {tier2.map((m) => (
+                                                <CoordinatorCard key={m.id} member={m} labels={roleLabels} />
+                                            ))}
+                                        </motion.div>
+                                    </>
+                                )}
+
+                                {tier3.length > 0 && (
+                                    <>
+                                        <TierDivider label={tierTitles[3]} />
+                                        <motion.div
+                                            variants={stagger}
+                                            initial="hidden"
+                                            whileInView="visible"
+                                            viewport={{ once: true, margin: '-50px' }}
+                                            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"
+                                        >
+                                            {tier3.map((m) => (
+                                                <AreaCard key={m.id} member={m} labels={roleLabels} />
+                                            ))}
+                                        </motion.div>
+                                    </>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </main>
+
+                <footer className="bg-brand-black border-t border-white/10 py-6 px-4">
+                    <div className="max-w-5xl mx-auto text-center">
+                        <p className="text-gray-600 text-xs">© {new Date().getFullYear()} {siteName}. Todos los derechos reservados.</p>
+                    </div>
+                </footer>
+
+                <MobileBottomNav />
+            </div>
+        </>
+    );
+}
