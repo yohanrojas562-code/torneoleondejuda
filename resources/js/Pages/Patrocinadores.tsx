@@ -292,7 +292,13 @@ export default function Patrocinadores({ sponsors = [], typeLabels = {}, section
                                             initial="hidden"
                                             whileInView="visible"
                                             viewport={{ once: true, margin: '-50px' }}
-                                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto"
+                                            className={`grid gap-6 mx-auto ${
+                                                patrocinios.length === 1
+                                                    ? 'grid-cols-1 max-w-sm'
+                                                    : patrocinios.length === 2
+                                                        ? 'grid-cols-1 sm:grid-cols-2 max-w-3xl'
+                                                        : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-5xl'
+                                            }`}
                                         >
                                             {patrocinios.map((s) => (
                                                 <PatrocinioCard key={s.id} sponsor={s} label={typeLabels['patrocinio'] || 'Patrocinador'} />
@@ -309,7 +315,13 @@ export default function Patrocinadores({ sponsors = [], typeLabels = {}, section
                                             initial="hidden"
                                             whileInView="visible"
                                             viewport={{ once: true, margin: '-50px' }}
-                                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl mx-auto"
+                                            className={`grid gap-5 mx-auto ${
+                                                alianzas.length === 1
+                                                    ? 'grid-cols-1 max-w-xs'
+                                                    : alianzas.length === 2
+                                                        ? 'grid-cols-1 sm:grid-cols-2 max-w-2xl'
+                                                        : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-5xl'
+                                            }`}
                                         >
                                             {alianzas.map((s) => (
                                                 <AlianzaCard key={s.id} sponsor={s} label={typeLabels['alianza'] || 'Aliado'} />
@@ -326,7 +338,13 @@ export default function Patrocinadores({ sponsors = [], typeLabels = {}, section
                                             initial="hidden"
                                             whileInView="visible"
                                             viewport={{ once: true, margin: '-50px' }}
-                                            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3"
+                                            className={`grid gap-3 mx-auto ${
+                                                apoyos.length === 1
+                                                    ? 'grid-cols-1 max-w-[180px]'
+                                                    : apoyos.length === 2
+                                                        ? 'grid-cols-2 max-w-sm'
+                                                        : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-5'
+                                            }`}
                                         >
                                             {apoyos.map((s) => (
                                                 <ApoyoCard key={s.id} sponsor={s} />
