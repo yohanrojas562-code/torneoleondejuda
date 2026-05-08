@@ -1,7 +1,9 @@
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { PageProps } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { motion } from 'framer-motion';
-import { Users, ArrowLeft } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Users, ArrowLeft, X } from 'lucide-react';
 import MobileBottomNav from '@/Components/MobileBottomNav';
 import MobileSideDrawer from '@/Components/MobileSideDrawer';
 
@@ -65,11 +67,16 @@ function RoleBadges({ roles, labels }: { roles: string[]; labels: Record<string,
     );
 }
 
-function DirectionCard({ member, labels }: { member: Member; labels: Record<string, string> }) {
+function DirectionCard({ member, labels, onSelect }: { member: Member; labels: Record<string, string>; onSelect: () => void }) {
     return (
         <motion.div
             variants={fadeUp}
-            className="group bg-gradient-to-b from-white/[0.04] to-transparent border border-white/10 hover:border-brand-gold/40 rounded-2xl p-6 sm:p-8 text-center transition-all hover:-translate-y-1 hover:shadow-[0_20px_40px_-15px_rgba(214,143,3,0.25)]"
+            onClick={onSelect}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(); } }}
+            role="button"
+            tabIndex={0}
+            aria-label={`Ver detalles de ${member.name}`}
+            className="group bg-gradient-to-b from-white/[0.04] to-transparent border border-white/10 hover:border-brand-gold/40 rounded-2xl p-6 sm:p-8 text-center transition-all hover:-translate-y-1 hover:shadow-[0_20px_40px_-15px_rgba(214,143,3,0.25)] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold/50"
         >
             <div className="flex flex-col items-center">
                 <MemberPhoto member={member} size="lg" />
@@ -85,11 +92,16 @@ function DirectionCard({ member, labels }: { member: Member; labels: Record<stri
     );
 }
 
-function CoordinatorCard({ member, labels }: { member: Member; labels: Record<string, string> }) {
+function CoordinatorCard({ member, labels, onSelect }: { member: Member; labels: Record<string, string>; onSelect: () => void }) {
     return (
         <motion.div
             variants={fadeUp}
-            className="group bg-white/[0.03] border border-white/10 hover:border-brand-gold/30 rounded-2xl p-5 text-center transition-all hover:-translate-y-1"
+            onClick={onSelect}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(); } }}
+            role="button"
+            tabIndex={0}
+            aria-label={`Ver detalles de ${member.name}`}
+            className="group bg-white/[0.03] border border-white/10 hover:border-brand-gold/30 rounded-2xl p-5 text-center transition-all hover:-translate-y-1 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold/50"
         >
             <div className="flex flex-col items-center">
                 <MemberPhoto member={member} size="md" />
@@ -105,11 +117,16 @@ function CoordinatorCard({ member, labels }: { member: Member; labels: Record<st
     );
 }
 
-function AreaCard({ member, labels }: { member: Member; labels: Record<string, string> }) {
+function AreaCard({ member, labels, onSelect }: { member: Member; labels: Record<string, string>; onSelect: () => void }) {
     return (
         <motion.div
             variants={fadeUp}
-            className="group bg-white/[0.02] border border-white/5 hover:border-brand-gold/25 rounded-xl p-4 text-center transition-all hover:-translate-y-0.5"
+            onClick={onSelect}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(); } }}
+            role="button"
+            tabIndex={0}
+            aria-label={`Ver detalles de ${member.name}`}
+            className="group bg-white/[0.02] border border-white/5 hover:border-brand-gold/25 rounded-xl p-4 text-center transition-all hover:-translate-y-0.5 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold/50"
         >
             <div className="flex flex-col items-center">
                 <MemberPhoto member={member} size="sm" />
@@ -125,6 +142,104 @@ function AreaCard({ member, labels }: { member: Member; labels: Record<string, s
     );
 }
 
+function MemberModal({
+    member,
+    labels,
+    onClose,
+}: {
+    member: Member;
+    labels: Record<string, string>;
+    onClose: () => void;
+}) {
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    useEffect(() => {
+        const handler = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') onClose();
+        };
+        window.addEventListener('keydown', handler);
+        return () => window.removeEventListener('keydown', handler);
+    }, [onClose]);
+
+    useEffect(() => {
+        const original = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = original;
+        };
+    }, []);
+
+    if (!mounted) return null;
+
+    return createPortal(
+        <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                onClick={onClose}
+                className="absolute inset-0 bg-black/80 backdrop-blur-md"
+            />
+            <motion.div
+                initial={{ opacity: 0, scale: 0.92, y: 16 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 8 }}
+                transition={{ duration: 0.25, ease: 'easeOut' }}
+                role="dialog"
+                aria-modal="true"
+                aria-label={`Perfil de ${member.name}`}
+                className="relative bg-brand-black border border-brand-gold/30 rounded-3xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-[0_0_80px_rgba(214,143,3,0.18)]"
+            >
+                <button
+                    type="button"
+                    onClick={onClose}
+                    aria-label="Cerrar"
+                    className="absolute top-4 right-4 z-10 inline-flex items-center justify-center w-10 h-10 rounded-full bg-black/60 backdrop-blur text-gray-200 hover:bg-black/80 hover:text-brand-gold transition"
+                >
+                    <X className="w-5 h-5" />
+                </button>
+
+                <div className="relative aspect-square bg-gradient-to-b from-brand-gold/5 to-brand-black">
+                    {member.photo ? (
+                        <img
+                            src={`/storage/${member.photo}`}
+                            alt={member.name}
+                            className="w-full h-full object-cover"
+                        />
+                    ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-brand-gold/10">
+                            <span className="text-brand-gold font-extrabold text-[8rem] leading-none">
+                                {member.name.charAt(0).toUpperCase()}
+                            </span>
+                        </div>
+                    )}
+                    <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-brand-black to-transparent pointer-events-none" />
+                </div>
+
+                <div className="px-6 pb-7 pt-5 text-center">
+                    <h3 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                        {member.name}
+                    </h3>
+                    <div className="mt-4">
+                        <RoleBadges roles={member.roles} labels={labels} />
+                    </div>
+                    {member.description && (
+                        <p className="mt-5 text-gray-400 text-sm sm:text-base leading-relaxed whitespace-pre-line">
+                            {member.description}
+                        </p>
+                    )}
+                </div>
+            </motion.div>
+        </div>,
+        document.body
+    );
+}
+
 function TierDivider({ label }: { label: string }) {
     return (
         <div className="flex items-center justify-center my-10">
@@ -137,6 +252,7 @@ function TierDivider({ label }: { label: string }) {
 
 export default function Equipo({ members = [], roleLabels = {}, settings = {} }: Props) {
     const data = Array.isArray(members) ? members : [];
+    const [selectedMember, setSelectedMember] = useState<Member | null>(null);
 
     const tier1 = data.filter((m) => m.tier === 1);
     const tier2 = data.filter((m) => m.tier === 2);
@@ -200,7 +316,7 @@ export default function Equipo({ members = [], roleLabels = {}, settings = {} }:
                                             className={`grid gap-6 ${tier1.length === 1 ? 'grid-cols-1 max-w-md mx-auto' : 'grid-cols-1 sm:grid-cols-2 max-w-3xl mx-auto'}`}
                                         >
                                             {tier1.map((m) => (
-                                                <DirectionCard key={m.id} member={m} labels={roleLabels} />
+                                                <DirectionCard key={m.id} member={m} labels={roleLabels} onSelect={() => setSelectedMember(m)} />
                                             ))}
                                         </motion.div>
                                     </>
@@ -217,7 +333,7 @@ export default function Equipo({ members = [], roleLabels = {}, settings = {} }:
                                             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-4xl mx-auto"
                                         >
                                             {tier2.map((m) => (
-                                                <CoordinatorCard key={m.id} member={m} labels={roleLabels} />
+                                                <CoordinatorCard key={m.id} member={m} labels={roleLabels} onSelect={() => setSelectedMember(m)} />
                                             ))}
                                         </motion.div>
                                     </>
@@ -234,7 +350,7 @@ export default function Equipo({ members = [], roleLabels = {}, settings = {} }:
                                             className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"
                                         >
                                             {tier3.map((m) => (
-                                                <AreaCard key={m.id} member={m} labels={roleLabels} />
+                                                <AreaCard key={m.id} member={m} labels={roleLabels} onSelect={() => setSelectedMember(m)} />
                                             ))}
                                         </motion.div>
                                     </>
@@ -251,6 +367,17 @@ export default function Equipo({ members = [], roleLabels = {}, settings = {} }:
                 </footer>
 
                 <MobileBottomNav />
+
+                <AnimatePresence>
+                    {selectedMember && (
+                        <MemberModal
+                            key={selectedMember.id}
+                            member={selectedMember}
+                            labels={roleLabels}
+                            onClose={() => setSelectedMember(null)}
+                        />
+                    )}
+                </AnimatePresence>
             </div>
         </>
     );
