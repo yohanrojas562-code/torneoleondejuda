@@ -152,7 +152,7 @@ function PatrocinioCard({ sponsor, label }: { sponsor: Sponsor; label: string })
                     {label}
                 </span>
             </div>
-            <SponsorLogo sponsor={sponsor} height="h-28" />
+            <SponsorLogo sponsor={sponsor} height="h-40" />
             <h3 className="mt-5 text-white font-extrabold text-xl text-center">{sponsor.name}</h3>
             {sponsor.description && (
                 <p className="mt-3 text-gray-400 text-sm leading-relaxed text-center">{sponsor.description}</p>
@@ -176,7 +176,7 @@ function AlianzaCard({ sponsor, label }: { sponsor: Sponsor; label: string }) {
                     {label}
                 </span>
             </div>
-            <SponsorLogo sponsor={sponsor} height="h-20" />
+            <SponsorLogo sponsor={sponsor} height="h-28" />
             <h3 className="mt-4 text-white font-bold text-base text-center">{sponsor.name}</h3>
             {sponsor.description && (
                 <p className="mt-2 text-gray-500 text-xs leading-relaxed text-center line-clamp-3">{sponsor.description}</p>
@@ -195,7 +195,7 @@ function ApoyoCard({ sponsor }: { sponsor: Sponsor }) {
             variants={fadeUp}
             className="group bg-white/[0.02] border border-white/5 hover:border-brand-gold/25 rounded-xl p-4 transition-all hover:-translate-y-0.5 h-full flex flex-col"
         >
-            <SponsorLogo sponsor={sponsor} height="h-14" />
+            <SponsorLogo sponsor={sponsor} height="h-20" />
             <h3 className="mt-3 text-white font-semibold text-xs text-center leading-tight">{sponsor.name}</h3>
             {Object.values(sponsor.social_links).some((u) => u) && (
                 <div className="mt-2.5">
