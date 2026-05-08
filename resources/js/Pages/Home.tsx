@@ -82,8 +82,7 @@ function Navbar({ canLogin, canRegister, auth, settings }: { canLogin: boolean; 
                 </Link>
                 <div className="hidden md:flex items-center gap-6 text-sm">
                     <a href="#torneo" className="text-gray-300 hover:text-brand-gold transition">Torneo</a>
-                    <a href="#equipos" className="text-gray-300 hover:text-brand-gold transition">Equipos</a>
-                    <a href="#partidos" className="text-gray-300 hover:text-brand-gold transition">Partidos</a>
+                    <Link href="/calendario" className="text-gray-300 hover:text-brand-gold transition">Calendario</Link>
                     <Link href="/tabla-de-posiciones" className="text-gray-300 hover:text-brand-gold transition">Posiciones</Link>
                     <a href="#escenarios" className="text-gray-300 hover:text-brand-gold transition">Escenarios</a>
                     <Link href="/equipo" className="text-gray-300 hover:text-brand-gold transition">Equipo</Link>
@@ -633,7 +632,6 @@ export default function Home({ auth, activeSeason, teams, standings, upcomingMat
             <div className="bg-brand-black min-h-screen">
                 <Navbar canLogin={canLogin} canRegister={canRegister} auth={auth} settings={settings} />
                 <Hero settings={settings} activeSeason={activeSeason} />
-                <TabbedSection upcomingMatches={upcomingMatches} recentMatches={recentMatches} standings={standings} />
                 <AboutTournamentSection settings={settings} activeSeason={activeSeason} />
                 <ValuesSection />
                 <TeamsCarousel teams={teams} />
