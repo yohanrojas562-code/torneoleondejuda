@@ -4,6 +4,7 @@ use App\Http\Controllers\CalendarioController;
 use App\Http\Controllers\EquipoController;
 use App\Http\Controllers\GoleadoresController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PatrocinadoresController;
 use App\Http\Controllers\PlayerCardController;
 use App\Http\Controllers\PqrsController;
 use App\Http\Controllers\ProfileController;
@@ -17,6 +18,7 @@ Route::get('/tabla-de-posiciones', StandingsController::class)->name('standings'
 Route::get('/calendario', CalendarioController::class)->name('calendario');
 Route::get('/goleadores', GoleadoresController::class)->name('goleadores');
 Route::get('/equipo', EquipoController::class)->name('equipo');
+Route::get('/patrocinadores', PatrocinadoresController::class)->name('patrocinadores');
 
 Route::get('/pqrs', [PqrsController::class, 'create'])->name('pqrs.create');
 Route::post('/pqrs', [PqrsController::class, 'store'])->middleware('throttle:5,1')->name('pqrs.store');

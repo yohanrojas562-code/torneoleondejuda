@@ -87,6 +87,7 @@ function Navbar({ canLogin, canRegister, auth, settings }: { canLogin: boolean; 
                     <Link href="/tabla-de-posiciones" className="text-gray-300 hover:text-brand-gold transition">Posiciones</Link>
                     <a href="#escenarios" className="text-gray-300 hover:text-brand-gold transition">Escenarios</a>
                     <Link href="/equipo" className="text-gray-300 hover:text-brand-gold transition">Equipo</Link>
+                    <Link href="/patrocinadores" className="text-gray-300 hover:text-brand-gold transition">Patrocinadores</Link>
                     <Link href="/pqrs" className="text-gray-300 hover:text-brand-gold transition">PQRS</Link>
                 </div>
                 <div className="flex items-center gap-2">

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, usePage } from '@inertiajs/react';
 import {
-    Menu, X, Home, Calendar, Trophy, Target, MessageSquare, ArrowRight, LogIn, Users,
+    Menu, X, Home, Calendar, Trophy, Target, MessageSquare, ArrowRight, LogIn, Users, HandHeart,
 } from 'lucide-react';
 
 const items = [
@@ -11,6 +11,7 @@ const items = [
     { href: '/tabla-de-posiciones', label: 'Tabla de Posiciones', icon: Trophy },
     { href: '/goleadores', label: 'Tabla de Goleadores', icon: Target },
     { href: '/equipo', label: 'Equipo', icon: Users },
+    { href: '/patrocinadores', label: 'Patrocinadores', icon: HandHeart },
     { href: '/pqrs', label: 'PQRS', icon: MessageSquare },
 ];
 
