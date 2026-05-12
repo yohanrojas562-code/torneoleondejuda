@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Player;
 use App\Models\Season;
 use App\Models\SiteSetting;
 use Illuminate\Support\Facades\Route;
@@ -23,12 +24,51 @@ class GoleadoresController extends Controller
                 ->first();
         }
 
+        $seasonId = $activeSeason?->id;
+
+        $topScorers = collect();
+
+        if ($seasonId) {
+            $topScorers = Player::query()
+                ->where('approval_status', 'approved')
+                ->withCount([
+                    'matchEvents as goals' => function ($q) use ($seasonId) {
+                        $q->whereIn('type', ['goal', 'penalty_goal'])
+                            ->whereHas('match', function ($mq) use ($seasonId) {
+                                $mq->where('season_id', $seasonId)
+                                    ->where('status', 'finished');
+                            });
+                    },
+                ])
+                ->having('goals', '>', 0)
+                ->orderByDesc('goals')
+                ->orderBy('last_name')
+                ->orderBy('first_name')
+                ->with(['team:id,name,short_name,logo,primary_color'])
+                ->get();
+        }
+
         $settings = SiteSetting::pluck('value', 'key');
 
         return Inertia::render('Goleadores', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
             'activeSeason' => $activeSeason,
+            'topScorers' => $topScorers->map(fn ($p) => [
+                'id' => $p->id,
+                'first_name' => $p->first_name,
+                'last_name' => $p->last_name,
+                'photo' => $p->photo,
+                'jersey_number' => $p->jersey_number,
+                'goals' => (int) $p->goals,
+                'team' => $p->team ? [
+                    'id' => $p->team->id,
+                    'name' => $p->team->name,
+                    'short_name' => $p->team->short_name,
+                    'logo' => $p->team->logo,
+                    'primary_color' => $p->team->primary_color,
+                ] : null,
+            ])->toArray(),
             'settings' => $settings->toArray(),
         ]);
     }
