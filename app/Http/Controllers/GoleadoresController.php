@@ -29,18 +29,18 @@ class GoleadoresController extends Controller
         $topScorers = collect();
 
         if ($seasonId) {
+            $goalEventsFilter = function ($q) use ($seasonId) {
+                $q->whereIn('type', ['goal', 'penalty_goal'])
+                    ->whereHas('match', function ($mq) use ($seasonId) {
+                        $mq->where('season_id', $seasonId)
+                            ->where('status', 'finished');
+                    });
+            };
+
             $topScorers = Player::query()
                 ->where('approval_status', 'approved')
-                ->withCount([
-                    'matchEvents as goals' => function ($q) use ($seasonId) {
-                        $q->whereIn('type', ['goal', 'penalty_goal'])
-                            ->whereHas('match', function ($mq) use ($seasonId) {
-                                $mq->where('season_id', $seasonId)
-                                    ->where('status', 'finished');
-                            });
-                    },
-                ])
-                ->having('goals', '>', 0)
+                ->whereHas('matchEvents', $goalEventsFilter)
+                ->withCount(['matchEvents as goals' => $goalEventsFilter])
                 ->orderByDesc('goals')
                 ->orderBy('last_name')
                 ->orderBy('first_name')
