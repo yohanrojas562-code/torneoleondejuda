@@ -330,10 +330,10 @@ export default function Equipo({ members = [], roleLabels = {}, settings = {} }:
                                             initial="hidden"
                                             whileInView="visible"
                                             viewport={{ once: true, margin: '-50px' }}
-                                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-4xl mx-auto"
+                                            className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4 max-w-4xl mx-auto"
                                         >
                                             {tier2.map((m) => (
-                                                <CoordinatorCard key={m.id} member={m} labels={roleLabels} onSelect={() => setSelectedMember(m)} />
+                                                <AreaCard key={m.id} member={m} labels={roleLabels} onSelect={() => setSelectedMember(m)} />
                                             ))}
                                         </motion.div>
                                     </>
@@ -347,7 +347,7 @@ export default function Equipo({ members = [], roleLabels = {}, settings = {} }:
                                             initial="hidden"
                                             whileInView="visible"
                                             viewport={{ once: true, margin: '-50px' }}
-                                            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"
+                                            className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4 max-w-4xl mx-auto"
                                         >
                                             {tier3.map((m) => (
                                                 <AreaCard key={m.id} member={m} labels={roleLabels} onSelect={() => setSelectedMember(m)} />
