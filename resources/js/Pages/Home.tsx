@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import {
     Trophy, Users, MapPin, Calendar, Shield, ChevronRight,
     Clock, Star, Swords, ArrowRight, LogIn, UserPlus,
-    Target, HandHeart, Info, MessageSquare,
+    Target, HandHeart, Info, MessageSquare, ShieldCheck,
 } from 'lucide-react';
 import MobileBottomNav from '@/Components/MobileBottomNav';
 import MobileSideDrawer from '@/Components/MobileSideDrawer';
@@ -87,6 +87,7 @@ function Navbar({ canLogin, canRegister, auth, settings }: { canLogin: boolean; 
                     <Link href="/tabla-de-posiciones" className="text-gray-300 hover:text-brand-gold transition">Posiciones</Link>
                     <Link href="/goleadores" className="text-gray-300 hover:text-brand-gold transition">Goleadores</Link>
                     <Link href="/valla-menos-vencida" className="text-gray-300 hover:text-brand-gold transition">Valla</Link>
+                    <Link href="/verificar" className="text-gray-300 hover:text-brand-gold transition">Validar</Link>
                     <a href="#escenarios" className="text-gray-300 hover:text-brand-gold transition">Escenarios</a>
                     <Link href="/equipo" className="text-gray-300 hover:text-brand-gold transition">Equipo</Link>
                     <Link href="/patrocinadores" className="text-gray-300 hover:text-brand-gold transition">Patrocinadores</Link>
@@ -610,6 +611,7 @@ function AppGrid() {
         { href: '/tabla-de-posiciones', label: 'Posiciones', desc: 'Clasificación', icon: Trophy },
         { href: '/goleadores', label: 'Goleadores', desc: 'Máximos artilleros', icon: Target },
         { href: '/valla-menos-vencida', label: 'Valla', desc: 'Menos vencida', icon: Shield },
+        { href: '/verificar', label: 'Validar', desc: 'Verificar jugador', icon: ShieldCheck },
         { href: '/equipo', label: 'Equipo', desc: 'Organigrama', icon: Users },
         { href: '/patrocinadores', label: 'Patrocinadores', desc: 'Aliados', icon: HandHeart },
         { href: '/acerca-del-torneo', label: 'Sobre el Torneo', desc: 'Conoce más', icon: Info },

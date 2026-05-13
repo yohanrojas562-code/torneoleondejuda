@@ -10,14 +10,17 @@
         }
 
         @page {
+            size: 242.65pt 153.01pt;
             margin: 0;
         }
 
-        body {
-            font-family: 'Helvetica', 'Arial', sans-serif;
+        html, body {
             margin: 0;
             padding: 0;
+            width: 242.65pt;
+            height: 153.01pt;
             background: #ffffff;
+            font-family: 'Helvetica', 'Arial', sans-serif;
         }
 
         .card {
@@ -27,29 +30,25 @@
             overflow: hidden;
             background: #ffffff;
             color: #0a0a0a;
-            border: 0.5pt solid #d0d0d0;
         }
 
-        /* Gold top bar (solid, sin gradient para que DomPDF lo renderice bien) */
+        /* Gold top bar (solido) */
         .top-bar {
             background: #D68F03;
-            height: 26pt;
+            height: 24pt;
             padding: 2pt 6pt;
             display: flex;
             align-items: center;
         }
 
-        .top-bar-inner {
-            width: 100%;
-        }
+        .top-bar-inner { width: 100%; }
 
         .logo-section {
             float: left;
-            height: 22pt;
+            height: 20pt;
         }
-
         .logo-section img {
-            height: 22pt;
+            height: 20pt;
             width: auto;
         }
 
@@ -78,19 +77,16 @@
         .content {
             padding: 5pt 6pt 5pt 6pt;
             position: relative;
-            height: 124pt;
+            height: 117pt;
             background: #ffffff;
         }
 
-        /* Left column: photo + jersey + position */
-        .left-col {
-            float: left;
-            width: 52pt;
-        }
+        /* Left column */
+        .left-col { float: left; width: 52pt; }
 
         .photo-frame {
             width: 50pt;
-            height: 60pt;
+            height: 58pt;
             border: 1.5pt solid #D68F03;
             border-radius: 3pt;
             overflow: hidden;
@@ -135,7 +131,7 @@
             font-weight: bold;
         }
 
-        /* Center column: name + team + ficha técnica */
+        /* Center column */
         .center-col {
             float: left;
             width: 118pt;
@@ -157,7 +153,6 @@
             word-wrap: break-word;
             overflow-wrap: break-word;
         }
-
         .player-name-short { font-size: 8.5pt; }
         .player-name-mid   { font-size: 7.5pt; }
         .player-name-long  { font-size: 6.5pt; }
@@ -187,14 +182,12 @@
             line-height: 1.1;
         }
 
-        .info-grid {
-            width: 100%;
-        }
+        .info-grid { width: 100%; }
 
         .info-row {
             font-size: 5.5pt;
-            line-height: 1.3;
-            margin-bottom: 0.8pt;
+            line-height: 1.25;
+            margin-bottom: 0.7pt;
             color: #000000;
         }
 
@@ -248,7 +241,7 @@
         .status-pending { background: #f59e0b; color: #0a0a0a; }
         .status-rejected { background: #ef4444; color: #ffffff; }
 
-        /* Right column: QR + code */
+        /* Right column: QR */
         .right-col {
             float: right;
             width: 60pt;
@@ -301,14 +294,38 @@
             letter-spacing: 0.3pt;
         }
 
-        /* Bottom gold accent */
-        .bottom-bar {
+        /* Footer bar — logo y nombre del torneo */
+        .card-footer {
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 2.5pt;
-            background: #D68F03;
+            height: 12pt;
+            background: #0a0a0a;
+            color: #D68F03;
+            padding: 2pt 6pt;
+        }
+
+        .card-footer-inner {
+            width: 100%;
+            text-align: center;
+        }
+
+        .card-footer-logo {
+            height: 8pt;
+            width: auto;
+            vertical-align: middle;
+            margin-right: 3pt;
+        }
+
+        .card-footer-name {
+            display: inline-block;
+            color: #D68F03;
+            font-size: 5pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5pt;
+            vertical-align: middle;
         }
 
         .clearfix::after {
@@ -318,135 +335,27 @@
         }
     </style>
 </head>
-<body>
-    @php
-        $statusLabels = [
-            'approved' => 'Aprobado',
-            'pending' => 'Pendiente',
-            'rejected' => 'Rechazado',
-        ];
-        $statusKey = $player->approval_status ?? 'pending';
-        $statusLabel = $statusLabels[$statusKey] ?? ucfirst($statusKey);
+<body><div class="card">@php
+    $statusLabels = [
+        'approved' => 'Aprobado',
+        'pending' => 'Pendiente',
+        'rejected' => 'Rechazado',
+    ];
+    $statusKey = $player->approval_status ?? 'pending';
+    $statusLabel = $statusLabels[$statusKey] ?? ucfirst($statusKey);
 
-        $positionLabels = [
-            'portero' => 'Portero',
-            'defensa' => 'Defensa',
-            'mediocampista' => 'Mediocampista',
-            'delantero' => 'Delantero',
-        ];
-        $positionLabel = $positionLabels[$player->position] ?? ucfirst($player->position ?? '—');
+    $positionLabels = [
+        'portero' => 'Portero',
+        'defensa' => 'Defensa',
+        'mediocampista' => 'Mediocampista',
+        'delantero' => 'Delantero',
+    ];
+    $positionLabel = $positionLabels[$player->position] ?? ucfirst($player->position ?? '—');
 
-        $fullName = trim(($player->first_name ?? '') . ' ' . ($player->last_name ?? ''));
-
-        // Clase de tamaño de nombre según longitud para evitar que quede mocho
-        $nameLen = mb_strlen($fullName);
-        $nameClass = $nameLen <= 16 ? 'player-name-short'
-            : ($nameLen <= 22 ? 'player-name-mid'
-            : ($nameLen <= 30 ? 'player-name-long' : 'player-name-xlong'));
-    @endphp
-
-    <div class="card">
-        {{-- Gold header bar --}}
-        <div class="top-bar">
-            <div class="top-bar-inner clearfix">
-                <div class="logo-section">
-                    @if($logoBase64)
-                        <img src="{{ $logoBase64 }}" alt="Logo">
-                    @endif
-                </div>
-                <div class="tournament-section">
-                    <div class="tournament-name">{{ $tournamentName }}</div>
-                    @if($categoryName)
-                        <div class="category-name">{{ $categoryName }}</div>
-                    @endif
-                </div>
-            </div>
-        </div>
-
-        {{-- Main content --}}
-        <div class="content clearfix">
-            {{-- Left: photo + jersey + position --}}
-            <div class="left-col">
-                <div class="photo-frame">
-                    @if($photoBase64)
-                        <img src="{{ $photoBase64 }}" alt="Foto">
-                    @else
-                        <div class="no-photo">SIN<br>FOTO</div>
-                    @endif
-                </div>
-                <div class="jersey-number">#{{ $player->jersey_number ?? '-' }}</div>
-                <div class="position-label">{{ $positionLabel }}</div>
-            </div>
-
-            {{-- Center: name + team + ficha técnica --}}
-            <div class="center-col">
-                <div class="name-row">
-                    <div class="player-name {{ $nameClass }}">
-                        {{ $fullName ?: '—' }}
-                        @if($player->is_captain)
-                            <span class="captain-badge">C</span>
-                        @endif
-                    </div>
-                </div>
-
-                <div class="team-name">{{ $player->team?->name ?? 'Sin equipo' }}</div>
-
-                <div class="info-grid">
-                    <div class="info-row">
-                        <span class="info-label">Doc</span>
-                        <span class="info-value">{{ $player->document_type }} {{ $player->document_number }}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Nac</span>
-                        <span class="info-value">
-                            {{ $player->birth_date?->format('d/m/Y') ?? '—' }}
-                            @if($player->age)
-                                <span class="info-value-note">({{ $player->age }} años)</span>
-                            @endif
-                        </span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">RH</span>
-                        <span class="info-value">
-                            @if($player->blood_type)
-                                <span class="rh-badge">{{ $player->blood_type }}</span>
-                            @else
-                                —
-                            @endif
-                        </span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Iglesia</span>
-                        <span class="info-value">{{ $player->church ?? '—' }}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Dorsal</span>
-                        <span class="info-value">{{ $player->jersey_name ?? '—' }}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Estado</span>
-                        <span class="info-value">
-                            <span class="status-badge status-{{ $statusKey }}">{{ $statusLabel }}</span>
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Right: QR + unique code --}}
-            <div class="right-col">
-                <div class="qr-frame">
-                    @if($qrBase64)
-                        <img src="{{ $qrBase64 }}" alt="QR">
-                    @else
-                        <div class="qr-fallback">{{ $player->unique_code ?? 'Sin QR' }}</div>
-                    @endif
-                </div>
-                <div class="qr-label">{{ $player->unique_code ?? '' }}</div>
-                <div class="qr-hint">Escanea ficha</div>
-            </div>
-
-            <div class="bottom-bar"></div>
-        </div>
-    </div>
-</body>
+    $fullName = trim(($player->first_name ?? '') . ' ' . ($player->last_name ?? ''));
+    $nameLen = mb_strlen($fullName);
+    $nameClass = $nameLen <= 16 ? 'player-name-short'
+        : ($nameLen <= 22 ? 'player-name-mid'
+        : ($nameLen <= 30 ? 'player-name-long' : 'player-name-xlong'));
+@endphp<div class="top-bar"><div class="top-bar-inner clearfix"><div class="logo-section">@if($logoBase64)<img src="{{ $logoBase64 }}" alt="Logo">@endif</div><div class="tournament-section"><div class="tournament-name">{{ $tournamentName }}</div>@if($categoryName)<div class="category-name">{{ $categoryName }}</div>@endif</div></div></div><div class="content clearfix"><div class="left-col"><div class="photo-frame">@if($photoBase64)<img src="{{ $photoBase64 }}" alt="Foto">@else<div class="no-photo">SIN<br>FOTO</div>@endif</div><div class="jersey-number">#{{ $player->jersey_number ?? '-' }}</div><div class="position-label">{{ $positionLabel }}</div></div><div class="center-col"><div class="name-row"><div class="player-name {{ $nameClass }}">{{ $fullName ?: '—' }}@if($player->is_captain)<span class="captain-badge">C</span>@endif</div></div><div class="team-name">{{ $player->team?->name ?? 'Sin equipo' }}</div><div class="info-grid"><div class="info-row"><span class="info-label">Doc</span><span class="info-value">{{ $player->document_type }} {{ $player->document_number }}</span></div><div class="info-row"><span class="info-label">Nac</span><span class="info-value">{{ $player->birth_date?->format('d/m/Y') ?? '—' }} @if($player->age)<span class="info-value-note">({{ $player->age }} años)</span>@endif</span></div><div class="info-row"><span class="info-label">RH</span><span class="info-value">@if($player->blood_type)<span class="rh-badge">{{ $player->blood_type }}</span>@else—@endif</span></div><div class="info-row"><span class="info-label">Iglesia</span><span class="info-value">{{ $player->church ?? '—' }}</span></div><div class="info-row"><span class="info-label">Dorsal</span><span class="info-value">{{ $player->jersey_name ?? '—' }}</span></div><div class="info-row"><span class="info-label">Estado</span><span class="info-value"><span class="status-badge status-{{ $statusKey }}">{{ $statusLabel }}</span></span></div></div></div><div class="right-col"><div class="qr-frame">@if($qrBase64)<img src="{{ $qrBase64 }}" alt="QR">@else<div class="qr-fallback">{{ $player->unique_code ?? 'Sin QR' }}</div>@endif</div><div class="qr-label">{{ $player->unique_code ?? '' }}</div><div class="qr-hint">Escanea ficha</div></div></div><div class="card-footer"><div class="card-footer-inner">@if($logoBase64)<img class="card-footer-logo" src="{{ $logoBase64 }}" alt="">@endif<span class="card-footer-name">{{ $tournamentName }}</span></div></div></div></body>
 </html>

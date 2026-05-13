@@ -21,24 +21,10 @@ class PlayerCardService
         $tournamentName = $tournament?->name ?? 'Torneo León de Judá';
         $categoryName = $category?->name ?? '';
 
-        // QR data: ficha completa del jugador en JSON
-        $qrData = json_encode([
-            'codigo' => $player->unique_code,
-            'nombre' => trim(($player->first_name ?? '') . ' ' . ($player->last_name ?? '')),
-            'documento' => trim(($player->document_type ?? '') . ' ' . ($player->document_number ?? '')),
-            'nacimiento' => $player->birth_date?->format('Y-m-d'),
-            'edad' => $player->age,
-            'rh' => $player->blood_type,
-            'equipo' => $player->team?->name,
-            'dorsal' => $player->jersey_number,
-            'nombre_dorsal' => $player->jersey_name,
-            'posicion' => $player->position,
-            'iglesia' => $player->church,
-            'estado' => $player->approval_status,
-            'capitan' => (bool) $player->is_captain,
-            'torneo' => $tournamentName,
-            'categoria' => $categoryName,
-        ], JSON_UNESCAPED_UNICODE);
+        // QR encode una URL al validador publico. Al escanear con cualquier
+        // camara de celular abre directo la ficha del jugador en el navegador.
+        // URL corta = QR con menos modulos = mucho mas facil de escanear.
+        $qrData = url('/verificar/' . $player->unique_code);
 
         // QR options: ECC M + scale 12 + quietzone 2.
         // chillerlan v6 a veces devuelve solo el base64 sin el prefijo data URI,

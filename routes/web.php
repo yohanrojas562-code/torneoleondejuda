@@ -11,6 +11,7 @@ use App\Http\Controllers\PqrsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StandingsController;
 use App\Http\Controllers\VallaController;
+use App\Http\Controllers\VerificarController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -22,6 +23,8 @@ Route::get('/goleadores', GoleadoresController::class)->name('goleadores');
 Route::get('/valla-menos-vencida', VallaController::class)->name('valla');
 Route::get('/equipo', EquipoController::class)->name('equipo');
 Route::get('/acerca-del-torneo', AcercaController::class)->name('acerca');
+Route::get('/verificar', VerificarController::class)->name('verificar');
+Route::get('/verificar/{code}', [VerificarController::class, 'show'])->name('verificar.show');
 Route::get('/patrocinadores', PatrocinadoresController::class)->name('patrocinadores');
 
 Route::get('/pqrs', [PqrsController::class, 'create'])->name('pqrs.create');
