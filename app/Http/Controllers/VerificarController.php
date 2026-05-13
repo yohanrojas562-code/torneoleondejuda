@@ -28,7 +28,7 @@ class VerificarController extends Controller
         ]);
     }
 
-    public function show(string $code, Request $request)
+    public function show(string $code)
     {
         $player = Player::with(['team:id,name,short_name,logo,primary_color'])
             ->where('unique_code', $code)
@@ -47,18 +47,24 @@ class VerificarController extends Controller
     {
         $base = Player::query()->with(['team:id,name,short_name,logo,primary_color']);
 
+        // Codigo unico: si trae el prefijo LDJ-, buscar exacto (case insensitive)
         if (stripos($q, 'LDJ-') === 0) {
-            return $base->where('unique_code', $q)->limit(1)->get();
-        }
-
-        if (ctype_digit($q)) {
-            return $base->where('document_number', $q)->limit(5)->get();
+            return $base->whereRaw('UPPER(unique_code) = ?', [strtoupper($q)])->limit(1)->get();
         }
 
         $lower = mb_strtolower($q);
+        // Quitar puntos, comas, espacios, guiones para tolerar formato del documento
+        // (ej. "1.098.765.432", "10 987 65432", "1098-765-432" -> todo a digitos)
+        $digitsOnly = preg_replace('/\D+/', '', $q);
+
         return $base
-            ->where(function ($qb) use ($lower) {
-                $qb->whereRaw('LOWER(first_name) LIKE ?', ['%' . $lower . '%'])
+            ->where(function ($qb) use ($lower, $digitsOnly) {
+                // Documento exacto (si hay digitos)
+                if ($digitsOnly !== '') {
+                    $qb->orWhere('document_number', $digitsOnly);
+                }
+                // Nombre/apellido por LIKE
+                $qb->orWhereRaw('LOWER(first_name) LIKE ?', ['%' . $lower . '%'])
                     ->orWhereRaw('LOWER(last_name) LIKE ?', ['%' . $lower . '%']);
             })
             ->orderBy('first_name')

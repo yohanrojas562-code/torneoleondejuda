@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { PageProps } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
-    ShieldCheck, ArrowLeft, Search, User as UserIcon, CheckCircle2, AlertTriangle, XCircle,
+    ShieldCheck, ArrowLeft, Search, User as UserIcon, CheckCircle2, AlertTriangle, XCircle, ScanLine,
 } from 'lucide-react';
 import MobileBottomNav from '@/Components/MobileBottomNav';
 import MobileSideDrawer from '@/Components/MobileSideDrawer';
+import QrScannerOverlay from '@/Components/QrScannerOverlay';
 
 interface TeamRef { id: number; name: string; short_name: string | null; logo: string | null; primary_color: string | null; }
 interface PlayerResult {
@@ -270,6 +271,7 @@ function PlayerMiniCard({ player }: { player: PlayerResult }) {
 
 export default function Verificar({ query = '', players = [], settings = {} }: Props) {
     const [input, setInput] = useState(query);
+    const [showScanner, setShowScanner] = useState(false);
     const data = Array.isArray(players) ? players : [];
 
     const siteName = settings.site_name || 'Torneo León de Judá';
@@ -280,6 +282,43 @@ export default function Verificar({ query = '', players = [], settings = {} }: P
         const q = input.trim();
         if (!q) return;
         router.get('/verificar', { q }, { preserveScroll: true });
+    };
+
+    // Procesa el resultado del scanner: maneja URL de validador,
+    // codigos LDJ- directos y QRs legacy con JSON.
+    const handleScanResult = (text: string) => {
+        setShowScanner(false);
+        if (!text) return;
+        const trimmed = text.trim();
+
+        // 1) URL completa con /verificar/{code}
+        const urlMatch = trimmed.match(/\/verificar\/([A-Za-z0-9\-_]+)/i);
+        if (urlMatch) {
+            router.visit(`/verificar/${urlMatch[1]}`);
+            return;
+        }
+
+        // 2) Codigo LDJ- plano
+        if (/^LDJ-/i.test(trimmed)) {
+            router.visit(`/verificar/${trimmed}`);
+            return;
+        }
+
+        // 3) Carnet legacy con QR JSON: extraer "codigo" o "code"
+        try {
+            const parsed = JSON.parse(trimmed);
+            const code = parsed?.codigo || parsed?.code;
+            if (code) {
+                router.visit(`/verificar/${code}`);
+                return;
+            }
+        } catch {
+            // no era JSON, sigue
+        }
+
+        // 4) Cualquier otra cosa: cargarlo en el input y buscar
+        setInput(trimmed);
+        router.get('/verificar', { q: trimmed });
     };
 
     return (
@@ -319,7 +358,7 @@ export default function Verificar({ query = '', players = [], settings = {} }: P
                             </p>
                         </motion.div>
 
-                        <form onSubmit={submit} className="mb-8">
+                        <form onSubmit={submit} className="mb-3">
                             <div className="flex flex-col sm:flex-row gap-2 bg-white/[0.03] border border-white/10 rounded-2xl p-2 focus-within:border-brand-gold/40 transition">
                                 <div className="flex-1 flex items-center gap-2 px-3">
                                     <Search className="w-5 h-5 text-gray-500 flex-shrink-0" />
@@ -327,7 +366,7 @@ export default function Verificar({ query = '', players = [], settings = {} }: P
                                         type="search"
                                         value={input}
                                         onChange={(e) => setInput(e.target.value)}
-                                        placeholder="Código (LDJ-...), documento o nombre"
+                                        placeholder="Documento, nombre o código LDJ-..."
                                         className="flex-1 bg-transparent text-white placeholder-gray-600 text-sm py-2.5 focus:outline-none"
                                         autoFocus
                                     />
@@ -341,9 +380,24 @@ export default function Verificar({ query = '', players = [], settings = {} }: P
                                 </button>
                             </div>
                             <p className="text-gray-600 text-[11px] mt-2 px-2">
-                                La búsqueda detecta automáticamente el tipo: si empieza con <span className="text-brand-gold font-mono">LDJ-</span> busca por código, si son solo números por documento, de lo contrario por nombre.
+                                Busca por <span className="text-brand-gold">número de documento</span>, nombre, apellido o código del carnet (<span className="text-brand-gold font-mono">LDJ-...</span>).
                             </p>
                         </form>
+
+                        <div className="flex items-center gap-3 my-5">
+                            <span className="flex-1 h-px bg-white/10" />
+                            <span className="text-gray-600 text-[10px] uppercase tracking-[0.3em] font-bold">o</span>
+                            <span className="flex-1 h-px bg-white/10" />
+                        </div>
+
+                        <button
+                            type="button"
+                            onClick={() => setShowScanner(true)}
+                            className="w-full mb-8 flex items-center justify-center gap-3 bg-brand-gold/10 hover:bg-brand-gold/20 border border-brand-gold/30 hover:border-brand-gold/60 text-brand-gold font-bold px-5 py-4 rounded-2xl transition text-sm"
+                        >
+                            <ScanLine className="w-5 h-5" />
+                            <span>Escanear QR del carnet</span>
+                        </button>
 
                         {query !== '' && data.length === 0 && (
                             <div className="text-center py-12 text-gray-500 bg-white/[0.02] border border-white/5 rounded-2xl">
@@ -387,6 +441,15 @@ export default function Verificar({ query = '', players = [], settings = {} }: P
                 </footer>
 
                 <MobileBottomNav />
+
+                <AnimatePresence>
+                    {showScanner && (
+                        <QrScannerOverlay
+                            onClose={() => setShowScanner(false)}
+                            onResult={handleScanResult}
+                        />
+                    )}
+                </AnimatePresence>
             </div>
         </>
     );
