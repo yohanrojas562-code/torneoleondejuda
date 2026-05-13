@@ -17,6 +17,7 @@
             font-family: 'Helvetica', 'Arial', sans-serif;
             margin: 0;
             padding: 0;
+            background: #ffffff;
         }
 
         .card {
@@ -24,13 +25,14 @@
             height: 153.01pt;
             position: relative;
             overflow: hidden;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-            color: #ffffff;
+            background: #ffffff;
+            color: #0a0a0a;
+            border: 0.5pt solid #d0d0d0;
         }
 
-        /* Gold top bar */
+        /* Gold top bar (solid, sin gradient para que DomPDF lo renderice bien) */
         .top-bar {
-            background: linear-gradient(90deg, #D68F03 0%, #E5A824 50%, #D68F03 100%);
+            background: #D68F03;
             height: 26pt;
             padding: 2pt 6pt;
             display: flex;
@@ -58,7 +60,7 @@
         }
 
         .tournament-name {
-            font-size: 5.5pt;
+            font-size: 6pt;
             font-weight: bold;
             color: #0a0a0a;
             text-transform: uppercase;
@@ -66,17 +68,18 @@
         }
 
         .category-name {
-            font-size: 4.5pt;
-            color: #2a2a2a;
+            font-size: 5pt;
+            color: #1a1a1a;
             text-transform: uppercase;
             margin-top: 0.5pt;
         }
 
         /* Main content */
         .content {
-            padding: 4pt 6pt 5pt 6pt;
+            padding: 5pt 6pt 5pt 6pt;
             position: relative;
             height: 124pt;
+            background: #ffffff;
         }
 
         /* Left column: photo + jersey + position */
@@ -91,7 +94,7 @@
             border: 1.5pt solid #D68F03;
             border-radius: 3pt;
             overflow: hidden;
-            background: #1a1a1a;
+            background: #f5f5f5;
         }
 
         .photo-frame img {
@@ -107,7 +110,7 @@
             align-items: center;
             justify-content: center;
             font-size: 6pt;
-            color: #666;
+            color: #888;
             text-align: center;
             padding-top: 22pt;
         }
@@ -116,7 +119,7 @@
             text-align: center;
             font-size: 13pt;
             font-weight: bold;
-            color: #D68F03;
+            color: #B57A02;
             margin-top: 2pt;
             line-height: 1;
             letter-spacing: -0.3pt;
@@ -125,10 +128,11 @@
         .position-label {
             text-align: center;
             font-size: 5pt;
-            color: #c8c8c8;
+            color: #1a1a1a;
             text-transform: uppercase;
             letter-spacing: 0.4pt;
             margin-top: 1pt;
+            font-weight: bold;
         }
 
         /* Center column: name + team + ficha técnica */
@@ -139,15 +143,15 @@
         }
 
         .name-row {
-            border-bottom: 0.5pt solid #D68F03;
+            border-bottom: 0.7pt solid #D68F03;
             padding-bottom: 2pt;
-            margin-bottom: 2pt;
+            margin-bottom: 3pt;
         }
 
         .player-name {
-            font-size: 7.5pt;
+            font-size: 8pt;
             font-weight: bold;
-            color: #ffffff;
+            color: #000000;
             text-transform: uppercase;
             letter-spacing: 0.2pt;
             line-height: 1.15;
@@ -168,8 +172,8 @@
         }
 
         .team-name {
-            font-size: 6pt;
-            color: #D68F03;
+            font-size: 6.5pt;
+            color: #B57A02;
             text-transform: uppercase;
             font-weight: bold;
             margin-bottom: 3pt;
@@ -185,27 +189,33 @@
 
         .info-row {
             font-size: 5.5pt;
-            line-height: 1.25;
-            margin-bottom: 0.5pt;
+            line-height: 1.3;
+            margin-bottom: 0.8pt;
+            color: #000000;
         }
 
         .info-label {
             display: inline-block;
-            color: #888;
+            color: #555555;
             text-transform: uppercase;
             letter-spacing: 0.3pt;
-            font-size: 4pt;
+            font-size: 4.2pt;
             font-weight: bold;
             width: 28pt;
         }
 
         .info-value {
             display: inline;
-            color: #f0f0f0;
+            color: #000000;
             font-weight: bold;
             font-size: 5.5pt;
             word-wrap: break-word;
             overflow-wrap: break-word;
+        }
+
+        .info-value-note {
+            color: #555555;
+            font-weight: normal;
         }
 
         .rh-badge {
@@ -231,7 +241,7 @@
         }
 
         .status-approved { background: #10b981; color: #ffffff; }
-        .status-pending { background: #f59e0b; color: #1a1a1a; }
+        .status-pending { background: #f59e0b; color: #0a0a0a; }
         .status-rejected { background: #ef4444; color: #ffffff; }
 
         /* Right column: QR + code */
@@ -247,6 +257,7 @@
             margin: 0 auto 2pt auto;
             padding: 1.5pt;
             background: #ffffff;
+            border: 1pt solid #D68F03;
             border-radius: 3pt;
             overflow: hidden;
         }
@@ -256,9 +267,22 @@
             height: 57pt;
         }
 
+        .qr-fallback {
+            width: 57pt;
+            height: 57pt;
+            background: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 5pt;
+            color: #555;
+            padding: 4pt;
+        }
+
         .qr-label {
             font-size: 4pt;
-            color: #D68F03;
+            color: #B57A02;
             text-transform: uppercase;
             letter-spacing: 0.4pt;
             font-weight: bold;
@@ -267,7 +291,7 @@
 
         .qr-hint {
             font-size: 3.5pt;
-            color: #888;
+            color: #555555;
             margin-top: 0.5pt;
             text-transform: uppercase;
             letter-spacing: 0.3pt;
@@ -280,7 +304,7 @@
             left: 0;
             right: 0;
             height: 2.5pt;
-            background: linear-gradient(90deg, #D68F03 0%, #E5A824 50%, #D68F03 100%);
+            background: #D68F03;
         }
 
         .clearfix::after {
@@ -307,6 +331,8 @@
             'delantero' => 'Delantero',
         ];
         $positionLabel = $positionLabels[$player->position] ?? ucfirst($player->position ?? '—');
+
+        $fullName = trim(($player->first_name ?? '') . ' ' . ($player->last_name ?? ''));
     @endphp
 
     <div class="card">
@@ -346,7 +372,7 @@
             <div class="center-col">
                 <div class="name-row">
                     <div class="player-name">
-                        {{ $player->first_name }} {{ $player->last_name }}
+                        {{ $fullName ?: '—' }}
                         @if($player->is_captain)
                             <span class="captain-badge">C</span>
                         @endif
@@ -365,7 +391,7 @@
                         <span class="info-value">
                             {{ $player->birth_date?->format('d/m/Y') ?? '—' }}
                             @if($player->age)
-                                <span style="color:#aaa;font-weight:normal">({{ $player->age }} años)</span>
+                                <span class="info-value-note">({{ $player->age }} años)</span>
                             @endif
                         </span>
                     </div>
@@ -399,7 +425,11 @@
             {{-- Right: QR + unique code --}}
             <div class="right-col">
                 <div class="qr-frame">
-                    <img src="{{ $qrBase64 }}" alt="QR">
+                    @if($qrBase64)
+                        <img src="{{ $qrBase64 }}" alt="QR">
+                    @else
+                        <div class="qr-fallback">{{ $player->unique_code ?? 'Sin QR' }}</div>
+                    @endif
                 </div>
                 <div class="qr-label">{{ $player->unique_code ?? '' }}</div>
                 <div class="qr-hint">Escanea ficha</div>

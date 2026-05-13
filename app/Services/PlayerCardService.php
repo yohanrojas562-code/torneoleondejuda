@@ -15,14 +15,13 @@ class PlayerCardService
     {
         $player->load(['team.seasons.tournament', 'team.seasons.category']);
 
-        // Tournament & category info (se calculan antes para incluirlos en QR)
         $season = $player->team?->seasons?->first();
         $tournament = $season?->tournament;
         $category = $season?->category ?? $tournament?->category;
         $tournamentName = $tournament?->name ?? 'Torneo León de Judá';
         $categoryName = $category?->name ?? '';
 
-        // QR data: ficha completa del jugador en JSON Unicode-safe
+        // QR data: ficha completa del jugador en JSON
         $qrData = json_encode([
             'codigo' => $player->unique_code,
             'nombre' => trim(($player->first_name ?? '') . ' ' . ($player->last_name ?? '')),
@@ -41,32 +40,38 @@ class PlayerCardService
             'categoria' => $categoryName,
         ], JSON_UNESCAPED_UNICODE);
 
-        // QR: ECC M (mejor capacidad de datos sin sacrificar mucha tolerancia)
-        // + scale 15 + quietzone 2 → módulos más grandes y margen suficiente
-        // para que cámaras de celular escaneen bien al imprimir el carnet.
-        $options = new QROptions([
-            'outputInterface' => QRGdImagePNG::class,
-            'eccLevel' => EccLevel::M,
-            'scale' => 15,
-            'outputBase64' => true,
-            'quietzoneSize' => 2,
-            'imageTransparent' => false,
-            'bgColor' => [255, 255, 255],
-        ]);
+        // QR options minimas (sin opciones extras que rompian el render).
+        // ECC M + scale 12 + quietzone 2: modulos grandes y margen para escaneo.
+        $qrBase64 = null;
+        try {
+            $options = new QROptions([
+                'outputInterface' => QRGdImagePNG::class,
+                'eccLevel' => EccLevel::M,
+                'scale' => 12,
+                'outputBase64' => true,
+                'quietzoneSize' => 2,
+            ]);
 
-        $qrBase64 = (new QRCode($options))->render($qrData);
+            $qrOutput = (new QRCode($options))->render($qrData);
 
-        // Foto del jugador comprimida (resize a 400px máx + JPEG 80)
+            // Validar que el output sea un data URI usable por DomPDF
+            if (is_string($qrOutput) && str_starts_with($qrOutput, 'data:image/')) {
+                $qrBase64 = $qrOutput;
+            }
+        } catch (\Throwable $e) {
+            $qrBase64 = null;
+        }
+
+        // Foto del jugador: max 300px ancho + JPEG 70 (mucho mas liviano)
         $photoBase64 = null;
         if ($player->photo) {
             $photoPath = storage_path('app/public/' . $player->photo);
             if (file_exists($photoPath)) {
-                $photoBase64 = self::compressImage($photoPath, 400, 80);
+                $photoBase64 = self::compressImage($photoPath, 300, 70);
             }
         }
 
-        // Logo dinámico desde Configuración del sitio (no se comprime — suele
-        // ser pequeño y la transparencia importa)
+        // Logo desde Configuración del sitio (se mantiene tal cual — pequeño y con transparencia)
         $logoBase64 = null;
         $logoValue = \App\Models\SiteSetting::get('logo');
         if ($logoValue) {
@@ -86,20 +91,19 @@ class PlayerCardService
             'categoryName' => $categoryName,
         ]);
 
-        // Tamaño tarjeta crédito (85.6mm x 53.98mm) en puntos
+        // Tarjeta crédito (85.6mm x 53.98mm)
         $pdf->setPaper([0, 0, 242.65, 153.01], 'landscape');
 
         return $pdf;
     }
 
     /**
-     * Comprime una imagen: resize si excede max width y la convierte a JPEG
-     * con la calidad dada. Devuelve un data URL base64 listo para embed.
+     * Comprime imagen: resize si excede ancho dado, convierte a JPEG con la
+     * calidad especificada. Devuelve data URL base64 o null.
      */
-    private static function compressImage(string $path, int $maxWidth = 400, int $quality = 80): ?string
+    private static function compressImage(string $path, int $maxWidth = 300, int $quality = 70): ?string
     {
         if (!function_exists('imagecreatefromstring')) {
-            // Fallback: GD no disponible → embebe original sin tocar
             $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION)) ?: 'png';
             return 'data:image/' . $ext . ';base64,' . base64_encode(file_get_contents($path));
         }
@@ -124,16 +128,14 @@ class PlayerCardService
             $white = imagecolorallocate($resized, 255, 255, 255);
             imagefill($resized, 0, 0, $white);
             imagecopyresampled($resized, $img, 0, 0, 0, 0, $maxWidth, $newH, $w, $h);
-            imagedestroy($img);
             $img = $resized;
         }
 
         ob_start();
         imagejpeg($img, null, $quality);
         $jpgData = ob_get_clean();
-        imagedestroy($img);
 
-        if ($jpgData === false || $jpgData === '' || $jpgData === null) {
+        if (empty($jpgData)) {
             return null;
         }
 
