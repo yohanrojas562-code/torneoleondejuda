@@ -40,8 +40,9 @@ class PlayerCardService
             'categoria' => $categoryName,
         ], JSON_UNESCAPED_UNICODE);
 
-        // QR options minimas (sin opciones extras que rompian el render).
-        // ECC M + scale 12 + quietzone 2: modulos grandes y margen para escaneo.
+        // QR options: ECC M + scale 12 + quietzone 2.
+        // chillerlan v6 a veces devuelve solo el base64 sin el prefijo data URI,
+        // asi que normalizamos al final para garantizar que DomPDF lo decodifique.
         $qrBase64 = null;
         try {
             $options = new QROptions([
@@ -54,20 +55,23 @@ class PlayerCardService
 
             $qrOutput = (new QRCode($options))->render($qrData);
 
-            // Validar que el output sea un data URI usable por DomPDF
-            if (is_string($qrOutput) && str_starts_with($qrOutput, 'data:image/')) {
-                $qrBase64 = $qrOutput;
+            if (is_string($qrOutput) && $qrOutput !== '') {
+                // Si ya viene con prefijo data URI lo dejamos. Si viene solo el
+                // base64 raw (caso comun en v6), agregamos el prefijo manualmente.
+                $qrBase64 = str_starts_with($qrOutput, 'data:')
+                    ? $qrOutput
+                    : 'data:image/png;base64,' . $qrOutput;
             }
         } catch (\Throwable $e) {
             $qrBase64 = null;
         }
 
-        // Foto del jugador: max 300px ancho + JPEG 70 (mucho mas liviano)
+        // Foto del jugador: max 250px ancho + JPEG 60 (PDF aun mas liviano)
         $photoBase64 = null;
         if ($player->photo) {
             $photoPath = storage_path('app/public/' . $player->photo);
             if (file_exists($photoPath)) {
-                $photoBase64 = self::compressImage($photoPath, 300, 70);
+                $photoBase64 = self::compressImage($photoPath, 250, 60);
             }
         }
 
@@ -91,8 +95,10 @@ class PlayerCardService
             'categoryName' => $categoryName,
         ]);
 
-        // Tarjeta crédito (85.6mm x 53.98mm)
-        $pdf->setPaper([0, 0, 242.65, 153.01], 'landscape');
+        // Tarjeta crédito (85.6mm x 53.98mm). El bbox ya define ancho > alto
+        // (landscape natural). Pasar 'landscape' como segundo argumento hacia
+        // que DomPDF rotara el bbox en algunas versiones y produjera A4 vertical.
+        $pdf->setPaper([0, 0, 242.65, 153.01]);
 
         return $pdf;
     }

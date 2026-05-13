@@ -149,15 +149,19 @@
         }
 
         .player-name {
-            font-size: 8pt;
             font-weight: bold;
             color: #000000;
             text-transform: uppercase;
-            letter-spacing: 0.2pt;
-            line-height: 1.15;
+            letter-spacing: 0.1pt;
+            line-height: 1.1;
             word-wrap: break-word;
             overflow-wrap: break-word;
         }
+
+        .player-name-short { font-size: 8.5pt; }
+        .player-name-mid   { font-size: 7.5pt; }
+        .player-name-long  { font-size: 6.5pt; }
+        .player-name-xlong { font-size: 5.5pt; }
 
         .captain-badge {
             display: inline-block;
@@ -333,6 +337,12 @@
         $positionLabel = $positionLabels[$player->position] ?? ucfirst($player->position ?? '—');
 
         $fullName = trim(($player->first_name ?? '') . ' ' . ($player->last_name ?? ''));
+
+        // Clase de tamaño de nombre según longitud para evitar que quede mocho
+        $nameLen = mb_strlen($fullName);
+        $nameClass = $nameLen <= 16 ? 'player-name-short'
+            : ($nameLen <= 22 ? 'player-name-mid'
+            : ($nameLen <= 30 ? 'player-name-long' : 'player-name-xlong'));
     @endphp
 
     <div class="card">
@@ -371,7 +381,7 @@
             {{-- Center: name + team + ficha técnica --}}
             <div class="center-col">
                 <div class="name-row">
-                    <div class="player-name">
+                    <div class="player-name {{ $nameClass }}">
                         {{ $fullName ?: '—' }}
                         @if($player->is_captain)
                             <span class="captain-badge">C</span>
