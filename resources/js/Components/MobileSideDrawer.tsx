@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, usePage } from '@inertiajs/react';
 import {
-    Menu, X, Home, Calendar, Trophy, Target, MessageSquare, ArrowRight, LogIn, Users, HandHeart, Shield,
+    Menu, X, Home, Calendar, Trophy, Target, MessageSquare, ArrowRight, LogIn, Users, HandHeart, Shield, Info,
 } from 'lucide-react';
 
 const items = [
@@ -13,6 +13,7 @@ const items = [
     { href: '/valla-menos-vencida', label: 'Valla Menos Vencida', icon: Shield },
     { href: '/equipo', label: 'Equipo', icon: Users },
     { href: '/patrocinadores', label: 'Patrocinadores', icon: HandHeart },
+    { href: '/acerca-del-torneo', label: 'Sobre el Torneo', icon: Info },
     { href: '/pqrs', label: 'PQRS', icon: MessageSquare },
 ];
 

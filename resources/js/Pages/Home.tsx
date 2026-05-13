@@ -4,7 +4,8 @@ import { Head, Link } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import {
     Trophy, Users, MapPin, Calendar, Shield, ChevronRight,
-    Clock, Star, Swords, ArrowRight, LogIn, UserPlus
+    Clock, Star, Swords, ArrowRight, LogIn, UserPlus,
+    Target, HandHeart, Info, MessageSquare,
 } from 'lucide-react';
 import MobileBottomNav from '@/Components/MobileBottomNav';
 import MobileSideDrawer from '@/Components/MobileSideDrawer';
@@ -603,6 +604,48 @@ function VenuesSection({ venues }: { venues: Venue[] }) {
     );
 }
 
+function AppGrid() {
+    const items = [
+        { href: '/calendario', label: 'Calendario', desc: 'Próximos y finalizados', icon: Calendar },
+        { href: '/tabla-de-posiciones', label: 'Posiciones', desc: 'Clasificación', icon: Trophy },
+        { href: '/goleadores', label: 'Goleadores', desc: 'Máximos artilleros', icon: Target },
+        { href: '/valla-menos-vencida', label: 'Valla', desc: 'Menos vencida', icon: Shield },
+        { href: '/equipo', label: 'Equipo', desc: 'Organigrama', icon: Users },
+        { href: '/patrocinadores', label: 'Patrocinadores', desc: 'Aliados', icon: HandHeart },
+        { href: '/acerca-del-torneo', label: 'Sobre el Torneo', desc: 'Conoce más', icon: Info },
+        { href: '/pqrs', label: 'PQRS', desc: 'Sugerencias', icon: MessageSquare },
+    ];
+
+    return (
+        <section className="md:hidden bg-brand-black py-10 px-4">
+            <div className="max-w-3xl mx-auto">
+                <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-6">
+                    <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.3em]">Explora</span>
+                    <h2 className="text-2xl font-extrabold text-white mt-1.5">Accesos rápidos</h2>
+                </motion.div>
+
+                <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-50px' }}
+                    className="grid grid-cols-2 gap-3">
+                    {items.map(({ href, label, desc, icon: Icon }) => (
+                        <motion.div key={href} variants={fadeUp}>
+                            <Link
+                                href={href}
+                                className="flex flex-col items-center justify-center gap-2 bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 hover:border-brand-gold/40 rounded-2xl p-4 transition-all active:scale-95 h-full text-center"
+                            >
+                                <span className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-brand-gold/10">
+                                    <Icon className="w-6 h-6 text-brand-gold" />
+                                </span>
+                                <span className="text-white font-bold text-sm">{label}</span>
+                                <span className="text-gray-500 text-[10px] leading-tight">{desc}</span>
+                            </Link>
+                        </motion.div>
+                    ))}
+                </motion.div>
+            </div>
+        </section>
+    );
+}
+
 function Footer({ settings }: { settings: Record<string, string | null> }) {
     return (
         <footer className="bg-brand-black border-t border-white/10 py-10 px-4">
@@ -634,8 +677,11 @@ export default function Home({ auth, activeSeason, teams, standings, upcomingMat
             <div className="bg-brand-black min-h-screen">
                 <Navbar canLogin={canLogin} canRegister={canRegister} auth={auth} settings={settings} />
                 <Hero settings={settings} activeSeason={activeSeason} />
-                <AboutTournamentSection settings={settings} activeSeason={activeSeason} />
-                <ValuesSection />
+                <AppGrid />
+                <div className="hidden md:block">
+                    <AboutTournamentSection settings={settings} activeSeason={activeSeason} />
+                    <ValuesSection />
+                </div>
                 <TeamsCarousel teams={teams} />
                 <VenuesSection venues={venues} />
                 <Footer settings={settings} />

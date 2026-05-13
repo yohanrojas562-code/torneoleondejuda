@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AcercaController;
 use App\Http\Controllers\CalendarioController;
 use App\Http\Controllers\EquipoController;
 use App\Http\Controllers\GoleadoresController;
@@ -20,6 +21,7 @@ Route::get('/calendario', CalendarioController::class)->name('calendario');
 Route::get('/goleadores', GoleadoresController::class)->name('goleadores');
 Route::get('/valla-menos-vencida', VallaController::class)->name('valla');
 Route::get('/equipo', EquipoController::class)->name('equipo');
+Route::get('/acerca-del-torneo', AcercaController::class)->name('acerca');
 Route::get('/patrocinadores', PatrocinadoresController::class)->name('patrocinadores');
 
 Route::get('/pqrs', [PqrsController::class, 'create'])->name('pqrs.create');
