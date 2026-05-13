@@ -9,6 +9,7 @@ use App\Http\Controllers\PlayerCardController;
 use App\Http\Controllers\PqrsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StandingsController;
+use App\Http\Controllers\VallaController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -17,6 +18,7 @@ Route::get('/', HomeController::class);
 Route::get('/tabla-de-posiciones', StandingsController::class)->name('standings');
 Route::get('/calendario', CalendarioController::class)->name('calendario');
 Route::get('/goleadores', GoleadoresController::class)->name('goleadores');
+Route::get('/valla-menos-vencida', VallaController::class)->name('valla');
 Route::get('/equipo', EquipoController::class)->name('equipo');
 Route::get('/patrocinadores', PatrocinadoresController::class)->name('patrocinadores');
 
