@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { PageProps } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Shield, ArrowLeft } from 'lucide-react';
 import MobileBottomNav from '@/Components/MobileBottomNav';
 import MobileSideDrawer from '@/Components/MobileSideDrawer';
+import PlayerModal, { PlayerProfile } from '@/Components/PlayerModal';
 
 interface Tournament { id: number; name: string; logo: string | null; }
 interface Season { id: number; name: string; status: string; tournament: Tournament; }
@@ -14,7 +16,15 @@ interface Goalkeeper {
     last_name: string;
     photo: string | null;
     jersey_number: number | null;
+    position: string | null;
     church: string | null;
+    stats: {
+        goals: number;
+        matches: number;
+        yellow_cards: number;
+        blue_cards: number;
+        red_cards: number;
+    };
 }
 interface Row {
     id: number;
@@ -102,9 +112,24 @@ function RankBadge({ position }: { position: number }) {
 
 export default function Valla({ activeSeason, rows = [], settings = {} }: Props) {
     const data = Array.isArray(rows) ? rows : [];
+    const [selectedPlayer, setSelectedPlayer] = useState<PlayerProfile | null>(null);
 
     const siteName = settings.site_name || 'Torneo León de Judá';
     const logoUrl = settings.logo ? `/storage/${settings.logo}` : null;
+
+    const openProfile = (gk: Goalkeeper, team: RowTeam | null) => {
+        setSelectedPlayer({
+            id: gk.id,
+            first_name: gk.first_name,
+            last_name: gk.last_name,
+            photo: gk.photo,
+            jersey_number: gk.jersey_number,
+            position: gk.position,
+            church: gk.church,
+            team,
+            stats: gk.stats,
+        });
+    };
 
     return (
         <>
@@ -167,7 +192,12 @@ export default function Valla({ activeSeason, rows = [], settings = {} }: Props)
                                             {data.map((r, i) => (
                                                 <tr
                                                     key={r.id}
-                                                    className={`border-t border-white/5 hover:bg-white/[0.04] transition-colors ${i === 0 ? 'bg-brand-gold/[0.06]' : ''}`}
+                                                    onClick={() => r.goalkeeper && openProfile(r.goalkeeper, r.team)}
+                                                    onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && r.goalkeeper) { e.preventDefault(); openProfile(r.goalkeeper, r.team); } }}
+                                                    role={r.goalkeeper ? 'button' : undefined}
+                                                    tabIndex={r.goalkeeper ? 0 : undefined}
+                                                    aria-label={r.goalkeeper ? `Ver perfil de ${r.goalkeeper.first_name} ${r.goalkeeper.last_name}` : undefined}
+                                                    className={`border-t border-white/5 hover:bg-white/[0.04] transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-brand-gold/40 ${r.goalkeeper ? 'cursor-pointer' : ''} ${i === 0 ? 'bg-brand-gold/[0.06]' : ''}`}
                                                 >
                                                     <td className="py-3 px-4">
                                                         <RankBadge position={i + 1} />
@@ -223,6 +253,16 @@ export default function Valla({ activeSeason, rows = [], settings = {} }: Props)
                 </footer>
 
                 <MobileBottomNav />
+
+                <AnimatePresence>
+                    {selectedPlayer && (
+                        <PlayerModal
+                            key={selectedPlayer.id}
+                            player={selectedPlayer}
+                            onClose={() => setSelectedPlayer(null)}
+                        />
+                    )}
+                </AnimatePresence>
             </div>
         </>
     );

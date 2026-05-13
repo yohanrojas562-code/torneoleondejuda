@@ -45,7 +45,11 @@ class VallaController extends Controller
                 ->whereRaw('LOWER(position) = ?', ['portero'])
                 ->orderBy('jersey_number')
                 ->orderBy('last_name')
-                ->get(['id', 'team_id', 'first_name', 'last_name', 'photo', 'jersey_number', 'church'])
+                ->get([
+                    'id', 'team_id', 'first_name', 'last_name', 'photo', 'jersey_number',
+                    'position', 'church', 'total_goals', 'total_matches',
+                    'yellow_cards', 'blue_cards', 'red_cards',
+                ])
                 ->groupBy('team_id')
                 ->map(fn ($group) => $group->first());
 
@@ -66,7 +70,15 @@ class VallaController extends Controller
                         'last_name' => $gk->last_name,
                         'photo' => $gk->photo,
                         'jersey_number' => $gk->jersey_number,
+                        'position' => $gk->position,
                         'church' => $gk->church,
+                        'stats' => [
+                            'goals' => (int) ($gk->total_goals ?? 0),
+                            'matches' => (int) ($gk->total_matches ?? 0),
+                            'yellow_cards' => (int) ($gk->yellow_cards ?? 0),
+                            'blue_cards' => (int) ($gk->blue_cards ?? 0),
+                            'red_cards' => (int) ($gk->red_cards ?? 0),
+                        ],
                     ] : null,
                     'played' => (int) $s->played,
                     'goals_against' => (int) $s->goals_against,

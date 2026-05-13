@@ -60,6 +60,8 @@ class GoleadoresController extends Controller
                 'last_name' => $p->last_name,
                 'photo' => $p->photo,
                 'jersey_number' => $p->jersey_number,
+                'position' => $p->position,
+                'church' => $p->church,
                 'goals' => (int) $p->goals,
                 'team' => $p->team ? [
                     'id' => $p->team->id,
@@ -68,6 +70,13 @@ class GoleadoresController extends Controller
                     'logo' => $p->team->logo,
                     'primary_color' => $p->team->primary_color,
                 ] : null,
+                'stats' => [
+                    'goals' => (int) $p->goals,
+                    'matches' => (int) ($p->total_matches ?? 0),
+                    'yellow_cards' => (int) ($p->yellow_cards ?? 0),
+                    'blue_cards' => (int) ($p->blue_cards ?? 0),
+                    'red_cards' => (int) ($p->red_cards ?? 0),
+                ],
             ])->toArray(),
             'settings' => $settings->toArray(),
         ]);

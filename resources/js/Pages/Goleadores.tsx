@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { PageProps } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Target, ArrowLeft } from 'lucide-react';
 import MobileBottomNav from '@/Components/MobileBottomNav';
 import MobileSideDrawer from '@/Components/MobileSideDrawer';
+import PlayerModal, { PlayerProfile } from '@/Components/PlayerModal';
 
 interface Tournament { id: number; name: string; logo: string | null; }
 interface Season { id: number; name: string; status: string; tournament: Tournament; }
@@ -14,8 +16,17 @@ interface Scorer {
     last_name: string;
     photo: string | null;
     jersey_number: number | null;
+    position: string | null;
+    church: string | null;
     goals: number;
     team: ScorerTeam | null;
+    stats: {
+        goals: number;
+        matches: number;
+        yellow_cards: number;
+        blue_cards: number;
+        red_cards: number;
+    };
 }
 
 type Props = PageProps<{
@@ -95,9 +106,24 @@ function RankBadge({ position }: { position: number }) {
 
 export default function Goleadores({ activeSeason, topScorers = [], settings = {} }: Props) {
     const scorers = Array.isArray(topScorers) ? topScorers : [];
+    const [selectedPlayer, setSelectedPlayer] = useState<PlayerProfile | null>(null);
 
     const siteName = settings.site_name || 'Torneo León de Judá';
     const logoUrl = settings.logo ? `/storage/${settings.logo}` : null;
+
+    const openProfile = (s: Scorer) => {
+        setSelectedPlayer({
+            id: s.id,
+            first_name: s.first_name,
+            last_name: s.last_name,
+            photo: s.photo,
+            jersey_number: s.jersey_number,
+            position: s.position,
+            church: s.church,
+            team: s.team,
+            stats: s.stats,
+        });
+    };
 
     return (
         <>
@@ -160,7 +186,12 @@ export default function Goleadores({ activeSeason, topScorers = [], settings = {
                                             {scorers.map((p, i) => (
                                                 <tr
                                                     key={p.id}
-                                                    className={`border-t border-white/5 hover:bg-white/[0.04] transition-colors ${i === 0 ? 'bg-brand-gold/[0.06]' : ''}`}
+                                                    onClick={() => openProfile(p)}
+                                                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openProfile(p); } }}
+                                                    role="button"
+                                                    tabIndex={0}
+                                                    aria-label={`Ver perfil de ${p.first_name} ${p.last_name}`}
+                                                    className={`border-t border-white/5 hover:bg-white/[0.04] transition-colors cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-brand-gold/40 ${i === 0 ? 'bg-brand-gold/[0.06]' : ''}`}
                                                 >
                                                     <td className="py-3 px-4">
                                                         <RankBadge position={i + 1} />
@@ -207,6 +238,16 @@ export default function Goleadores({ activeSeason, topScorers = [], settings = {
                 </footer>
 
                 <MobileBottomNav />
+
+                <AnimatePresence>
+                    {selectedPlayer && (
+                        <PlayerModal
+                            key={selectedPlayer.id}
+                            player={selectedPlayer}
+                            onClose={() => setSelectedPlayer(null)}
+                        />
+                    )}
+                </AnimatePresence>
             </div>
         </>
     );
