@@ -84,6 +84,7 @@ function Navbar({ canLogin, canRegister, auth, settings }: { canLogin: boolean; 
                     <a href="#torneo" className="text-gray-300 hover:text-brand-gold transition">Torneo</a>
                     <Link href="/calendario" className="text-gray-300 hover:text-brand-gold transition">Calendario</Link>
                     <Link href="/tabla-de-posiciones" className="text-gray-300 hover:text-brand-gold transition">Posiciones</Link>
+                    <Link href="/goleadores" className="text-gray-300 hover:text-brand-gold transition">Goleadores</Link>
                     <Link href="/valla-menos-vencida" className="text-gray-300 hover:text-brand-gold transition">Valla</Link>
                     <a href="#escenarios" className="text-gray-300 hover:text-brand-gold transition">Escenarios</a>
                     <Link href="/equipo" className="text-gray-300 hover:text-brand-gold transition">Equipo</Link>

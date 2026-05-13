@@ -182,9 +182,8 @@ export default function Valla({ activeSeason, rows = [], settings = {} }: Props)
                                         <thead>
                                             <tr className="bg-white/5 text-gray-500 text-[11px] uppercase tracking-wider">
                                                 <th className="py-3 px-4 text-left w-12">#</th>
-                                                <th className="py-3 px-3 text-left">Equipo</th>
                                                 <th className="py-3 px-3 text-left">Portero</th>
-                                                <th className="py-3 px-3 text-left">Iglesia</th>
+                                                <th className="py-3 px-3 text-left">Equipo</th>
                                                 <th className="py-3 px-3 text-center font-bold text-white w-20">GC</th>
                                             </tr>
                                         </thead>
@@ -203,14 +202,6 @@ export default function Valla({ activeSeason, rows = [], settings = {} }: Props)
                                                         <RankBadge position={i + 1} />
                                                     </td>
                                                     <td className="py-3 px-3">
-                                                        <div className="flex items-center gap-2 min-w-0">
-                                                            <TeamLogo team={r.team} size={26} />
-                                                            <span className="text-white font-medium text-sm whitespace-nowrap">
-                                                                {r.team?.name || '—'}
-                                                            </span>
-                                                        </div>
-                                                    </td>
-                                                    <td className="py-3 px-3">
                                                         {r.goalkeeper ? (
                                                             <div className="flex items-center gap-3 min-w-0">
                                                                 <PlayerPhoto gk={r.goalkeeper} team={r.team} size={32} />
@@ -227,8 +218,13 @@ export default function Valla({ activeSeason, rows = [], settings = {} }: Props)
                                                             <span className="text-gray-600 text-xs italic">Sin portero registrado</span>
                                                         )}
                                                     </td>
-                                                    <td className="py-3 px-3 text-gray-400 text-sm whitespace-nowrap">
-                                                        {r.goalkeeper?.church || '—'}
+                                                    <td className="py-3 px-3">
+                                                        <div className="flex items-center gap-2 min-w-0">
+                                                            <TeamLogo team={r.team} size={26} />
+                                                            <span className="text-white font-medium text-sm whitespace-nowrap">
+                                                                {r.team?.name || '—'}
+                                                            </span>
+                                                        </div>
                                                     </td>
                                                     <td className="py-3 px-3 text-center">
                                                         <span className="text-brand-gold font-extrabold text-lg">{r.goals_against}</span>
