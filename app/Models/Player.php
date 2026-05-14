@@ -13,7 +13,7 @@ class Player extends Model
     protected $fillable = [
         'team_id', 'user_id', 'unique_code', 'first_name', 'last_name',
         'document_type', 'document_number', 'document_file', 'birth_date', 'blood_type', 'photo',
-        'jersey_number', 'jersey_name', 'position', 'is_active',
+        'jersey_number', 'jersey_name', 'position', 'goalkeeper_type', 'is_active',
         'height', 'weight', 'is_captain',
         'eps_certificate', 'no_eps_consent', 'has_eps',
         'parental_consent', 'church',

@@ -206,7 +206,18 @@ class PlayerResource extends Resource
                         'mediocampista' => 'Mediocampista',
                         'delantero' => 'Delantero',
                     ])
-                    ->required(),
+                    ->required()
+                    ->live(),
+                Forms\Components\Select::make('goalkeeper_type')
+                    ->label('Tipo de portero')
+                    ->options([
+                        'titular' => 'Titular',
+                        'suplente' => 'Suplente',
+                    ])
+                    ->placeholder('Sin especificar')
+                    ->nullable()
+                    ->visible(fn (Forms\Get $get) => $get('position') === 'portero')
+                    ->helperText('El portero titular es el que se muestra en la tabla de Valla Menos Vencida. Si solo hay un portero registrado, ese se mostrara independientemente del tipo.'),
                 Forms\Components\TextInput::make('height')
                     ->label('Estatura (cm)')
                     ->numeric()

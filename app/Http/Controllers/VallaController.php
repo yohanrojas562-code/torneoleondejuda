@@ -39,15 +39,22 @@ class VallaController extends Controller
 
             $teamIds = $standings->pluck('team_id')->unique()->all();
 
+            // Orden de prioridad para elegir el portero del equipo:
+            //   1) goalkeeper_type = 'titular'
+            //   2) goalkeeper_type = 'suplente'
+            //   3) sin tipo especificado
+            // Si solo hay un portero registrado, ese se muestra sin importar
+            // el tipo (porque al filtrar el group y tomar el primero, queda ese).
             $goalkeepers = Player::query()
                 ->whereIn('team_id', $teamIds)
                 ->where('approval_status', 'approved')
                 ->whereRaw('LOWER(position) = ?', ['portero'])
+                ->orderByRaw("CASE WHEN LOWER(goalkeeper_type) = 'titular' THEN 0 WHEN LOWER(goalkeeper_type) = 'suplente' THEN 1 ELSE 2 END")
                 ->orderBy('jersey_number')
                 ->orderBy('last_name')
                 ->get([
                     'id', 'team_id', 'first_name', 'last_name', 'photo', 'jersey_number',
-                    'position', 'church', 'total_goals', 'total_matches',
+                    'position', 'goalkeeper_type', 'church', 'total_goals', 'total_matches',
                     'yellow_cards', 'blue_cards', 'red_cards',
                 ])
                 ->groupBy('team_id')
