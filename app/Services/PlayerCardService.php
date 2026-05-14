@@ -72,6 +72,30 @@ class PlayerCardService
             }
         }
 
+        // Pre-calculamos en PHP toda la logica que antes vivia en @php del
+        // blade. Mantener el blade SIN @php evita whitespace dentro del .card
+        // que generaria un nodo de texto con line-height y rompia la
+        // paginacion del PDF.
+        $statusLabels = [
+            'approved' => 'Aprobado',
+            'pending' => 'Pendiente',
+            'rejected' => 'Rechazado',
+        ];
+        $positionLabels = [
+            'portero' => 'Portero',
+            'defensa' => 'Defensa',
+            'mediocampista' => 'Mediocampista',
+            'delantero' => 'Delantero',
+        ];
+        $statusKey = $player->approval_status ?? 'pending';
+        $statusLabel = $statusLabels[$statusKey] ?? ucfirst($statusKey);
+        $positionLabel = $positionLabels[$player->position] ?? ucfirst($player->position ?? '—');
+        $fullName = trim(($player->first_name ?? '') . ' ' . ($player->last_name ?? ''));
+        $nameLen = mb_strlen($fullName);
+        $nameClass = $nameLen <= 16 ? 'player-name-short'
+            : ($nameLen <= 22 ? 'player-name-mid'
+            : ($nameLen <= 30 ? 'player-name-long' : 'player-name-xlong'));
+
         $pdf = Pdf::loadView('pdf.player-card', [
             'player' => $player,
             'qrBase64' => $qrBase64,
@@ -79,6 +103,11 @@ class PlayerCardService
             'logoBase64' => $logoBase64,
             'tournamentName' => $tournamentName,
             'categoryName' => $categoryName,
+            'statusKey' => $statusKey,
+            'statusLabel' => $statusLabel,
+            'positionLabel' => $positionLabel,
+            'fullName' => $fullName,
+            'nameClass' => $nameClass,
         ]);
 
         // Tarjeta crédito (85.6mm x 53.98mm). El bbox ya define ancho > alto
