@@ -28,6 +28,16 @@ class PlayerResource extends Resource
         $isAdmin = $user?->hasRole('admin');
         $isLider = $user?->hasRole('lider_equipo');
 
+        // Cuando el jugador ya esta aprobado, el lider NO puede editar el
+        // nombre, apellido, numero de dorsal ni nombre del dorsal. Esto evita
+        // que se reemplace al jugador sin pasar por el flujo de PQRS.
+        $lockedWhenApproved = fn (?\App\Models\Player $record) =>
+            !$isAdmin && $record !== null && $record->approval_status === 'approved';
+        $lockedHelper = fn (?\App\Models\Player $record) =>
+            (!$isAdmin && $record !== null && $record->approval_status === 'approved')
+                ? 'Bloqueado: jugador aprobado. Genera una PQRS si necesitas cambiar este dato.'
+                : null;
+
         return $form->schema([
             Forms\Components\Section::make('Datos Personales')->schema([
                 Forms\Components\TextInput::make('first_name')
@@ -35,13 +45,17 @@ class PlayerResource extends Resource
                     ->required()
                     ->maxLength(255)
                     ->extraInputAttributes(['style' => 'text-transform: capitalize;'])
-                    ->dehydrateStateUsing(fn (?string $state) => $state ? ucwords(mb_strtolower($state)) : null),
+                    ->dehydrateStateUsing(fn (?string $state) => $state ? ucwords(mb_strtolower($state)) : null)
+                    ->disabled($lockedWhenApproved)
+                    ->helperText($lockedHelper),
                 Forms\Components\TextInput::make('last_name')
                     ->label('Apellidos')
                     ->required()
                     ->maxLength(255)
                     ->extraInputAttributes(['style' => 'text-transform: capitalize;'])
-                    ->dehydrateStateUsing(fn (?string $state) => $state ? ucwords(mb_strtolower($state)) : null),
+                    ->dehydrateStateUsing(fn (?string $state) => $state ? ucwords(mb_strtolower($state)) : null)
+                    ->disabled($lockedWhenApproved)
+                    ->helperText($lockedHelper),
                 Forms\Components\Select::make('document_type')
                     ->label('Tipo de documento')
                     ->options([
@@ -173,13 +187,17 @@ class PlayerResource extends Resource
                     ->numeric()
                     ->minValue(1)
                     ->maxValue(99)
-                    ->required(),
+                    ->required()
+                    ->disabled($lockedWhenApproved)
+                    ->helperText($lockedHelper),
                 Forms\Components\TextInput::make('jersey_name')
                     ->label('Nombre en dorsal')
                     ->maxLength(50)
                     ->placeholder('Nombre que aparece en la camiseta')
                     ->extraInputAttributes(['style' => 'text-transform: uppercase;'])
-                    ->dehydrateStateUsing(fn (?string $state) => $state ? mb_strtoupper($state) : null),
+                    ->dehydrateStateUsing(fn (?string $state) => $state ? mb_strtoupper($state) : null)
+                    ->disabled($lockedWhenApproved)
+                    ->helperText($lockedHelper),
                 Forms\Components\Select::make('position')
                     ->label('Posición')
                     ->options([
