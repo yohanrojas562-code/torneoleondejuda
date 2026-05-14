@@ -10,15 +10,12 @@
         }
 
         @page {
-            size: 242.65pt 153.01pt;
             margin: 0;
         }
 
         html, body {
             margin: 0;
             padding: 0;
-            width: 242.65pt;
-            height: 153.01pt;
             background: #ffffff;
             font-family: 'Helvetica', 'Arial', sans-serif;
         }
@@ -26,19 +23,16 @@
         .card {
             width: 242.65pt;
             height: 153.01pt;
-            position: relative;
             overflow: hidden;
             background: #ffffff;
             color: #0a0a0a;
         }
 
-        /* Gold top bar (solido) */
+        /* Gold top bar (sin display flex, mas confiable en DomPDF) */
         .top-bar {
             background: #D68F03;
             height: 24pt;
             padding: 2pt 6pt;
-            display: flex;
-            align-items: center;
         }
 
         .top-bar-inner { width: 100%; }
@@ -294,12 +288,9 @@
             letter-spacing: 0.3pt;
         }
 
-        /* Footer bar — logo y nombre del torneo */
+        /* Footer bar — logo y nombre del torneo. SIN position absolute para
+           que DomPDF lo apile naturalmente y no genere paginas extras. */
         .card-footer {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
             height: 12pt;
             background: #0a0a0a;
             color: #D68F03;

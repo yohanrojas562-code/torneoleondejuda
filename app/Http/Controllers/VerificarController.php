@@ -59,9 +59,15 @@ class VerificarController extends Controller
 
         return $base
             ->where(function ($qb) use ($lower, $digitsOnly) {
-                // Documento exacto (si hay digitos)
                 if ($digitsOnly !== '') {
+                    // 1) Documento exacto
                     $qb->orWhere('document_number', $digitsOnly);
+                    // 2) Documento parcial (por si la persona tipea solo los
+                    //    ultimos digitos o le falta uno)
+                    $qb->orWhere('document_number', 'LIKE', '%' . $digitsOnly . '%');
+                    // 3) Documento normalizado (sin puntos/espacios/guiones)
+                    //    para el caso de DBs con formato guardado
+                    $qb->orWhereRaw("REGEXP_REPLACE(document_number, '[^0-9]', '', 'g') = ?", [$digitsOnly]);
                 }
                 // Nombre/apellido por LIKE
                 $qb->orWhereRaw('LOWER(first_name) LIKE ?', ['%' . $lower . '%'])
