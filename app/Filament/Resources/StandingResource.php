@@ -53,7 +53,7 @@ class StandingResource extends Resource
             ])->columns(2),
 
             Forms\Components\Section::make('Estadísticas')
-                ->description('PJ, DG y PTS se recalculan automaticamente cuando editas PG/PE/PP o GF/GC, siguiendo la misma logica de StandingsService (PJ = PG+PE+PP · PTS = PG×3+PE · DG = GF−GC). Si necesitas un valor distinto, puedes sobreescribirlo manualmente.')
+                ->description('PJ y DG se recalculan automaticamente cuando editas PG/PE/PP o GF/GC. PTS lo decides tu manualmente (util cuando un partido entrega el mismo puntaje a ambos equipos por acuerdo). Al guardar, las posiciones del grupo se reordenan segun: PTS → DG → FairPlay → GF → −GC → −PP.')
                 ->schema([
                     Forms\Components\TextInput::make('played')
                         ->label('PJ')
@@ -70,7 +70,9 @@ class StandingResource extends Resource
                             $d = (int) ($get('drawn') ?? 0);
                             $l = (int) ($get('lost') ?? 0);
                             $set('played', $w + $d + $l);
-                            $set('points', $w * 3 + $d);
+                            // NO auto-actualizar PTS aqui — el admin puede
+                            // editarlo manualmente (ej. acuerdos especiales
+                            // donde ambos equipos reciben mismos puntos).
                         }),
                     Forms\Components\TextInput::make('drawn')
                         ->label('PE')
@@ -82,7 +84,9 @@ class StandingResource extends Resource
                             $d = (int) ($get('drawn') ?? 0);
                             $l = (int) ($get('lost') ?? 0);
                             $set('played', $w + $d + $l);
-                            $set('points', $w * 3 + $d);
+                            // NO auto-actualizar PTS aqui — el admin puede
+                            // editarlo manualmente (ej. acuerdos especiales
+                            // donde ambos equipos reciben mismos puntos).
                         }),
                     Forms\Components\TextInput::make('lost')
                         ->label('PP')
@@ -94,7 +98,9 @@ class StandingResource extends Resource
                             $d = (int) ($get('drawn') ?? 0);
                             $l = (int) ($get('lost') ?? 0);
                             $set('played', $w + $d + $l);
-                            $set('points', $w * 3 + $d);
+                            // NO auto-actualizar PTS aqui — el admin puede
+                            // editarlo manualmente (ej. acuerdos especiales
+                            // donde ambos equipos reciben mismos puntos).
                         }),
                     Forms\Components\TextInput::make('goals_for')
                         ->label('GF')
@@ -121,7 +127,7 @@ class StandingResource extends Resource
                         ->label('PTS')
                         ->numeric()
                         ->default(0)
-                        ->helperText('Auto: PG × 3 + PE'),
+                        ->helperText('Editable libremente. Por defecto seria PG×3+PE pero puedes sobreescribir.'),
                 ])->columns(4),
         ]);
     }
