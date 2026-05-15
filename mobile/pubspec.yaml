@@ -1,0 +1,68 @@
+name: torneo_leon_de_juda
+description: "Torneo Leon de Juda - App movil oficial"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # State management
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+
+  # Routing
+  go_router: ^14.6.2
+
+  # HTTP
+  dio: ^5.7.0
+
+  # Storage
+  flutter_secure_storage: ^9.2.2
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+
+  # JSON / inmutabilidad
+  freezed_annotation: ^2.4.4
+  json_annotation: ^4.9.0
+
+  # UI helpers
+  cached_network_image: ^3.4.1
+  google_fonts: ^6.2.1
+  flutter_animate: ^4.5.2
+
+  # Funcionalidad nativa
+  mobile_scanner: ^5.2.3
+  url_launcher: ^6.3.1
+  share_plus: ^10.1.2
+  image_picker: ^1.1.2
+  permission_handler: ^11.3.1
+  intl: ^0.19.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  very_good_analysis: ^7.0.0
+  riverpod_generator: ^2.6.3
+  build_runner: ^2.4.13
+  freezed: ^2.5.7
+  json_serializable: ^6.8.0
+  custom_lint: ^0.7.0
+  riverpod_lint: ^2.6.3
+
+flutter:
+  uses-material-design: true
+
+  # Assets (los iremos agregando segun necesidad)
+  # assets:
+  #   - assets/images/
+
+  # Fonts: usamos google_fonts en runtime, no necesitamos bundlear
+
+  generate: true
