@@ -52,16 +52,77 @@ class StandingResource extends Resource
                     ->default(0),
             ])->columns(2),
 
-            Forms\Components\Section::make('Estadísticas')->schema([
-                Forms\Components\TextInput::make('played')->label('PJ')->numeric()->default(0),
-                Forms\Components\TextInput::make('won')->label('PG')->numeric()->default(0),
-                Forms\Components\TextInput::make('drawn')->label('PE')->numeric()->default(0),
-                Forms\Components\TextInput::make('lost')->label('PP')->numeric()->default(0),
-                Forms\Components\TextInput::make('goals_for')->label('GF')->numeric()->default(0),
-                Forms\Components\TextInput::make('goals_against')->label('GC')->numeric()->default(0),
-                Forms\Components\TextInput::make('goal_difference')->label('DG')->numeric()->default(0),
-                Forms\Components\TextInput::make('points')->label('PTS')->numeric()->default(0),
-            ])->columns(4),
+            Forms\Components\Section::make('Estadísticas')
+                ->description('PJ, DG y PTS se recalculan automaticamente cuando editas PG/PE/PP o GF/GC, siguiendo la misma logica de StandingsService (PJ = PG+PE+PP · PTS = PG×3+PE · DG = GF−GC). Si necesitas un valor distinto, puedes sobreescribirlo manualmente.')
+                ->schema([
+                    Forms\Components\TextInput::make('played')
+                        ->label('PJ')
+                        ->numeric()
+                        ->default(0)
+                        ->helperText('Auto: PG + PE + PP'),
+                    Forms\Components\TextInput::make('won')
+                        ->label('PG')
+                        ->numeric()
+                        ->default(0)
+                        ->live(onBlur: true)
+                        ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get) {
+                            $w = (int) ($get('won') ?? 0);
+                            $d = (int) ($get('drawn') ?? 0);
+                            $l = (int) ($get('lost') ?? 0);
+                            $set('played', $w + $d + $l);
+                            $set('points', $w * 3 + $d);
+                        }),
+                    Forms\Components\TextInput::make('drawn')
+                        ->label('PE')
+                        ->numeric()
+                        ->default(0)
+                        ->live(onBlur: true)
+                        ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get) {
+                            $w = (int) ($get('won') ?? 0);
+                            $d = (int) ($get('drawn') ?? 0);
+                            $l = (int) ($get('lost') ?? 0);
+                            $set('played', $w + $d + $l);
+                            $set('points', $w * 3 + $d);
+                        }),
+                    Forms\Components\TextInput::make('lost')
+                        ->label('PP')
+                        ->numeric()
+                        ->default(0)
+                        ->live(onBlur: true)
+                        ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get) {
+                            $w = (int) ($get('won') ?? 0);
+                            $d = (int) ($get('drawn') ?? 0);
+                            $l = (int) ($get('lost') ?? 0);
+                            $set('played', $w + $d + $l);
+                            $set('points', $w * 3 + $d);
+                        }),
+                    Forms\Components\TextInput::make('goals_for')
+                        ->label('GF')
+                        ->numeric()
+                        ->default(0)
+                        ->live(onBlur: true)
+                        ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get) {
+                            $set('goal_difference', (int) ($get('goals_for') ?? 0) - (int) ($get('goals_against') ?? 0));
+                        }),
+                    Forms\Components\TextInput::make('goals_against')
+                        ->label('GC')
+                        ->numeric()
+                        ->default(0)
+                        ->live(onBlur: true)
+                        ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get) {
+                            $set('goal_difference', (int) ($get('goals_for') ?? 0) - (int) ($get('goals_against') ?? 0));
+                        }),
+                    Forms\Components\TextInput::make('goal_difference')
+                        ->label('DG')
+                        ->numeric()
+                        ->default(0)
+                        ->helperText('Auto: GF − GC'),
+                    Forms\Components\TextInput::make('points')
+                        ->label('PTS')
+                        ->numeric()
+                        ->default(0)
+                        ->helperText('Auto: PG × 3 + PE'),
+                ])->columns(4),
         ]);
     }
 
