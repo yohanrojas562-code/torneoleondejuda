@@ -28,6 +28,7 @@ class PlayerResource extends JsonResource
             'goalkeeper_type' => $this->goalkeeper_type,
             'is_captain' => (bool) $this->is_captain,
             'church' => $this->church,
+            'approval_status' => $this->approval_status,
             'team' => new TeamResource($this->whenLoaded('team')),
         ];
     }

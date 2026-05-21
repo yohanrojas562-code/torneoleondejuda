@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:torneo_leon_de_juda/core/router/app_route.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_colors.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_radius.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_spacing.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_typography.dart';
+import 'package:torneo_leon_de_juda/features/auth/data/auth_repository.dart';
+import 'package:torneo_leon_de_juda/features/auth/data/auth_user.dart';
 
 /// Drawer lateral compartido entre todas las pantallas principales.
 /// Lista todas las rutas con highlight del item activo segun la ruta
@@ -13,7 +16,7 @@ import 'package:torneo_leon_de_juda/core/theme/app_typography.dart';
 /// Uso: en cualquier Scaffold, `drawer: const AppDrawer()`.
 /// Para abrirlo desde un boton: `Scaffold.of(context).openDrawer()` desde
 /// un Builder que tenga el Scaffold como ancestor.
-class AppDrawer extends StatelessWidget {
+class AppDrawer extends ConsumerWidget {
   const AppDrawer({super.key});
 
   static const _items = <_DrawerItem>[
@@ -75,9 +78,10 @@ class AppDrawer extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final width = MediaQuery.of(context).size.width;
     final currentLocation = GoRouterState.of(context).matchedLocation;
+    final auth = ref.watch(authControllerProvider);
 
     return Drawer(
       backgroundColor: AppColors.bgDeep,
@@ -85,7 +89,7 @@ class AppDrawer extends StatelessWidget {
       shape: const RoundedRectangleBorder(),
       child: Column(
         children: [
-          const _DrawerHeader(),
+          _DrawerHeader(user: auth.user),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(
@@ -93,19 +97,33 @@ class AppDrawer extends StatelessWidget {
                 horizontal: AppSpacing.xs,
               ),
               children: [
+                if (auth.isAuthenticated)
+                  _DrawerNavItem(
+                    item: const _DrawerItem(
+                      route: AppRoute.dashboard,
+                      icon: Icons.dashboard_rounded,
+                      label: 'Mi Panel',
+                    ),
+                    isActive:
+                        _isActive(currentLocation, AppRoute.dashboard),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      context.goNamed(AppRoute.dashboard.name);
+                    },
+                  ),
                 for (final item in _items)
                   _DrawerNavItem(
                     item: item,
                     isActive: _isActive(currentLocation, item.route),
                     onTap: () {
-                      Navigator.of(context).pop(); // cerrar drawer
+                      Navigator.of(context).pop();
                       context.goNamed(item.route.name);
                     },
                   ),
               ],
             ),
           ),
-          const _DrawerFooter(),
+          _DrawerFooter(user: auth.user),
         ],
       ),
     );
@@ -113,7 +131,9 @@ class AppDrawer extends StatelessWidget {
 }
 
 class _DrawerHeader extends StatelessWidget {
-  const _DrawerHeader();
+  const _DrawerHeader({this.user});
+
+  final AuthUser? user;
 
   @override
   Widget build(BuildContext context) {
@@ -143,7 +163,7 @@ class _DrawerHeader extends StatelessWidget {
             ),
             alignment: Alignment.center,
             child: Text(
-              'LJ',
+              user?.initials ?? 'LJ',
               style: AppTypography.headerSmall.copyWith(
                 color: AppColors.textOnPrimary,
                 fontSize: 20,
@@ -156,13 +176,20 @@ class _DrawerHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('León de Judá', style: AppTypography.headerSmall),
+                Text(
+                  user?.name ?? 'León de Judá',
+                  style: AppTypography.headerSmall,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
                 const SizedBox(height: 2),
                 Text(
-                  'Torneo de Fútbol',
+                  user?.email ?? 'Torneo de Fútbol',
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.textSecondary,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -251,11 +278,14 @@ class _DrawerNavItem extends StatelessWidget {
   }
 }
 
-class _DrawerFooter extends StatelessWidget {
-  const _DrawerFooter();
+class _DrawerFooter extends ConsumerWidget {
+  const _DrawerFooter({this.user});
+
+  final AuthUser? user;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isLoggedIn = user != null;
     return Container(
       padding: EdgeInsets.fromLTRB(
         AppSpacing.md,
@@ -266,18 +296,55 @@ class _DrawerFooter extends StatelessWidget {
       decoration: const BoxDecoration(
         border: Border(top: BorderSide(color: AppColors.border)),
       ),
-      child: FilledButton.icon(
-        onPressed: () {
-          Navigator.of(context).pop();
-          context.goNamed(AppRoute.login.name);
-        },
-        icon: const Icon(Icons.login_rounded, size: 20),
-        label: const Text('Ingresar'),
-        style: FilledButton.styleFrom(
-          minimumSize: const Size.fromHeight(AppSpacing.minTouchTarget),
-        ),
+      child: isLoggedIn
+          ? OutlinedButton.icon(
+              onPressed: () => _confirmLogout(context, ref),
+              icon: const Icon(Icons.logout_rounded, size: 20),
+              label: const Text('Cerrar sesión'),
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size.fromHeight(AppSpacing.minTouchTarget),
+                foregroundColor: AppColors.textPrimary,
+                side: const BorderSide(color: AppColors.border),
+              ),
+            )
+          : FilledButton.icon(
+              onPressed: () {
+                Navigator.of(context).pop();
+                context.goNamed(AppRoute.login.name);
+              },
+              icon: const Icon(Icons.login_rounded, size: 20),
+              label: const Text('Ingresar'),
+              style: FilledButton.styleFrom(
+                minimumSize: const Size.fromHeight(AppSpacing.minTouchTarget),
+              ),
+            ),
+    );
+  }
+
+  Future<void> _confirmLogout(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Cerrar sesión'),
+        content: const Text('¿Seguro que quieres salir de tu cuenta?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Cerrar sesión'),
+          ),
+        ],
       ),
     );
+    if (confirmed != true) return;
+    await ref.read(authControllerProvider.notifier).logout();
+    if (!context.mounted) return;
+    // El drawer está abierto sobre la pantalla; lo cerramos y vamos a /home.
+    Navigator.of(context).pop();
+    context.goNamed(AppRoute.home.name);
   }
 }
 

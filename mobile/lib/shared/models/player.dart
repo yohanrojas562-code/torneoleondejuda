@@ -15,6 +15,7 @@ class Player {
     this.position,
     this.goalkeeperType,
     this.church,
+    this.approvalStatus,
     this.isCaptain = false,
   });
 
@@ -39,6 +40,7 @@ class Player {
       position: json['position'] as String?,
       goalkeeperType: json['goalkeeper_type'] as String?,
       church: json['church'] as String?,
+      approvalStatus: json['approval_status'] as String?,
       isCaptain: (json['is_captain'] as bool?) ?? false,
       team: team,
     );
@@ -54,6 +56,8 @@ class Player {
   final String? position;
   final String? goalkeeperType;
   final String? church;
+  /// approved | pending | rejected (espeja la columna del backend).
+  final String? approvalStatus;
   final bool isCaptain;
 
   String get fullName => '$firstName $lastName'.trim();

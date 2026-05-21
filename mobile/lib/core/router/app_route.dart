@@ -21,7 +21,11 @@ enum AppRoute {
   pqrsSuccess('/pqrs/exito/:code', 'pqrs-success'),
 
   // ─── Auth ──────────────────────────────────────────────────────────
-  login('/login', 'login');
+  login('/login', 'login'),
+  dashboard('/dashboard', 'dashboard'),
+  myTeams('/dashboard/equipos', 'my-teams'),
+  myMatches('/dashboard/partidos', 'my-matches'),
+  myPlayers('/dashboard/jugadores', 'my-players');
 
   const AppRoute(this.path, this.name);
 

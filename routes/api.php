@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CalendarController;
 use App\Http\Controllers\Api\V1\DefenseController;
 use App\Http\Controllers\Api\V1\HomeController;
+use App\Http\Controllers\Api\V1\MyDashboardController;
 use App\Http\Controllers\Api\V1\OrganigramController;
 use App\Http\Controllers\Api\V1\PqrsController;
 use App\Http\Controllers\Api\V1\ScorersController;
@@ -16,15 +18,14 @@ use Illuminate\Support\Facades\Route;
 | API Routes — v1
 |--------------------------------------------------------------------------
 |
-| Endpoints públicos consumidos por la app móvil (Flutter). El sitio web
+| Endpoints públicos + endpoints autenticados via Sanctum. El sitio web
 | Inertia sigue funcionando por completo sin tocar nada de routes/web.php.
-|
-| Rate limit: 60 req/min por IP (default global de Laravel). Para POST de
-| PQRS aplicamos un límite extra más estricto para frenar spam.
 |
 */
 
 Route::prefix('v1')->group(function () {
+
+    // ─── Públicos (sin auth) ──────────────────────────────────────
     Route::get('home', HomeController::class)->name('api.v1.home');
     Route::get('standings', StandingsController::class)->name('api.v1.standings');
     Route::get('calendar', CalendarController::class)->name('api.v1.calendar');
@@ -35,6 +36,28 @@ Route::prefix('v1')->group(function () {
     Route::get('verify', VerifyController::class)->name('api.v1.verify');
 
     Route::post('pqrs', [PqrsController::class, 'store'])
-        ->middleware('throttle:10,1') // 10 PQRS por minuto por IP
+        ->middleware('throttle:10,1')
         ->name('api.v1.pqrs.store');
+
+    // ─── Autenticación (Sanctum) ──────────────────────────────────
+    Route::post('auth/login', [AuthController::class, 'login'])
+        ->middleware('throttle:5,1') // 5 intentos por minuto por IP (anti-brute-force)
+        ->name('api.v1.auth.login');
+
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('auth/me', [AuthController::class, 'me'])
+            ->name('api.v1.auth.me');
+        Route::post('auth/logout', [AuthController::class, 'logout'])
+            ->name('api.v1.auth.logout');
+
+        // ─── Dashboard / recursos del usuario autenticado ──────────
+        Route::get('my/dashboard', [MyDashboardController::class, 'dashboard'])
+            ->name('api.v1.my.dashboard');
+        Route::get('my/teams', [MyDashboardController::class, 'teams'])
+            ->name('api.v1.my.teams');
+        Route::get('my/matches', [MyDashboardController::class, 'matches'])
+            ->name('api.v1.my.matches');
+        Route::get('my/players', [MyDashboardController::class, 'players'])
+            ->name('api.v1.my.players');
+    });
 });
