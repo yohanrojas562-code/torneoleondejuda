@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:torneo_leon_de_juda/core/router/app_route.dart';
+import 'package:torneo_leon_de_juda/features/about/presentation/screens/about_screen.dart';
 import 'package:torneo_leon_de_juda/features/calendar/presentation/screens/calendar_screen.dart';
 import 'package:torneo_leon_de_juda/features/defense/presentation/screens/defense_screen.dart';
 import 'package:torneo_leon_de_juda/features/home/presentation/screens/home_screen.dart';
@@ -92,12 +93,7 @@ abstract final class AppRouter {
         GoRoute(
           path: AppRoute.about.path,
           name: AppRoute.about.name,
-          builder: (context, state) => const PlaceholderScreen(
-            title: 'Sobre el Torneo',
-            icon: Icons.info_rounded,
-            subtitle: 'Informacion del campeonato',
-            stepRef: 'Step 14/15',
-          ),
+          builder: (context, state) => const AboutScreen(),
         ),
 
         // ─── Validador (con deep link por codigo) ──────────────────

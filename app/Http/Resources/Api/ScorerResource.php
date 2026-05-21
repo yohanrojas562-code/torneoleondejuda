@@ -23,7 +23,11 @@ class ScorerResource extends JsonResource
             'rank' => $this->rank,
             'player' => new PlayerResource($this->resource),
             'stats' => [
-                'goals' => (int) ($this->total_goals ?? 0),
+                // `goals_season` viene del withCount() del controller (cuenta
+                // solo los goles en partidos finalizados de la temporada
+                // activa). Fallback al total acumulado del jugador si por
+                // alguna razón no llegó.
+                'goals' => (int) ($this->goals_season ?? $this->total_goals ?? 0),
                 'matches_played' => (int) ($this->total_matches ?? 0),
                 'yellow_cards' => (int) ($this->yellow_cards ?? 0),
                 'blue_cards' => (int) ($this->blue_cards ?? 0),
