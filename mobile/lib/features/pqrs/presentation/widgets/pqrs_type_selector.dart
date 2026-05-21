@@ -3,7 +3,7 @@ import 'package:torneo_leon_de_juda/core/theme/app_colors.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_radius.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_spacing.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_typography.dart';
-import 'package:torneo_leon_de_juda/features/pqrs/data/mock_pqrs_data.dart';
+import 'package:torneo_leon_de_juda/features/pqrs/data/pqrs.dart';
 
 /// Selector segmentado de tipo de PQRS (Petición / Queja / Reclamo /
 /// Sugerencia). Grid 2x2 con tile resaltada para la selección activa.

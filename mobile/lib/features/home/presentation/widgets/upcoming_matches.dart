@@ -6,14 +6,14 @@ import 'package:torneo_leon_de_juda/core/theme/app_colors.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_radius.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_spacing.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_typography.dart';
-import 'package:torneo_leon_de_juda/features/home/data/mock_home_data.dart';
+import 'package:torneo_leon_de_juda/features/calendar/data/match_data.dart';
 
-/// Row horizontal scrollable con los proximos partidos. Cada card mini
+/// Row horizontal scrollable con los próximos partidos. Cada card mini
 /// muestra equipos, hora y sede. Tap → /calendario para ver detalle.
 class UpcomingMatchesRow extends StatelessWidget {
   const UpcomingMatchesRow({required this.matches, super.key});
 
-  final List<UpcomingMatchMock> matches;
+  final List<MatchData> matches;
 
   @override
   Widget build(BuildContext context) {
@@ -34,13 +34,12 @@ class UpcomingMatchesRow extends StatelessWidget {
 
 class _UpcomingMatchCard extends StatelessWidget {
   const _UpcomingMatchCard({required this.match});
-  final UpcomingMatchMock match;
+  final MatchData match;
 
   String get _timeLabel {
     final now = DateTime.now();
     final diff = match.scheduledAt.difference(now);
     if (diff.inHours < 12) {
-      // Mismo día → "HOY · 7:30 PM"
       return 'HOY · ${DateFormat.jm('es_CO').format(match.scheduledAt)}';
     }
     if (diff.inDays == 1) {
@@ -53,6 +52,8 @@ class _UpcomingMatchCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final matchDay = match.matchDay;
+    final venue = match.venue;
     return SizedBox(
       width: 260,
       child: Material(
@@ -71,17 +72,18 @@ class _UpcomingMatchCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  match.matchDay.toUpperCase(),
-                  style: AppTypography.labelSmall.copyWith(
-                    color: AppColors.primary,
+                if (matchDay != null)
+                  Text(
+                    matchDay.toUpperCase(),
+                    style: AppTypography.labelSmall.copyWith(
+                      color: AppColors.primary,
+                    ),
                   ),
-                ),
                 Row(
                   children: [
                     Expanded(
                       child: Text(
-                        match.homeTeam,
+                        match.home.name,
                         style: AppTypography.bodyMedium,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -100,7 +102,7 @@ class _UpcomingMatchCard extends StatelessWidget {
                     ),
                     Expanded(
                       child: Text(
-                        match.awayTeam,
+                        match.away.name,
                         style: AppTypography.bodyMedium,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -118,28 +120,30 @@ class _UpcomingMatchCard extends StatelessWidget {
                         color: AppColors.primary,
                       ),
                     ),
-                    const SizedBox(height: 2),
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.place_outlined,
-                          size: 12,
-                          color: AppColors.textMuted,
-                        ),
-                        const SizedBox(width: 2),
-                        Expanded(
-                          child: Text(
-                            match.venue,
-                            style: AppTypography.bodySmall.copyWith(
-                              color: AppColors.textMuted,
-                              fontSize: 11,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                    if (venue != null) ...[
+                      const SizedBox(height: 2),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.place_outlined,
+                            size: 12,
+                            color: AppColors.textMuted,
                           ),
-                        ),
-                      ],
-                    ),
+                          const SizedBox(width: 2),
+                          Expanded(
+                            child: Text(
+                              venue,
+                              style: AppTypography.bodySmall.copyWith(
+                                color: AppColors.textMuted,
+                                fontSize: 11,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
               ],

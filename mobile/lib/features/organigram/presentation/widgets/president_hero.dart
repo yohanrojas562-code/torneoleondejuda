@@ -3,11 +3,11 @@ import 'package:torneo_leon_de_juda/core/theme/app_colors.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_radius.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_spacing.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_typography.dart';
-import 'package:torneo_leon_de_juda/features/organigram/data/mock_organigram_data.dart';
+import 'package:torneo_leon_de_juda/features/organigram/data/staff_member.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/player_photo.dart';
 
-/// Card destacada para el Presidente del Torneo. Photo grande + nombre + rol
-/// + iglesia. Tap → bottom sheet con bio completa.
+/// Card destacada para el Presidente del Torneo. Photo grande + nombre + rol.
+/// Tap → bottom sheet con descripción completa.
 class PresidentHero extends StatelessWidget {
   const PresidentHero({
     required this.president,
@@ -15,7 +15,7 @@ class PresidentHero extends StatelessWidget {
     super.key,
   });
 
-  final StaffMemberMock president;
+  final StaffMember president;
   final VoidCallback onTap;
 
   @override
@@ -88,42 +88,20 @@ class PresidentHero extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      president.fullName,
+                      president.name,
                       style: AppTypography.headerSmall,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      president.role,
-                      style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    if (president.church != null) ...[
-                      const SizedBox(height: AppSpacing.xs),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.church_outlined,
-                            size: 14,
-                            color: AppColors.textMuted,
-                          ),
-                          const SizedBox(width: 4),
-                          Flexible(
-                            child: Text(
-                              president.church!,
-                              style: AppTypography.bodySmall.copyWith(
-                                color: AppColors.textMuted,
-                                fontSize: 11,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
+                    if (president.roles.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        president.rolesLabel,
+                        style: AppTypography.bodySmall.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ],

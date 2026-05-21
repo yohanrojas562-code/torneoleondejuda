@@ -4,7 +4,8 @@ import 'package:torneo_leon_de_juda/core/theme/app_colors.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_radius.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_spacing.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_typography.dart';
-import 'package:torneo_leon_de_juda/features/calendar/data/mock_calendar_data.dart';
+import 'package:torneo_leon_de_juda/features/calendar/data/match_data.dart';
+import 'package:torneo_leon_de_juda/features/standings/data/standing.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/team_badge.dart';
 
 /// Card de partido proximo o en vivo. Si esta en vivo, muestra dot pulsante
@@ -12,11 +13,12 @@ import 'package:torneo_leon_de_juda/shared/widgets/team_badge.dart';
 class UpcomingMatchCard extends StatelessWidget {
   const UpcomingMatchCard({required this.match, super.key});
 
-  final UpcomingMatchMock match;
+  final MatchData match;
 
   @override
   Widget build(BuildContext context) {
     final timeText = DateFormat.jm('es_CO').format(match.scheduledAt);
+    final matchDay = match.matchDay;
 
     return Container(
       decoration: BoxDecoration(
@@ -32,19 +34,22 @@ class UpcomingMatchCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Text(
-                match.matchDay.toUpperCase(),
-                style: AppTypography.labelSmall.copyWith(
-                  color: AppColors.primary,
-                ),
-              ),
-              const Spacer(),
-              if (match.isLive) const _LiveDot(),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.sm),
+          if (matchDay != null || match.isLive)
+            Row(
+              children: [
+                if (matchDay != null)
+                  Text(
+                    matchDay.toUpperCase(),
+                    style: AppTypography.labelSmall.copyWith(
+                      color: AppColors.primary,
+                    ),
+                  ),
+                const Spacer(),
+                if (match.isLive) const _LiveDot(),
+              ],
+            ),
+          if (matchDay != null || match.isLive)
+            const SizedBox(height: AppSpacing.sm),
           Row(
             children: [
               Expanded(
@@ -53,9 +58,9 @@ class UpcomingMatchCard extends StatelessWidget {
               const SizedBox(width: AppSpacing.sm),
               _CenterScore(
                 isLive: match.isLive,
-                liveHome: match.liveHomeScore,
-                liveAway: match.liveAwayScore,
-                liveStatus: match.liveStatus,
+                liveHome: match.homeScore,
+                liveAway: match.awayScore,
+                liveStatus: match.liveStatusLabel,
                 scheduledTime: timeText,
               ),
               const SizedBox(width: AppSpacing.sm),
@@ -64,27 +69,29 @@ class UpcomingMatchCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.sm),
-          Row(
-            children: [
-              const Icon(
-                Icons.place_outlined,
-                size: 14,
-                color: AppColors.textMuted,
-              ),
-              const SizedBox(width: 4),
-              Expanded(
-                child: Text(
-                  match.venue,
-                  style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textMuted,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+          if (match.venue != null) ...[
+            const SizedBox(height: AppSpacing.sm),
+            Row(
+              children: [
+                const Icon(
+                  Icons.place_outlined,
+                  size: 14,
+                  color: AppColors.textMuted,
                 ),
-              ),
-            ],
-          ),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    match.venue!,
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.textMuted,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );
@@ -94,7 +101,7 @@ class UpcomingMatchCard extends StatelessWidget {
 class _TeamSide extends StatelessWidget {
   const _TeamSide({required this.team, this.alignEnd = false});
 
-  final MatchTeamMock team;
+  final TeamSummary team;
   final bool alignEnd;
 
   @override
@@ -190,7 +197,8 @@ class _LiveDot extends StatefulWidget {
   State<_LiveDot> createState() => _LiveDotState();
 }
 
-class _LiveDotState extends State<_LiveDot> with SingleTickerProviderStateMixin {
+class _LiveDotState extends State<_LiveDot>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _ctrl;
 
   @override

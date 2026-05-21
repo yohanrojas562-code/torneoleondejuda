@@ -3,7 +3,7 @@ import 'package:torneo_leon_de_juda/core/theme/app_colors.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_radius.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_spacing.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_typography.dart';
-import 'package:torneo_leon_de_juda/features/defense/data/mock_defense_data.dart';
+import 'package:torneo_leon_de_juda/features/defense/data/defense.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/player_photo.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/team_badge.dart';
 
@@ -18,10 +18,10 @@ class DefensePodium extends StatelessWidget {
     super.key,
   });
 
-  final DefenseMock top1;
-  final DefenseMock? top2;
-  final DefenseMock? top3;
-  final ValueChanged<DefenseMock> onTap;
+  final Defense top1;
+  final Defense? top2;
+  final Defense? top3;
+  final ValueChanged<Defense> onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +61,7 @@ class DefensePodium extends StatelessWidget {
 class _HeroCard extends StatelessWidget {
   const _HeroCard({required this.defense, required this.onTap});
 
-  final DefenseMock defense;
+  final Defense defense;
   final VoidCallback onTap;
 
   @override
@@ -198,7 +198,7 @@ class _RunnerUpCard extends StatelessWidget {
     required this.onTap,
   });
 
-  final DefenseMock defense;
+  final Defense defense;
   final Color medalColor;
   final VoidCallback onTap;
 

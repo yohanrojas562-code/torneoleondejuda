@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_colors.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_radius.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_spacing.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_typography.dart';
-import 'package:torneo_leon_de_juda/features/sponsors/data/mock_sponsors_data.dart';
+import 'package:torneo_leon_de_juda/features/sponsors/data/sponsor.dart';
+import 'package:torneo_leon_de_juda/features/sponsors/data/sponsors_repository.dart';
 import 'package:torneo_leon_de_juda/features/sponsors/presentation/widgets/sponsor_detail_sheet.dart';
 import 'package:torneo_leon_de_juda/features/sponsors/presentation/widgets/sponsor_grid_tile.dart';
 import 'package:torneo_leon_de_juda/features/sponsors/presentation/widgets/sponsor_oficial_card.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/app_drawer.dart';
+import 'package:torneo_leon_de_juda/shared/widgets/async_view.dart';
 
 /// Pantalla Patrocinadores. Tres secciones jerárquicas: Oficiales (cards
 /// destacadas), Aliados (grid 2-col), Apoyos (grid 3-col compacto).
-class SponsorsScreen extends StatelessWidget {
+class SponsorsScreen extends ConsumerWidget {
   const SponsorsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final oficiales = MockSponsorsData.byTier(SponsorTier.oficial);
-    final aliados = MockSponsorsData.byTier(SponsorTier.aliado);
-    final apoyos = MockSponsorsData.byTier(SponsorTier.apoyo);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final asyncSponsors = ref.watch(sponsorsProvider);
 
     return Scaffold(
       drawer: const AppDrawer(),
@@ -36,86 +37,149 @@ class SponsorsScreen extends StatelessWidget {
         color: AppColors.primary,
         backgroundColor: AppColors.surfaceLow,
         onRefresh: () async {
-          await Future<void>.delayed(const Duration(milliseconds: 600));
+          ref.invalidate(sponsorsProvider);
+          await ref.read(sponsorsProvider.future);
         },
-        child: ListView(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          children: [
-            const _IntroBanner(),
-            const SizedBox(height: AppSpacing.xl),
+        child: AsyncView<List<Sponsor>>(
+          value: asyncSponsors,
+          onRetry: () => ref.invalidate(sponsorsProvider),
+          data: (sponsors) => _SponsorsList(sponsors: sponsors),
+        ),
+      ),
+    );
+  }
+}
 
-            // ─── Oficiales (cards destacadas, 1 col) ───────────────
-            if (oficiales.isNotEmpty) ...[
-              _SectionHeader(
-                title: SponsorTier.oficial.displayName,
-                count: oficiales.length,
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              for (var i = 0; i < oficiales.length; i++) ...[
-                if (i > 0) const SizedBox(height: AppSpacing.sm),
-                SponsorOficialCard(
-                  sponsor: oficiales[i],
-                  onTap: () =>
-                      SponsorDetailSheet.show(context, oficiales[i]),
+class _SponsorsList extends StatelessWidget {
+  const _SponsorsList({required this.sponsors});
+
+  final List<Sponsor> sponsors;
+
+  @override
+  Widget build(BuildContext context) {
+    final oficiales = sponsors.where((s) => s.tier == SponsorTier.oficial).toList(growable: false);
+    final aliados = sponsors.where((s) => s.tier == SponsorTier.aliado).toList(growable: false);
+    final apoyos = sponsors.where((s) => s.tier == SponsorTier.apoyo).toList(growable: false);
+
+    if (sponsors.isEmpty) {
+      return const _EmptyState();
+    }
+
+    return ListView(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      children: [
+        const _IntroBanner(),
+        const SizedBox(height: AppSpacing.xl),
+
+        if (oficiales.isNotEmpty) ...[
+          _SectionHeader(
+            title: SponsorTier.oficial.displayName,
+            count: oficiales.length,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          for (var i = 0; i < oficiales.length; i++) ...[
+            if (i > 0) const SizedBox(height: AppSpacing.sm),
+            SponsorOficialCard(
+              sponsor: oficiales[i],
+              onTap: () => SponsorDetailSheet.show(context, oficiales[i]),
+            ),
+          ],
+          const SizedBox(height: AppSpacing.xl),
+        ],
+
+        if (aliados.isNotEmpty) ...[
+          _SectionHeader(
+            title: SponsorTier.aliado.displayName,
+            count: aliados.length,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          GridView.count(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: 2,
+            crossAxisSpacing: AppSpacing.sm,
+            mainAxisSpacing: AppSpacing.sm,
+            childAspectRatio: 1.3,
+            children: [
+              for (final sponsor in aliados)
+                SponsorGridTile(
+                  sponsor: sponsor,
+                  logoSize: 64,
+                  onTap: () => SponsorDetailSheet.show(context, sponsor),
                 ),
-              ],
-              const SizedBox(height: AppSpacing.xl),
             ],
+          ),
+          const SizedBox(height: AppSpacing.xl),
+        ],
 
-            // ─── Aliados (grid 2-col) ──────────────────────────────
-            if (aliados.isNotEmpty) ...[
-              _SectionHeader(
-                title: SponsorTier.aliado.displayName,
-                count: aliados.length,
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              GridView.count(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 2,
-                crossAxisSpacing: AppSpacing.sm,
-                mainAxisSpacing: AppSpacing.sm,
-                childAspectRatio: 1.3,
-                children: [
-                  for (final sponsor in aliados)
-                    SponsorGridTile(
-                      sponsor: sponsor,
-                      logoSize: 64,
-                      onTap: () =>
-                          SponsorDetailSheet.show(context, sponsor),
-                    ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.xl),
+        if (apoyos.isNotEmpty) ...[
+          _SectionHeader(
+            title: SponsorTier.apoyo.displayName,
+            count: apoyos.length,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          GridView.count(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: 3,
+            crossAxisSpacing: AppSpacing.xs,
+            mainAxisSpacing: AppSpacing.xs,
+            childAspectRatio: 0.95,
+            children: [
+              for (final sponsor in apoyos)
+                SponsorGridTile(
+                  sponsor: sponsor,
+                  logoSize: 48,
+                  onTap: () => SponsorDetailSheet.show(context, sponsor),
+                ),
             ],
+          ),
+        ],
 
-            // ─── Apoyos (grid 3-col compacto) ──────────────────────
-            if (apoyos.isNotEmpty) ...[
-              _SectionHeader(
-                title: SponsorTier.apoyo.displayName,
-                count: apoyos.length,
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              GridView.count(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 3,
-                crossAxisSpacing: AppSpacing.xs,
-                mainAxisSpacing: AppSpacing.xs,
-                childAspectRatio: 0.95,
-                children: [
-                  for (final sponsor in apoyos)
-                    SponsorGridTile(
-                      sponsor: sponsor,
-                      logoSize: 48,
-                      onTap: () =>
-                          SponsorDetailSheet.show(context, sponsor),
-                    ),
-                ],
-              ),
-            ],
+        const SizedBox(height: AppSpacing.huge),
+      ],
+    );
+  }
+}
 
-            const SizedBox(height: AppSpacing.huge),
+class _EmptyState extends StatelessWidget {
+  const _EmptyState();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(AppSpacing.huge),
+      child: Center(
+        child: Column(
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: AppColors.surfaceLow,
+                borderRadius: AppRadius.brLg,
+                border: Border.all(color: AppColors.border),
+              ),
+              child: const Icon(
+                Icons.favorite_outline_rounded,
+                size: 36,
+                color: AppColors.textMuted,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Text(
+              'Sin patrocinadores activos',
+              style: AppTypography.headerSmall,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: AppSpacing.xxs),
+            Text(
+              'Aún no se han registrado aliados del torneo.',
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.textSecondary,
+              ),
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
       ),

@@ -3,7 +3,7 @@ import 'package:torneo_leon_de_juda/core/theme/app_colors.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_radius.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_spacing.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_typography.dart';
-import 'package:torneo_leon_de_juda/features/verify/data/mock_verify_data.dart';
+import 'package:torneo_leon_de_juda/features/verify/data/verify_result.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/player_photo.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/team_badge.dart';
 
@@ -17,12 +17,12 @@ class VerifyResultSheet extends StatelessWidget {
     super.key,
   });
 
-  final VerifyResultMock? result;
+  final VerifyResult? result;
   final String searchedCode;
 
   static Future<void> show(
     BuildContext context, {
-    required VerifyResultMock? result,
+    required VerifyResult? result,
     required String searchedCode,
   }) {
     return showModalBottomSheet<void>(
@@ -46,7 +46,7 @@ class VerifyResultSheet extends StatelessWidget {
 
 class _FoundView extends StatelessWidget {
   const _FoundView({required this.result});
-  final VerifyResultMock result;
+  final VerifyResult result;
 
   Color get _statusColor {
     return switch (result.status) {

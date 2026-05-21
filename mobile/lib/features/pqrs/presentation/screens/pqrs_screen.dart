@@ -1,26 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:torneo_leon_de_juda/core/network/api_exception.dart';
 import 'package:torneo_leon_de_juda/core/router/app_route.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_colors.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_radius.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_spacing.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_typography.dart';
-import 'package:torneo_leon_de_juda/features/pqrs/data/mock_pqrs_data.dart';
+import 'package:torneo_leon_de_juda/features/pqrs/data/pqrs.dart';
+import 'package:torneo_leon_de_juda/features/pqrs/data/pqrs_repository.dart';
 import 'package:torneo_leon_de_juda/features/pqrs/presentation/widgets/evidence_picker.dart';
 import 'package:torneo_leon_de_juda/features/pqrs/presentation/widgets/pqrs_type_selector.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/app_drawer.dart';
 
 /// Pantalla PQRS. Form completo: tipo, datos del solicitante, asunto,
-/// descripción, evidencias. Al enviar simula latencia y navega a success.
-class PqrsScreen extends StatefulWidget {
+/// descripción, evidencias. Al enviar hace POST al API y navega a success.
+class PqrsScreen extends ConsumerStatefulWidget {
   const PqrsScreen({super.key});
 
   @override
-  State<PqrsScreen> createState() => _PqrsScreenState();
+  ConsumerState<PqrsScreen> createState() => _PqrsScreenState();
 }
 
-class _PqrsScreenState extends State<PqrsScreen> {
+class _PqrsScreenState extends ConsumerState<PqrsScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
@@ -58,11 +61,26 @@ class _PqrsScreenState extends State<PqrsScreen> {
     );
 
     try {
-      final code = await MockPqrsService.submit(submission);
+      final code =
+          await ref.read(pqrsRepositoryProvider).submit(submission);
       if (!mounted) return;
       context.goNamed(
         AppRoute.pqrsSuccess.name,
         pathParameters: {'code': code},
+      );
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      final message = e is ValidationException && e.errors != null
+          ? e.errors!.values
+              .expand((errs) => errs)
+              .firstOrNull ??
+              e.message
+          : e.message;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: AppColors.defeat,
+        ),
       );
     } finally {
       if (mounted) setState(() => _submitting = false);

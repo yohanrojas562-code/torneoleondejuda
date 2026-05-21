@@ -3,7 +3,7 @@ import 'package:torneo_leon_de_juda/core/theme/app_colors.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_radius.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_spacing.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_typography.dart';
-import 'package:torneo_leon_de_juda/features/calendar/data/mock_calendar_data.dart';
+import 'package:torneo_leon_de_juda/features/calendar/data/match_data.dart';
 
 /// Wrapper generico para una tab del calendario. Recibe la lista pre-agrupada
 /// por dia y un builder que renderiza cada item. Maneja empty state y
@@ -15,6 +15,7 @@ class MatchesTab<T> extends StatelessWidget {
     required this.emptyIcon,
     required this.emptyTitle,
     required this.emptySubtitle,
+    required this.onRefresh,
     super.key,
   });
 
@@ -25,15 +26,14 @@ class MatchesTab<T> extends StatelessWidget {
   final IconData emptyIcon;
   final String emptyTitle;
   final String emptySubtitle;
+  final Future<void> Function() onRefresh;
 
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
       color: AppColors.primary,
       backgroundColor: AppColors.surfaceLow,
-      onRefresh: () async {
-        await Future<void>.delayed(const Duration(milliseconds: 600));
-      },
+      onRefresh: onRefresh,
       child: itemsByDate.isEmpty
           ? _EmptyState(
               icon: emptyIcon,

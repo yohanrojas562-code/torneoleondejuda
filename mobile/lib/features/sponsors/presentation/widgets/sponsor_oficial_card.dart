@@ -3,7 +3,7 @@ import 'package:torneo_leon_de_juda/core/theme/app_colors.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_radius.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_spacing.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_typography.dart';
-import 'package:torneo_leon_de_juda/features/sponsors/data/mock_sponsors_data.dart';
+import 'package:torneo_leon_de_juda/features/sponsors/data/sponsor.dart';
 import 'package:torneo_leon_de_juda/features/sponsors/presentation/widgets/sponsor_logo.dart';
 
 /// Card destacada para patrocinadores tier "oficial". Logo grande + nombre +
@@ -15,7 +15,7 @@ class SponsorOficialCard extends StatelessWidget {
     super.key,
   });
 
-  final SponsorMock sponsor;
+  final Sponsor sponsor;
   final VoidCallback onTap;
 
   @override
@@ -51,10 +51,10 @@ class SponsorOficialCard extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    if (sponsor.category != null) ...[
+                    if (sponsor.description != null) ...[
                       const SizedBox(height: 4),
                       Text(
-                        sponsor.category!,
+                        sponsor.description!,
                         style: AppTypography.bodySmall.copyWith(
                           color: AppColors.textSecondary,
                           fontSize: 12,

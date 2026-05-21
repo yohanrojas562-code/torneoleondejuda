@@ -4,7 +4,7 @@ import 'package:torneo_leon_de_juda/core/theme/app_colors.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_radius.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_spacing.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_typography.dart';
-import 'package:torneo_leon_de_juda/features/sponsors/data/mock_sponsors_data.dart';
+import 'package:torneo_leon_de_juda/features/sponsors/data/sponsor.dart';
 import 'package:torneo_leon_de_juda/features/sponsors/presentation/widgets/sponsor_logo.dart';
 
 /// Bottom sheet con detalle de un patrocinador: logo grande, nombre,
@@ -12,9 +12,9 @@ import 'package:torneo_leon_de_juda/features/sponsors/presentation/widgets/spons
 class SponsorDetailSheet extends StatelessWidget {
   const SponsorDetailSheet({required this.sponsor, super.key});
 
-  final SponsorMock sponsor;
+  final Sponsor sponsor;
 
-  static Future<void> show(BuildContext context, SponsorMock sponsor) {
+  static Future<void> show(BuildContext context, Sponsor sponsor) {
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -49,16 +49,6 @@ class SponsorDetailSheet extends StatelessWidget {
             Center(
               child: _TierBadge(tier: sponsor.tier),
             ),
-            if (sponsor.category != null) ...[
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                sponsor.category!,
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
             if (sponsor.description != null) ...[
               const SizedBox(height: AppSpacing.lg),
               Text(

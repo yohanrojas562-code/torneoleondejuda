@@ -3,7 +3,7 @@ import 'package:torneo_leon_de_juda/core/theme/app_colors.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_radius.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_spacing.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_typography.dart';
-import 'package:torneo_leon_de_juda/features/standings/data/mock_standings_data.dart';
+import 'package:torneo_leon_de_juda/features/standings/data/standing.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/team_badge.dart';
 
 /// Constantes de cupos para badge de clasificacion. Reutilizadas en el
@@ -19,7 +19,7 @@ class StandingsRow extends StatelessWidget {
     super.key,
   });
 
-  final StandingMock standing;
+  final Standing standing;
   final VoidCallback onTap;
 
   bool get _classifies => standing.position <= kClassificationCut;

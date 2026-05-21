@@ -9,13 +9,13 @@ class StandingsHeader extends StatelessWidget {
   const StandingsHeader({
     required this.tournamentName,
     required this.seasonName,
-    required this.category,
+    this.category,
     super.key,
   });
 
   final String tournamentName;
   final String seasonName;
-  final String category;
+  final String? category;
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +55,9 @@ class StandingsHeader extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '$seasonName · $category',
+                  category == null || category!.isEmpty
+                      ? seasonName
+                      : '$seasonName · $category',
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.textSecondary,
                   ),

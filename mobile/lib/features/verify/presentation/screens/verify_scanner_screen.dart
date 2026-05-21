@@ -2,31 +2,34 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:torneo_leon_de_juda/core/network/api_exception.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_colors.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_radius.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_spacing.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_typography.dart';
-import 'package:torneo_leon_de_juda/features/verify/data/mock_verify_data.dart';
+import 'package:torneo_leon_de_juda/features/verify/data/verify_repository.dart';
 import 'package:torneo_leon_de_juda/features/verify/presentation/widgets/manual_lookup_sheet.dart';
 import 'package:torneo_leon_de_juda/features/verify/presentation/widgets/scanner_overlay.dart';
 import 'package:torneo_leon_de_juda/features/verify/presentation/widgets/verify_result_sheet.dart';
 
 /// Pantalla Validador. Cámara activa que escanea QR de carnets de jugadores.
-/// Cuando detecta uno → consulta el mock y muestra el resultado en un sheet.
+/// Cuando detecta uno → consulta el API y muestra el resultado en un sheet.
 /// Opción de búsqueda manual abajo si la cámara no funciona o el QR está
 /// dañado.
-class VerifyScannerScreen extends StatefulWidget {
+class VerifyScannerScreen extends ConsumerStatefulWidget {
   const VerifyScannerScreen({this.initialCode, super.key});
 
   /// Si llega por deep-link `/verificar/:code`, lo procesamos al inicio.
   final String? initialCode;
 
   @override
-  State<VerifyScannerScreen> createState() => _VerifyScannerScreenState();
+  ConsumerState<VerifyScannerScreen> createState() =>
+      _VerifyScannerScreenState();
 }
 
-class _VerifyScannerScreenState extends State<VerifyScannerScreen>
+class _VerifyScannerScreenState extends ConsumerState<VerifyScannerScreen>
     with WidgetsBindingObserver {
   late final MobileScannerController _controller;
   bool _torchOn = false;
@@ -68,14 +71,23 @@ class _VerifyScannerScreenState extends State<VerifyScannerScreen>
     unawaited(HapticFeedback.mediumImpact());
     await _controller.stop();
 
-    final result = MockVerifyData.lookup(code);
-    if (!mounted) return;
-
-    await VerifyResultSheet.show(
-      context,
-      result: result,
-      searchedCode: code,
-    );
+    try {
+      final lookup = await ref.read(verifyRepositoryProvider).lookup(code);
+      if (!mounted) return;
+      await VerifyResultSheet.show(
+        context,
+        result: lookup.result,
+        searchedCode: code,
+      );
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.message),
+          backgroundColor: AppColors.defeat,
+        ),
+      );
+    }
 
     if (!mounted) return;
     await _controller.start();

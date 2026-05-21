@@ -3,7 +3,7 @@ import 'package:torneo_leon_de_juda/core/theme/app_colors.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_radius.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_spacing.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_typography.dart';
-import 'package:torneo_leon_de_juda/features/scorers/data/mock_scorers_data.dart';
+import 'package:torneo_leon_de_juda/features/scorers/data/scorer.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/player_photo.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/team_badge.dart';
 
@@ -18,10 +18,10 @@ class ScorerPodium extends StatelessWidget {
     super.key,
   });
 
-  final ScorerMock top1;
-  final ScorerMock? top2;
-  final ScorerMock? top3;
-  final ValueChanged<ScorerMock> onTap;
+  final Scorer top1;
+  final Scorer? top2;
+  final Scorer? top3;
+  final ValueChanged<Scorer> onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +61,7 @@ class ScorerPodium extends StatelessWidget {
 class _HeroCard extends StatelessWidget {
   const _HeroCard({required this.scorer, required this.onTap});
 
-  final ScorerMock scorer;
+  final Scorer scorer;
   final VoidCallback onTap;
 
   @override
@@ -197,7 +197,7 @@ class _RunnerUpCard extends StatelessWidget {
     required this.onTap,
   });
 
-  final ScorerMock scorer;
+  final Scorer scorer;
   final Color medalColor;
   final VoidCallback onTap;
 

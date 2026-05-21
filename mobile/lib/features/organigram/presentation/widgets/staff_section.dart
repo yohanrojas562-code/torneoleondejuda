@@ -3,11 +3,12 @@ import 'package:torneo_leon_de_juda/core/theme/app_colors.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_radius.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_spacing.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_typography.dart';
-import 'package:torneo_leon_de_juda/features/organigram/data/mock_organigram_data.dart';
+import 'package:torneo_leon_de_juda/features/organigram/data/staff_member.dart';
 import 'package:torneo_leon_de_juda/features/organigram/presentation/widgets/staff_row.dart';
 
-/// Grupo de staff (Junta Directiva, Comisión Técnica, etc). Header con icono
-/// + título + contador, y lista de [StaffRow] adentro.
+/// Grupo de staff. Header con icono (derivado del tier) + título + contador
+/// y lista de [StaffRow]. La sección se construye en el repositorio
+/// agrupando miembros por tier — ver organigram_repository.dart.
 class StaffSection extends StatelessWidget {
   const StaffSection({
     required this.section,
@@ -15,17 +16,14 @@ class StaffSection extends StatelessWidget {
     super.key,
   });
 
-  final OrgSectionMock section;
-  final ValueChanged<StaffMemberMock> onTapMember;
+  final OrgSection section;
+  final ValueChanged<StaffMember> onTapMember;
 
   IconData get _icon {
-    return switch (section.iconName) {
-      'gavel' => Icons.gavel_rounded,
-      'people' => Icons.groups_rounded,
-      'tactics' => Icons.psychology_rounded,
-      'whistle' => Icons.sports_rounded,
-      'shield' => Icons.shield_rounded,
-      _ => Icons.group_rounded,
+    return switch (section.tier) {
+      1 => Icons.gavel_rounded,
+      2 => Icons.groups_rounded,
+      _ => Icons.shield_rounded,
     };
   }
 

@@ -4,7 +4,8 @@ import 'package:torneo_leon_de_juda/core/theme/app_colors.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_radius.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_spacing.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_typography.dart';
-import 'package:torneo_leon_de_juda/features/calendar/data/mock_calendar_data.dart';
+import 'package:torneo_leon_de_juda/features/calendar/data/match_data.dart';
+import 'package:torneo_leon_de_juda/features/standings/data/standing.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/team_badge.dart';
 
 /// Card de partido aplazado/suspendido/cancelado. Sin marcador, con badge
@@ -12,14 +13,16 @@ import 'package:torneo_leon_de_juda/shared/widgets/team_badge.dart';
 class PostponedMatchCard extends StatelessWidget {
   const PostponedMatchCard({required this.match, super.key});
 
-  final PostponedMatchMock match;
+  final MatchData match;
 
   @override
   Widget build(BuildContext context) {
-    final isCancelled = match.status == PostponedStatus.cancelled;
+    final status = match.postponedStatus;
+    final isCancelled = status == PostponedStatus.cancelled;
     final accent = isCancelled ? AppColors.defeat : AppColors.warning;
-    final dateText =
-        DateFormat("d 'de' MMMM 'a' h:mm a", 'es_CO').format(match.originalDate);
+    final dateText = DateFormat("d 'de' MMMM 'a' h:mm a", 'es_CO')
+        .format(match.scheduledAt);
+    final matchDay = match.matchDay;
 
     return Container(
       decoration: BoxDecoration(
@@ -33,14 +36,15 @@ class PostponedMatchCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text(
-                match.matchDay.toUpperCase(),
-                style: AppTypography.labelSmall.copyWith(
-                  color: AppColors.textMuted,
+              if (matchDay != null)
+                Text(
+                  matchDay.toUpperCase(),
+                  style: AppTypography.labelSmall.copyWith(
+                    color: AppColors.textMuted,
+                  ),
                 ),
-              ),
               const Spacer(),
-              _StatusBadge(label: match.status.label, color: accent),
+              _StatusBadge(label: status.label, color: accent),
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -83,27 +87,29 @@ class PostponedMatchCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 2),
-          Row(
-            children: [
-              const Icon(
-                Icons.place_outlined,
-                size: 14,
-                color: AppColors.textMuted,
-              ),
-              const SizedBox(width: 4),
-              Expanded(
-                child: Text(
-                  match.venue,
-                  style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textMuted,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+          if (match.venue != null) ...[
+            const SizedBox(height: 2),
+            Row(
+              children: [
+                const Icon(
+                  Icons.place_outlined,
+                  size: 14,
+                  color: AppColors.textMuted,
                 ),
-              ),
-            ],
-          ),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    match.venue!,
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.textMuted,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );
@@ -113,7 +119,7 @@ class PostponedMatchCard extends StatelessWidget {
 class _TeamSide extends StatelessWidget {
   const _TeamSide({required this.team, this.alignEnd = false});
 
-  final MatchTeamMock team;
+  final TeamSummary team;
   final bool alignEnd;
 
   @override

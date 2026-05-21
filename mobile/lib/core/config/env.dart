@@ -25,11 +25,4 @@ abstract final class Env {
     'APP_VERSION',
     defaultValue: '1.0.0',
   );
-
-  /// Indica si esta corriendo en modo "demo" con datos mock en vez de API real.
-  /// Util durante el desarrollo antes de que el API este listo.
-  static const bool useMockData = bool.fromEnvironment(
-    'USE_MOCK_DATA',
-    defaultValue: true,
-  );
 }

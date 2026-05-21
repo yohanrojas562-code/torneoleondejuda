@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_colors.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_spacing.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_typography.dart';
-import 'package:torneo_leon_de_juda/features/organigram/data/mock_organigram_data.dart';
+import 'package:torneo_leon_de_juda/features/organigram/data/staff_member.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/player_photo.dart';
 
 /// Fila de un miembro del staff dentro de una sección. Foto · nombre · rol.
@@ -13,7 +13,7 @@ class StaffRow extends StatelessWidget {
     super.key,
   });
 
-  final StaffMemberMock member;
+  final StaffMember member;
   final VoidCallback onTap;
 
   @override
@@ -41,23 +41,25 @@ class StaffRow extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      member.fullName,
+                      member.name,
                       style: AppTypography.bodyMedium.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      member.role,
-                      style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textSecondary,
-                        fontSize: 12,
+                    if (member.roles.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        member.rolesLabel,
+                        style: AppTypography.bodySmall.copyWith(
+                          color: AppColors.textSecondary,
+                          fontSize: 12,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    ],
                   ],
                 ),
               ),

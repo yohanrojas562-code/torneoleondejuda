@@ -3,17 +3,17 @@ import 'package:torneo_leon_de_juda/core/theme/app_colors.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_radius.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_spacing.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_typography.dart';
-import 'package:torneo_leon_de_juda/features/organigram/data/mock_organigram_data.dart';
+import 'package:torneo_leon_de_juda/features/organigram/data/staff_member.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/player_photo.dart';
 
-/// Bottom sheet con detalle de un miembro del staff. Foto, nombre, rol,
-/// iglesia, bio y contacto si está disponible.
+/// Bottom sheet con detalle de un miembro del staff. Foto, nombre, roles
+/// como chips, y descripción libre si existe.
 class StaffDetailSheet extends StatelessWidget {
   const StaffDetailSheet({required this.member, super.key});
 
-  final StaffMemberMock member;
+  final StaffMember member;
 
-  static Future<void> show(BuildContext context, StaffMemberMock member) {
+  static Future<void> show(BuildContext context, StaffMember member) {
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -53,51 +53,16 @@ class StaffDetailSheet extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        member.fullName,
+                        member.name,
                         style: AppTypography.headerSmall,
                       ),
-                      const SizedBox(height: 4),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 3,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryTintMedium,
-                          borderRadius: AppRadius.brXs,
-                          border: Border.all(
-                            color: AppColors.primary.withValues(alpha: 0.35),
-                          ),
-                        ),
-                        child: Text(
-                          member.role,
-                          style: AppTypography.labelMedium.copyWith(
-                            color: AppColors.primary,
-                            fontSize: 11,
-                          ),
-                        ),
-                      ),
-                      if (member.church != null) ...[
+                      if (member.roles.isNotEmpty) ...[
                         const SizedBox(height: AppSpacing.xs),
-                        Row(
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
                           children: [
-                            const Icon(
-                              Icons.church_outlined,
-                              size: 14,
-                              color: AppColors.textMuted,
-                            ),
-                            const SizedBox(width: 4),
-                            Flexible(
-                              child: Text(
-                                member.church!,
-                                style: AppTypography.bodySmall.copyWith(
-                                  color: AppColors.textMuted,
-                                  fontSize: 11,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
+                            for (final role in member.roles) _RoleChip(role),
                           ],
                         ),
                       ],
@@ -106,34 +71,18 @@ class StaffDetailSheet extends StatelessWidget {
                 ),
               ],
             ),
-            if (member.bio != null) ...[
+            if (member.description != null &&
+                member.description!.isNotEmpty) ...[
               const SizedBox(height: AppSpacing.xl),
-              Text('BIOGRAFÍA', style: AppTypography.labelLarge),
+              Text('DESCRIPCIÓN', style: AppTypography.labelLarge),
               const SizedBox(height: AppSpacing.sm),
               Text(
-                member.bio!,
+                member.description!,
                 style: AppTypography.bodyMedium.copyWith(
                   color: AppColors.textSecondary,
                   height: 1.5,
                 ),
               ),
-            ],
-            if (member.email != null || member.phone != null) ...[
-              const SizedBox(height: AppSpacing.lg),
-              Text('CONTACTO', style: AppTypography.labelLarge),
-              const SizedBox(height: AppSpacing.sm),
-              if (member.email != null)
-                _ContactRow(
-                  icon: Icons.mail_outline_rounded,
-                  value: member.email!,
-                ),
-              if (member.phone != null) ...[
-                const SizedBox(height: AppSpacing.xs),
-                _ContactRow(
-                  icon: Icons.phone_outlined,
-                  value: member.phone!,
-                ),
-              ],
             ],
             const SizedBox(height: AppSpacing.lg),
           ],
@@ -143,36 +92,27 @@ class StaffDetailSheet extends StatelessWidget {
   }
 }
 
-class _ContactRow extends StatelessWidget {
-  const _ContactRow({required this.icon, required this.value});
-
-  final IconData icon;
-  final String value;
+class _RoleChip extends StatelessWidget {
+  const _RoleChip(this.label);
+  final String label;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.sm),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLow,
-        borderRadius: AppRadius.brSm,
-        border: Border.all(color: AppColors.border),
+        color: AppColors.primaryTintMedium,
+        borderRadius: AppRadius.brXs,
+        border: Border.all(
+          color: AppColors.primary.withValues(alpha: 0.35),
+        ),
       ),
-      child: Row(
-        children: [
-          Icon(icon, size: 18, color: AppColors.textMuted),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Text(
-              value,
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
+      child: Text(
+        label,
+        style: AppTypography.labelMedium.copyWith(
+          color: AppColors.primary,
+          fontSize: 11,
+        ),
       ),
     );
   }

@@ -3,14 +3,14 @@ import 'package:torneo_leon_de_juda/core/theme/app_colors.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_radius.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_spacing.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_typography.dart';
-import 'package:torneo_leon_de_juda/features/home/data/mock_home_data.dart';
+import 'package:torneo_leon_de_juda/features/home/data/home_data.dart';
 
 /// Card hero con info de la temporada activa. Si hay partidos en vivo hoy,
 /// muestra un dot pulsante con el conteo (UX live-aware tipo Sofascore).
 class HomeHero extends StatelessWidget {
   const HomeHero({required this.season, super.key});
 
-  final ActiveSeasonMock season;
+  final ActiveSeason season;
 
   @override
   Widget build(BuildContext context) {
@@ -58,13 +58,7 @@ class HomeHero extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.md),
-          Row(
-            children: [
-              _StatusChip(label: season.category),
-              const SizedBox(width: AppSpacing.xs),
-              _StatusChip(label: season.statusLabel, accent: true),
-            ],
-          ),
+          _StatusChip(label: season.statusLabel, accent: true),
         ],
       ),
     );

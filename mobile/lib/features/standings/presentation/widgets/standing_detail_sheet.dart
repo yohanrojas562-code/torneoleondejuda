@@ -3,7 +3,7 @@ import 'package:torneo_leon_de_juda/core/theme/app_colors.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_radius.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_spacing.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_typography.dart';
-import 'package:torneo_leon_de_juda/features/standings/data/mock_standings_data.dart';
+import 'package:torneo_leon_de_juda/features/standings/data/standing.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/team_badge.dart';
 
 /// Bottom sheet con detalle completo de un standing. Se muestra al tap en
@@ -12,10 +12,10 @@ import 'package:torneo_leon_de_juda/shared/widgets/team_badge.dart';
 class StandingDetailSheet extends StatelessWidget {
   const StandingDetailSheet({required this.standing, super.key});
 
-  final StandingMock standing;
+  final Standing standing;
 
   /// Helper para abrir el sheet con la API estandar de Flutter.
-  static Future<void> show(BuildContext context, StandingMock standing) {
+  static Future<void> show(BuildContext context, Standing standing) {
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -122,7 +122,7 @@ class _PointsPill extends StatelessWidget {
 
 class _StatsGrid extends StatelessWidget {
   const _StatsGrid({required this.standing});
-  final StandingMock standing;
+  final Standing standing;
 
   @override
   Widget build(BuildContext context) {

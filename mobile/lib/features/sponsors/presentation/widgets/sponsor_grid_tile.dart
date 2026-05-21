@@ -3,7 +3,7 @@ import 'package:torneo_leon_de_juda/core/theme/app_colors.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_radius.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_spacing.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_typography.dart';
-import 'package:torneo_leon_de_juda/features/sponsors/data/mock_sponsors_data.dart';
+import 'package:torneo_leon_de_juda/features/sponsors/data/sponsor.dart';
 import 'package:torneo_leon_de_juda/features/sponsors/presentation/widgets/sponsor_logo.dart';
 
 /// Tile compacta para patrocinadores en grid (aliados y apoyos). Logo
@@ -17,7 +17,7 @@ class SponsorGridTile extends StatelessWidget {
     super.key,
   });
 
-  final SponsorMock sponsor;
+  final Sponsor sponsor;
   final VoidCallback onTap;
   final double logoSize;
 

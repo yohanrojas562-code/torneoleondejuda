@@ -3,7 +3,7 @@ import 'package:torneo_leon_de_juda/core/theme/app_colors.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_radius.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_spacing.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_typography.dart';
-import 'package:torneo_leon_de_juda/features/scorers/data/mock_scorers_data.dart';
+import 'package:torneo_leon_de_juda/features/scorers/data/scorer.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/player_photo.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/team_badge.dart';
 
@@ -12,9 +12,9 @@ import 'package:torneo_leon_de_juda/shared/widgets/team_badge.dart';
 class ScorerDetailSheet extends StatelessWidget {
   const ScorerDetailSheet({required this.scorer, super.key});
 
-  final ScorerMock scorer;
+  final Scorer scorer;
 
-  static Future<void> show(BuildContext context, ScorerMock scorer) {
+  static Future<void> show(BuildContext context, Scorer scorer) {
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -217,7 +217,7 @@ class _RankPill extends StatelessWidget {
 
 class _StatsGrid extends StatelessWidget {
   const _StatsGrid({required this.scorer});
-  final ScorerMock scorer;
+  final Scorer scorer;
 
   @override
   Widget build(BuildContext context) {

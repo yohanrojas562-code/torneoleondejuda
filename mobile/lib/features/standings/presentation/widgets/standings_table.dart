@@ -3,7 +3,7 @@ import 'package:torneo_leon_de_juda/core/theme/app_colors.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_radius.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_spacing.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_typography.dart';
-import 'package:torneo_leon_de_juda/features/standings/data/mock_standings_data.dart';
+import 'package:torneo_leon_de_juda/features/standings/data/standing.dart';
 import 'package:torneo_leon_de_juda/features/standings/presentation/widgets/standings_row.dart';
 
 /// Tabla de posiciones de un grupo. Header con etiquetas de columnas +
@@ -17,8 +17,8 @@ class StandingsTable extends StatelessWidget {
   });
 
   final String group;
-  final List<StandingMock> standings;
-  final ValueChanged<StandingMock> onTapStanding;
+  final List<Standing> standings;
+  final ValueChanged<Standing> onTapStanding;
 
   @override
   Widget build(BuildContext context) {

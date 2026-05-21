@@ -3,7 +3,7 @@ import 'package:torneo_leon_de_juda/core/theme/app_colors.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_radius.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_spacing.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_typography.dart';
-import 'package:torneo_leon_de_juda/features/defense/data/mock_defense_data.dart';
+import 'package:torneo_leon_de_juda/features/defense/data/defense.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/player_photo.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/team_badge.dart';
 
@@ -12,9 +12,9 @@ import 'package:torneo_leon_de_juda/shared/widgets/team_badge.dart';
 class DefenseDetailSheet extends StatelessWidget {
   const DefenseDetailSheet({required this.defense, super.key});
 
-  final DefenseMock defense;
+  final Defense defense;
 
-  static Future<void> show(BuildContext context, DefenseMock defense) {
+  static Future<void> show(BuildContext context, Defense defense) {
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -209,7 +209,7 @@ class _RankPill extends StatelessWidget {
 
 class _StatsGrid extends StatelessWidget {
   const _StatsGrid({required this.defense});
-  final DefenseMock defense;
+  final Defense defense;
 
   @override
   Widget build(BuildContext context) {

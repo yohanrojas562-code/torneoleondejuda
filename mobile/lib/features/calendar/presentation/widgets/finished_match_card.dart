@@ -3,7 +3,8 @@ import 'package:torneo_leon_de_juda/core/theme/app_colors.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_radius.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_spacing.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_typography.dart';
-import 'package:torneo_leon_de_juda/features/calendar/data/mock_calendar_data.dart';
+import 'package:torneo_leon_de_juda/features/calendar/data/match_data.dart';
+import 'package:torneo_leon_de_juda/features/standings/data/standing.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/team_badge.dart';
 
 /// Card de partido finalizado. Muestra marcador prominente, lista compacta
@@ -11,12 +12,15 @@ import 'package:torneo_leon_de_juda/shared/widgets/team_badge.dart';
 class FinishedMatchCard extends StatelessWidget {
   const FinishedMatchCard({required this.match, super.key});
 
-  final FinishedMatchMock match;
+  final MatchData match;
 
   @override
   Widget build(BuildContext context) {
-    final homeWon = match.homeScore > match.awayScore;
-    final awayWon = match.awayScore > match.homeScore;
+    final homeScore = match.homeScore ?? 0;
+    final awayScore = match.awayScore ?? 0;
+    final homeWon = homeScore > awayScore;
+    final awayWon = awayScore > homeScore;
+    final matchDay = match.matchDay;
 
     return Container(
       decoration: BoxDecoration(
@@ -30,12 +34,13 @@ class FinishedMatchCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text(
-                match.matchDay.toUpperCase(),
-                style: AppTypography.labelSmall.copyWith(
-                  color: AppColors.textMuted,
+              if (matchDay != null)
+                Text(
+                  matchDay.toUpperCase(),
+                  style: AppTypography.labelSmall.copyWith(
+                    color: AppColors.textMuted,
+                  ),
                 ),
-              ),
               const Spacer(),
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -71,7 +76,7 @@ class FinishedMatchCard extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.sm,
                 ),
-                child: _Score(home: match.homeScore, away: match.awayScore),
+                child: _Score(home: homeScore, away: awayScore),
               ),
               Expanded(
                 child: _TeamWithResult(
@@ -121,27 +126,29 @@ class FinishedMatchCard extends StatelessWidget {
               ],
             ),
           ],
-          const SizedBox(height: AppSpacing.sm),
-          Row(
-            children: [
-              const Icon(
-                Icons.place_outlined,
-                size: 14,
-                color: AppColors.textMuted,
-              ),
-              const SizedBox(width: 4),
-              Expanded(
-                child: Text(
-                  match.venue,
-                  style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textMuted,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+          if (match.venue != null) ...[
+            const SizedBox(height: AppSpacing.sm),
+            Row(
+              children: [
+                const Icon(
+                  Icons.place_outlined,
+                  size: 14,
+                  color: AppColors.textMuted,
                 ),
-              ),
-            ],
-          ),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    match.venue!,
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.textMuted,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );
@@ -156,7 +163,7 @@ class _TeamWithResult extends StatelessWidget {
     this.alignEnd = false,
   });
 
-  final MatchTeamMock team;
+  final TeamSummary team;
   final bool isWinner;
   final bool isLoser;
   final bool alignEnd;
@@ -169,9 +176,8 @@ class _TeamWithResult extends StatelessWidget {
       primaryColor: team.primaryColor,
       size: 36,
     );
-    final color = isLoser
-        ? AppColors.textMuted
-        : AppColors.textPrimary;
+    final color =
+        isLoser ? AppColors.textMuted : AppColors.textPrimary;
     final name = Flexible(
       child: Text(
         team.name,
@@ -212,7 +218,7 @@ class _Score extends StatelessWidget {
 class _GoalsList extends StatelessWidget {
   const _GoalsList({required this.goals, this.alignEnd = false});
 
-  final List<MatchGoalMock> goals;
+  final List<MatchGoal> goals;
   final bool alignEnd;
 
   @override

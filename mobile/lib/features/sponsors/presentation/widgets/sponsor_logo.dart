@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_colors.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_typography.dart';
-import 'package:torneo_leon_de_juda/features/sponsors/data/mock_sponsors_data.dart';
+import 'package:torneo_leon_de_juda/features/sponsors/data/sponsor.dart';
 
 /// Logo del patrocinador con cache + fallback elegante a iniciales sobre
 /// gradient del color de marca. Tamaños sugeridos: oficial 120, aliado 80,
@@ -14,7 +14,7 @@ class SponsorLogo extends StatelessWidget {
     super.key,
   });
 
-  final SponsorMock sponsor;
+  final Sponsor sponsor;
   final double size;
 
   String get _initials {

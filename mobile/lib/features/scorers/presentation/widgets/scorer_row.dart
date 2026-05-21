@@ -3,7 +3,7 @@ import 'package:torneo_leon_de_juda/core/theme/app_colors.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_radius.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_spacing.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_typography.dart';
-import 'package:torneo_leon_de_juda/features/scorers/data/mock_scorers_data.dart';
+import 'package:torneo_leon_de_juda/features/scorers/data/scorer.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/player_photo.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/team_badge.dart';
 
@@ -16,7 +16,7 @@ class ScorerRow extends StatelessWidget {
     super.key,
   });
 
-  final ScorerMock scorer;
+  final Scorer scorer;
   final VoidCallback onTap;
 
   @override
