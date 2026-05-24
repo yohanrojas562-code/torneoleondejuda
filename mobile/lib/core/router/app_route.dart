@@ -25,7 +25,11 @@ enum AppRoute {
   dashboard('/dashboard', 'dashboard'),
   myTeams('/dashboard/equipos', 'my-teams'),
   myMatches('/dashboard/partidos', 'my-matches'),
-  myPlayers('/dashboard/jugadores', 'my-players');
+  myPlayers('/dashboard/jugadores', 'my-players'),
+  myPlayerNew('/dashboard/jugadores/nuevo', 'my-player-new'),
+  myPlayerDetail('/dashboard/jugadores/:id', 'my-player-detail'),
+  myPlayerEdit('/dashboard/jugadores/:id/editar', 'my-player-edit'),
+  myPlayerFiles('/dashboard/jugadores/:id/archivos', 'my-player-files');
 
   const AppRoute(this.path, this.name);
 

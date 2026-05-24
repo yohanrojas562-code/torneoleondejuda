@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:torneo_leon_de_juda/core/router/app_route.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_colors.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_radius.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_spacing.dart';
@@ -22,6 +24,16 @@ class MyPlayersScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Mis Jugadores')),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () async {
+          await context.pushNamed(AppRoute.myPlayerNew.name);
+          ref.invalidate(myPlayersProvider);
+        },
+        icon: const Icon(Icons.person_add_alt_1_rounded),
+        label: const Text('Nuevo jugador'),
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.textOnPrimary,
+      ),
       body: RefreshIndicator(
         color: AppColors.primary,
         backgroundColor: AppColors.surfaceLow,
@@ -243,15 +255,24 @@ class _PlayerRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.xs),
-      padding: const EdgeInsets.all(AppSpacing.sm),
-      decoration: BoxDecoration(
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+      child: Material(
         color: AppColors.surfaceLow,
         borderRadius: AppRadius.brSm,
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Row(
+        child: InkWell(
+          borderRadius: AppRadius.brSm,
+          onTap: () => context.pushNamed(
+            AppRoute.myPlayerDetail.name,
+            pathParameters: {'id': '${player.id}'},
+          ),
+          child: Ink(
+            padding: const EdgeInsets.all(AppSpacing.sm),
+            decoration: BoxDecoration(
+              borderRadius: AppRadius.brSm,
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Row(
         children: [
           PlayerPhoto(
             firstName: player.firstName,
@@ -333,6 +354,9 @@ class _PlayerRow extends StatelessWidget {
             ),
           ),
         ],
+            ),
+          ),
+        ),
       ),
     );
   }

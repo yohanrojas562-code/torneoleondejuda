@@ -8,6 +8,9 @@ import 'package:torneo_leon_de_juda/features/auth/presentation/screens/login_scr
 import 'package:torneo_leon_de_juda/features/calendar/presentation/screens/calendar_screen.dart';
 import 'package:torneo_leon_de_juda/features/dashboard/presentation/screens/dashboard_screen.dart';
 import 'package:torneo_leon_de_juda/features/dashboard/presentation/screens/my_matches_screen.dart';
+import 'package:torneo_leon_de_juda/features/dashboard/presentation/screens/my_player_detail_screen.dart';
+import 'package:torneo_leon_de_juda/features/dashboard/presentation/screens/my_player_files_screen.dart';
+import 'package:torneo_leon_de_juda/features/dashboard/presentation/screens/my_player_form_screen.dart';
 import 'package:torneo_leon_de_juda/features/dashboard/presentation/screens/my_players_screen.dart';
 import 'package:torneo_leon_de_juda/features/defense/presentation/screens/defense_screen.dart';
 import 'package:torneo_leon_de_juda/features/home/presentation/screens/home_screen.dart';
@@ -188,6 +191,56 @@ abstract final class AppRouter {
           path: AppRoute.myPlayers.path,
           name: AppRoute.myPlayers.name,
           builder: (context, state) => const MyPlayersScreen(),
+        ),
+        GoRoute(
+          path: AppRoute.myPlayerNew.path,
+          name: AppRoute.myPlayerNew.name,
+          builder: (context, state) => const MyPlayerFormScreen(),
+        ),
+        GoRoute(
+          path: AppRoute.myPlayerDetail.path,
+          name: AppRoute.myPlayerDetail.name,
+          builder: (context, state) {
+            final id = int.tryParse(state.pathParameters['id'] ?? '');
+            if (id == null) {
+              return const PlaceholderScreen(
+                title: 'Jugador no encontrado',
+                icon: Icons.error_outline_rounded,
+                subtitle: 'ID de jugador inválido.',
+              );
+            }
+            return MyPlayerDetailScreen(playerId: id);
+          },
+        ),
+        GoRoute(
+          path: AppRoute.myPlayerEdit.path,
+          name: AppRoute.myPlayerEdit.name,
+          builder: (context, state) {
+            final id = int.tryParse(state.pathParameters['id'] ?? '');
+            if (id == null) {
+              return const PlaceholderScreen(
+                title: 'Jugador no encontrado',
+                icon: Icons.error_outline_rounded,
+                subtitle: 'ID de jugador inválido.',
+              );
+            }
+            return MyPlayerFormScreen(playerId: id);
+          },
+        ),
+        GoRoute(
+          path: AppRoute.myPlayerFiles.path,
+          name: AppRoute.myPlayerFiles.name,
+          builder: (context, state) {
+            final id = int.tryParse(state.pathParameters['id'] ?? '');
+            if (id == null) {
+              return const PlaceholderScreen(
+                title: 'Jugador no encontrado',
+                icon: Icons.error_outline_rounded,
+                subtitle: 'ID de jugador inválido.',
+              );
+            }
+            return MyPlayerFilesScreen(playerId: id);
+          },
         ),
       ],
 

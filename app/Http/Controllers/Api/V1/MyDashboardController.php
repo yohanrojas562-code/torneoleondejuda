@@ -4,13 +4,19 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\V1\Concerns\ResolvesActiveSeason;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\StoreMyPlayerRequest;
+use App\Http\Requests\Api\UpdateMyPlayerRequest;
 use App\Http\Resources\Api\MatchResource;
+use App\Http\Resources\Api\MyPlayerDetailResource;
 use App\Http\Resources\Api\PlayerResource;
 use App\Http\Resources\Api\TeamResource;
 use App\Models\GameMatch;
 use App\Models\Player;
 use App\Models\Team;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Endpoints "/my/*" — devuelven los datos del usuario autenticado en función
@@ -183,6 +189,193 @@ class MyDashboardController extends Controller
                 'rejected' => $players->where('approval_status', 'rejected')->count(),
             ],
         ]);
+    }
+
+    /**
+     * GET /api/v1/my/players/{player} — Detalle completo de un jugador del
+     * usuario autenticado. Devuelve 404 si el jugador no pertenece a ningún
+     * equipo del líder.
+     */
+    public function playerShow(Request $request, Player $player)
+    {
+        $this->authorizePlayerAccess($request->user(), $player);
+        $player->load('team');
+        return response()->json([
+            'player' => new MyPlayerDetailResource($player),
+        ]);
+    }
+
+    /**
+     * POST /api/v1/my/players — Crea un jugador en uno de los equipos del
+     * líder. Si el líder tiene un solo equipo y no envía team_id, se asigna
+     * automáticamente.
+     */
+    public function playerCreate(StoreMyPlayerRequest $request)
+    {
+        $data = $request->validated();
+        $user = $request->user();
+
+        // Resolver team_id si el líder no lo envía
+        if (empty($data['team_id']) && ! $user->hasRole('admin')) {
+            $teams = Team::where('leader_id', $user->id)->pluck('id');
+            if ($teams->count() === 0) {
+                throw ValidationException::withMessages([
+                    'team_id' => ['No tienes equipos asignados.'],
+                ]);
+            }
+            if ($teams->count() > 1) {
+                throw ValidationException::withMessages([
+                    'team_id' => ['Indica el equipo al que pertenece el jugador.'],
+                ]);
+            }
+            $data['team_id'] = $teams->first();
+        }
+
+        // Límite de 12 jugadores por equipo: si ya hay 12, exige solicitud especial
+        $playersInTeam = Player::where('team_id', $data['team_id'])->count();
+        if ($playersInTeam >= 12) {
+            if (empty($data['special_request']) || empty($data['special_request_reason'])) {
+                throw ValidationException::withMessages([
+                    'special_request' => [
+                        'El equipo ya tiene 12 jugadores. Marca como solicitud especial y explica el motivo.',
+                    ],
+                ]);
+            }
+        }
+
+        // Defaults forzados por seguridad — el cliente no decide estos
+        $data['approval_status'] = 'pending';
+        $data['is_active'] = true;
+        // Si goalkeeper_type llega pero position no es portero, lo limpiamos
+        if (($data['position'] ?? null) !== 'portero') {
+            $data['goalkeeper_type'] = null;
+        }
+
+        $player = Player::create($data);
+        $player->load('team');
+
+        return response()->json([
+            'player' => new MyPlayerDetailResource($player),
+        ], 201);
+    }
+
+    /**
+     * PATCH /api/v1/my/players/{player} — Edita los campos permitidos.
+     * Las reglas de lock-when-approved se aplican en UpdateMyPlayerRequest.
+     */
+    public function playerUpdate(UpdateMyPlayerRequest $request, Player $player)
+    {
+        $this->authorizePlayerAccess($request->user(), $player);
+
+        $data = $request->validated();
+        if (($data['position'] ?? $player->position) !== 'portero') {
+            $data['goalkeeper_type'] = null;
+        }
+
+        $player->fill($data)->save();
+        $player->load('team');
+
+        return response()->json([
+            'player' => new MyPlayerDetailResource($player),
+        ]);
+    }
+
+    /**
+     * POST /api/v1/my/players/{player}/files — Sube uno de los 5 archivos
+     * del jugador. El cliente envía:
+     *  - `kind`: photo | document | eps_certificate | no_eps_consent |
+     *    parental_consent
+     *  - `file`: el binario (multipart).
+     *
+     * Conserva la misma estructura de directorios que el Filament para que
+     * los archivos se vean igual en el panel admin web y en la app móvil.
+     */
+    public function playerUploadFile(Request $request, Player $player)
+    {
+        $this->authorizePlayerAccess($request->user(), $player);
+
+        $data = $request->validate([
+            'kind' => ['required', 'in:photo,document,eps_certificate,no_eps_consent,parental_consent'],
+            'file' => ['required', 'file', 'max:5120'],
+        ]);
+
+        $kindMap = [
+            'photo' => [
+                'column' => 'photo',
+                'directory' => 'players/photos',
+                'mimes' => ['image/jpeg', 'image/png', 'image/webp'],
+                'max_kb' => 3072,
+            ],
+            'document' => [
+                'column' => 'document_file',
+                'directory' => 'players/documents',
+                'mimes' => ['application/pdf', 'image/jpeg', 'image/png'],
+                'max_kb' => 5120,
+            ],
+            'eps_certificate' => [
+                'column' => 'eps_certificate',
+                'directory' => 'players/eps',
+                'mimes' => ['application/pdf', 'image/jpeg', 'image/png'],
+                'max_kb' => 5120,
+            ],
+            'no_eps_consent' => [
+                'column' => 'no_eps_consent',
+                'directory' => 'players/consents',
+                'mimes' => ['application/pdf', 'image/jpeg', 'image/png'],
+                'max_kb' => 5120,
+            ],
+            'parental_consent' => [
+                'column' => 'parental_consent',
+                'directory' => 'players/parental',
+                'mimes' => ['application/pdf', 'image/jpeg', 'image/png'],
+                'max_kb' => 5120,
+            ],
+        ];
+
+        $cfg = $kindMap[$data['kind']];
+        $file = $request->file('file');
+
+        if (! in_array($file->getMimeType(), $cfg['mimes'], true)) {
+            throw ValidationException::withMessages([
+                'file' => ['Tipo de archivo no permitido para '.$data['kind'].'.'],
+            ]);
+        }
+        if (($file->getSize() / 1024) > $cfg['max_kb']) {
+            throw ValidationException::withMessages([
+                'file' => ['El archivo excede el tamaño máximo permitido.'],
+            ]);
+        }
+
+        // Borrar el archivo anterior si existía, para no llenar storage
+        if ($player->{$cfg['column']}) {
+            Storage::disk('public')->delete($player->{$cfg['column']});
+        }
+
+        $ext = $file->getClientOriginalExtension() ?: 'bin';
+        $filename = strtoupper(Str::ulid()).'.'.$ext;
+        $path = $file->storeAs($cfg['directory'], $filename, 'public');
+
+        $player->{$cfg['column']} = $path;
+        $player->save();
+        $player->load('team');
+
+        return response()->json([
+            'player' => new MyPlayerDetailResource($player),
+        ]);
+    }
+
+    /**
+     * Garantiza que el usuario autenticado tenga acceso al jugador. Admin ve
+     * todos; líder solo los de sus equipos; capitán los de su equipo.
+     */
+    private function authorizePlayerAccess($user, Player $player): void
+    {
+        if ($user->hasRole('admin')) return;
+
+        $teamIds = $this->resolveTeamIds($user);
+        if (! in_array($player->team_id, $teamIds, true)) {
+            abort(404);
+        }
     }
 
     // ─── Dashboards por rol ───────────────────────────────────────────

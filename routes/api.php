@@ -59,5 +59,15 @@ Route::prefix('v1')->group(function () {
             ->name('api.v1.my.matches');
         Route::get('my/players', [MyDashboardController::class, 'players'])
             ->name('api.v1.my.players');
+
+        // ─── CRUD de jugadores del lider de equipo ─────────────────
+        Route::get('my/players/{player}', [MyDashboardController::class, 'playerShow'])
+            ->name('api.v1.my.players.show');
+        Route::post('my/players', [MyDashboardController::class, 'playerCreate'])
+            ->name('api.v1.my.players.create');
+        Route::patch('my/players/{player}', [MyDashboardController::class, 'playerUpdate'])
+            ->name('api.v1.my.players.update');
+        Route::post('my/players/{player}/files', [MyDashboardController::class, 'playerUploadFile'])
+            ->name('api.v1.my.players.upload');
     });
 });
