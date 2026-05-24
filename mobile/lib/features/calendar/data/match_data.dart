@@ -68,6 +68,24 @@ class MatchGoal {
   final bool isOwnGoal;
 }
 
+/// Parsea `scheduled_at` del API preservando los componentes wall-clock que
+/// el admin escribió (sin convertir timezone). Si el admin guarda un partido
+/// a las 14:00, la app muestra 14:00 — independiente del TZ del dispositivo.
+/// La hora viene del backend como ISO8601 UTC (`2026-05-24T14:00:00Z`) y la
+/// reinterpretamos como hora local sin ajuste.
+DateTime _parseScheduled(String iso) {
+  final raw = DateTime.tryParse(iso);
+  if (raw == null) return DateTime.now();
+  return DateTime(
+    raw.year,
+    raw.month,
+    raw.day,
+    raw.hour,
+    raw.minute,
+    raw.second,
+  );
+}
+
 /// Partido completo. Una sola clase para upcoming/finished/postponed —
 /// los flags `isLive`, `isFinished`, `isPostponed` te dicen qué mostrar.
 class MatchData {
@@ -113,9 +131,8 @@ class MatchData {
     }
 
     final scheduledStr = json['scheduled_at'] as String?;
-    final scheduledAt = scheduledStr != null
-        ? DateTime.tryParse(scheduledStr)?.toLocal() ?? DateTime.now()
-        : DateTime.now();
+    final scheduledAt =
+        scheduledStr != null ? _parseScheduled(scheduledStr) : DateTime.now();
 
     // Parse events for goals + card counts. Backend filtra a los tipos
     // relevantes antes de enviarlos, pero los contamos defensivamente.

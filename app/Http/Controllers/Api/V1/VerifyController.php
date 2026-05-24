@@ -46,9 +46,13 @@ class VerifyController extends Controller
     {
         $base = Player::with('team');
 
-        // Unique code LDJ-XXXX (case insensitive, exacto)
-        if (stripos($code, 'LDJ-') === 0) {
-            return $base->whereRaw('UPPER(unique_code) = ?', [strtoupper($code)])
+        // Extrae unique_code LDJ-XXXX desde cualquier parte del string.
+        // El QR del carnet codifica la URL completa
+        // `https://torneoleondejuda.com/verificar/LDJ-XXXX`, no el código
+        // pelado, asi que el match no es por prefijo sino por regex global.
+        if (preg_match('/LDJ-[A-Z0-9]+/i', $code, $matches)) {
+            return $base
+                ->whereRaw('UPPER(unique_code) = ?', [strtoupper($matches[0])])
                 ->first();
         }
 

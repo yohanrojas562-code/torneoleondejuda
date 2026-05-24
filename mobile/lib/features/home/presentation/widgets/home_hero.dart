@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_colors.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_radius.dart';
@@ -48,18 +49,100 @@ class HomeHero extends StatelessWidget {
                 _LiveBadge(count: season.liveMatchesToday),
             ],
           ),
-          const SizedBox(height: AppSpacing.sm),
-          Text(season.tournamentName, style: AppTypography.headerMedium),
-          const SizedBox(height: AppSpacing.xxs),
-          Text(
-            season.seasonName,
-            style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.textSecondary,
-            ),
+          const SizedBox(height: AppSpacing.md),
+          Row(
+            children: [
+              _TournamentLogo(url: season.tournamentLogoUrl),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      season.tournamentName,
+                      style: AppTypography.headerMedium,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      season.seasonName,
+                      style: AppTypography.bodyLarge.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: AppSpacing.md),
           _StatusChip(label: season.statusLabel, accent: true),
         ],
+      ),
+    );
+  }
+}
+
+/// Logo del torneo. Si el backend expone `tournamentLogoUrl` lo carga via
+/// CachedNetworkImage; si no hay logo, muestra el placeholder "LJ" dorado
+/// (consistente con la identidad de marca).
+class _TournamentLogo extends StatelessWidget {
+  const _TournamentLogo({required this.url});
+
+  final String? url;
+
+  @override
+  Widget build(BuildContext context) {
+    const size = 64.0;
+    final hasUrl = url != null && url!.isNotEmpty;
+    return Container(
+      width: size,
+      height: size,
+      clipBehavior: Clip.hardEdge,
+      decoration: BoxDecoration(
+        gradient: hasUrl ? null : AppColors.goldGradient,
+        color: hasUrl ? Colors.white : null,
+        borderRadius: AppRadius.brMd,
+        border: Border.all(
+          color: AppColors.primary.withValues(alpha: 0.35),
+        ),
+      ),
+      alignment: Alignment.center,
+      child: hasUrl
+          ? Padding(
+              padding: const EdgeInsets.all(4),
+              child: CachedNetworkImage(
+                imageUrl: url!,
+                fit: BoxFit.contain,
+                placeholder: (_, __) => const _LogoFallback(size: size),
+                errorWidget: (_, __, ___) => const _LogoFallback(size: size),
+              ),
+            )
+          : const _LogoFallback(size: size),
+    );
+  }
+}
+
+class _LogoFallback extends StatelessWidget {
+  const _LogoFallback({required this.size});
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: const BoxDecoration(gradient: AppColors.goldGradient),
+      alignment: Alignment.center,
+      child: Text(
+        'LJ',
+        style: AppTypography.headerMedium.copyWith(
+          color: AppColors.textOnPrimary,
+          fontSize: 22,
+        ),
       ),
     );
   }
