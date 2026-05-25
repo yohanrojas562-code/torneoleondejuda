@@ -11,6 +11,7 @@ import 'package:torneo_leon_de_juda/features/calendar/presentation/widgets/postp
 import 'package:torneo_leon_de_juda/features/calendar/presentation/widgets/upcoming_match_card.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/app_drawer.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/async_view.dart';
+import 'package:torneo_leon_de_juda/shared/widgets/brand_menu_button.dart';
 
 /// Pantalla Calendario con 3 tabs: Próximos · Finalizados · Aplazados.
 /// Cada tab tiene su propia lista, pull-to-refresh y empty state.
@@ -24,13 +25,8 @@ class CalendarScreen extends ConsumerWidget {
     return Scaffold(
       drawer: const AppDrawer(),
       appBar: AppBar(
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu_rounded),
-            tooltip: 'Menú',
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
+        leading: const BrandMenuButton(),
+        leadingWidth: 52,
         title: const Text('Calendario'),
       ),
       body: AsyncView<CalendarData>(

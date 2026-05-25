@@ -16,6 +16,7 @@ import 'package:torneo_leon_de_juda/features/dashboard/data/dashboard_repository
 import 'package:torneo_leon_de_juda/features/standings/data/standing.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/app_drawer.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/async_view.dart';
+import 'package:torneo_leon_de_juda/shared/widgets/brand_menu_button.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/team_badge.dart';
 
 /// Pantalla principal post-login. Hero con el usuario + sus roles, y debajo
@@ -33,13 +34,8 @@ class DashboardScreen extends ConsumerWidget {
     return Scaffold(
       drawer: const AppDrawer(),
       appBar: AppBar(
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu_rounded),
-            tooltip: 'Menú',
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
+        leading: const BrandMenuButton(),
+        leadingWidth: 52,
         title: const Text('Mi Panel'),
         actions: [
           IconButton(

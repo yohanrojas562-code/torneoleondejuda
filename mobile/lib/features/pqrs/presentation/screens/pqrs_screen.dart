@@ -13,6 +13,7 @@ import 'package:torneo_leon_de_juda/features/pqrs/data/pqrs_repository.dart';
 import 'package:torneo_leon_de_juda/features/pqrs/presentation/widgets/evidence_picker.dart';
 import 'package:torneo_leon_de_juda/features/pqrs/presentation/widgets/pqrs_type_selector.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/app_drawer.dart';
+import 'package:torneo_leon_de_juda/shared/widgets/brand_menu_button.dart';
 
 /// Pantalla PQRS. Form completo: tipo, datos del solicitante, asunto,
 /// descripción, evidencias. Al enviar hace POST al API y navega a success.
@@ -105,13 +106,8 @@ class _PqrsScreenState extends ConsumerState<PqrsScreen> {
     return Scaffold(
       drawer: const AppDrawer(),
       appBar: AppBar(
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu_rounded),
-            tooltip: 'Menú',
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
+        leading: const BrandMenuButton(),
+        leadingWidth: 52,
         title: const Text('PQRS'),
       ),
       body: AbsorbPointer(

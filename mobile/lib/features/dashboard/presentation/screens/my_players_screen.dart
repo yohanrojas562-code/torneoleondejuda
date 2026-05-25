@@ -21,11 +21,19 @@ class MyPlayersScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(myPlayersProvider);
+    final approvedCount = async.maybeWhen(
+      data: (d) => d.counts['approved'] ?? 0,
+      orElse: () => 0,
+    );
 
     return Scaffold(
       appBar: AppBar(title: const Text('Mis Jugadores')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
+          if (approvedCount >= 12) {
+            await _showQuotaDialog(context);
+            return;
+          }
           await context.pushNamed(AppRoute.myPlayerNew.name);
           ref.invalidate(myPlayersProvider);
         },
@@ -48,6 +56,36 @@ class MyPlayersScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  /// Dialog cuando el equipo ya tiene 12 jugadores aprobados. El líder no
+  /// puede crear el 13° desde el form; debe abrir una PQRS al comité.
+  Future<void> _showQuotaDialog(BuildContext context) async {
+    final action = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Límite de jugadores alcanzado'),
+        content: const Text(
+          'Tu equipo ya tiene 12 jugadores aprobados (cupo máximo). '
+          'Para inscribir un jugador adicional debes abrir una PQRS al '
+          'comité organizador explicando el motivo.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton.icon(
+            onPressed: () => Navigator.of(ctx).pop('pqrs'),
+            icon: const Icon(Icons.chat_bubble_outline_rounded, size: 18),
+            label: const Text('Abrir PQRS'),
+          ),
+        ],
+      ),
+    );
+    if (action == 'pqrs' && context.mounted) {
+      context.goNamed(AppRoute.pqrs.name);
+    }
   }
 }
 

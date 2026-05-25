@@ -11,6 +11,7 @@ import 'package:torneo_leon_de_juda/features/organigram/presentation/widgets/sta
 import 'package:torneo_leon_de_juda/features/organigram/presentation/widgets/staff_section.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/app_drawer.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/async_view.dart';
+import 'package:torneo_leon_de_juda/shared/widgets/brand_menu_button.dart';
 
 /// Pantalla Equipo / Organigrama. Presidente como hero card + secciones
 /// agrupadas por tier (Dirección, Coordinación, Apoyo). Tap en cualquier
@@ -25,13 +26,8 @@ class OrganigramScreen extends ConsumerWidget {
     return Scaffold(
       drawer: const AppDrawer(),
       appBar: AppBar(
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu_rounded),
-            tooltip: 'Menú',
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
+        leading: const BrandMenuButton(),
+        leadingWidth: 52,
         title: const Text('Equipo'),
       ),
       body: RefreshIndicator(

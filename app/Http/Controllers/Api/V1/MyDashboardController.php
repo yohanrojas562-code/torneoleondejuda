@@ -231,17 +231,23 @@ class MyDashboardController extends Controller
             $data['team_id'] = $teams->first();
         }
 
-        // Límite de 12 jugadores por equipo: si ya hay 12, exige solicitud especial
-        $playersInTeam = Player::where('team_id', $data['team_id'])->count();
-        if ($playersInTeam >= 12) {
-            if (empty($data['special_request']) || empty($data['special_request_reason'])) {
+        // Límite de 12 jugadores aprobados por equipo: si ya hay 12, NO se
+        // puede crear directamente. El líder debe abrir una PQRS para que el
+        // comité lo apruebe manualmente.
+        if (! $user->hasRole('admin')) {
+            $approvedCount = Player::where('team_id', $data['team_id'])
+                ->where('approval_status', 'approved')
+                ->count();
+            if ($approvedCount >= 12) {
                 throw ValidationException::withMessages([
-                    'special_request' => [
-                        'El equipo ya tiene 12 jugadores. Marca como solicitud especial y explica el motivo.',
+                    'team_id' => [
+                        'Tu equipo ya tiene 12 jugadores aprobados. Para inscribir un jugador adicional debes abrir una PQRS al comité.',
                     ],
                 ]);
             }
         }
+        // El special_request del web sigue disponible para que el admin lo
+        // marque al crear el 13+, pero ya no es la vía para el líder.
 
         // Defaults forzados por seguridad — el cliente no decide estos
         $data['approval_status'] = 'pending';

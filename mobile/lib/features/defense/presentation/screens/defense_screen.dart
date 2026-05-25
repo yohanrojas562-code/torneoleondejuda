@@ -11,6 +11,7 @@ import 'package:torneo_leon_de_juda/features/defense/presentation/widgets/defens
 import 'package:torneo_leon_de_juda/features/defense/presentation/widgets/defense_row.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/app_drawer.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/async_view.dart';
+import 'package:torneo_leon_de_juda/shared/widgets/brand_menu_button.dart';
 
 /// Pantalla Valla Menos Vencida.
 class DefenseScreen extends ConsumerWidget {
@@ -23,13 +24,8 @@ class DefenseScreen extends ConsumerWidget {
     return Scaffold(
       drawer: const AppDrawer(),
       appBar: AppBar(
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu_rounded),
-            tooltip: 'Menú',
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
+        leading: const BrandMenuButton(),
+        leadingWidth: 52,
         title: const Text('Valla Menos Vencida'),
       ),
       body: RefreshIndicator(

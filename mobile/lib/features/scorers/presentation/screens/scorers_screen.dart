@@ -11,6 +11,7 @@ import 'package:torneo_leon_de_juda/features/scorers/presentation/widgets/scorer
 import 'package:torneo_leon_de_juda/features/scorers/presentation/widgets/scorer_row.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/app_drawer.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/async_view.dart';
+import 'package:torneo_leon_de_juda/shared/widgets/brand_menu_button.dart';
 
 /// Pantalla Goleadores. Top 3 en podio + lista del resto del ranking.
 class ScorersScreen extends ConsumerWidget {
@@ -23,13 +24,8 @@ class ScorersScreen extends ConsumerWidget {
     return Scaffold(
       drawer: const AppDrawer(),
       appBar: AppBar(
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu_rounded),
-            tooltip: 'Menú',
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
+        leading: const BrandMenuButton(),
+        leadingWidth: 52,
         title: const Text('Goleadores'),
       ),
       body: RefreshIndicator(

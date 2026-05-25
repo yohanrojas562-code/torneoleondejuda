@@ -305,38 +305,95 @@ class _ActionsRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Row(
+    final isApproved = player.isApproved;
+    return Column(
       children: [
-        Expanded(
-          child: FilledButton.icon(
-            onPressed: () async {
-              await context.pushNamed(
-                AppRoute.myPlayerEdit.name,
-                pathParameters: {'id': '${player.id}'},
-              );
-              // Volvió del form: refresca detalle
-              ref.invalidate(myPlayerDetailProvider(player.id));
-            },
-            icon: const Icon(Icons.edit_rounded),
-            label: const Text('Editar datos'),
-          ),
+        Row(
+          children: [
+            Expanded(
+              child: FilledButton.icon(
+                onPressed: () async {
+                  if (isApproved) {
+                    await _showLockedDialog(context);
+                    return;
+                  }
+                  await context.pushNamed(
+                    AppRoute.myPlayerEdit.name,
+                    pathParameters: {'id': '${player.id}'},
+                  );
+                  ref.invalidate(myPlayerDetailProvider(player.id));
+                },
+                icon: Icon(
+                  isApproved ? Icons.lock_rounded : Icons.edit_rounded,
+                ),
+                label: Text(
+                  isApproved ? 'Editar (PQRS)' : 'Editar datos',
+                ),
+                style: isApproved
+                    ? FilledButton.styleFrom(
+                        backgroundColor: AppColors.warning,
+                      )
+                    : null,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: () async {
+                  await context.pushNamed(
+                    AppRoute.myPlayerFiles.name,
+                    pathParameters: {'id': '${player.id}'},
+                  );
+                  ref.invalidate(myPlayerDetailProvider(player.id));
+                },
+                icon: const Icon(Icons.attach_file_rounded),
+                label: const Text('Archivos'),
+              ),
+            ),
+          ],
         ),
-        const SizedBox(width: AppSpacing.sm),
-        Expanded(
-          child: OutlinedButton.icon(
-            onPressed: () async {
-              await context.pushNamed(
-                AppRoute.myPlayerFiles.name,
-                pathParameters: {'id': '${player.id}'},
-              );
-              ref.invalidate(myPlayerDetailProvider(player.id));
-            },
-            icon: const Icon(Icons.attach_file_rounded),
-            label: const Text('Archivos'),
+        if (isApproved) ...[
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            'Para modificar o eliminar un jugador aprobado debes abrir una PQRS al comité.',
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.textMuted,
+              fontSize: 11,
+              height: 1.4,
+            ),
+            textAlign: TextAlign.center,
           ),
-        ),
+        ],
       ],
     );
+  }
+
+  Future<void> _showLockedDialog(BuildContext context) async {
+    final action = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Jugador aprobado'),
+        content: const Text(
+          'Este jugador ya fue aprobado por el comité. '
+          'Para modificar sus datos o solicitar su eliminación debes '
+          'abrir una PQRS al comité organizador.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton.icon(
+            onPressed: () => Navigator.of(ctx).pop('pqrs'),
+            icon: const Icon(Icons.chat_bubble_outline_rounded, size: 18),
+            label: const Text('Abrir PQRS'),
+          ),
+        ],
+      ),
+    );
+    if (action == 'pqrs' && context.mounted) {
+      context.goNamed(AppRoute.pqrs.name);
+    }
   }
 }
 

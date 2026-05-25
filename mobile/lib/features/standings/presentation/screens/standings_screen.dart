@@ -11,6 +11,7 @@ import 'package:torneo_leon_de_juda/features/standings/presentation/widgets/stan
 import 'package:torneo_leon_de_juda/features/standings/presentation/widgets/standings_table.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/app_drawer.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/async_view.dart';
+import 'package:torneo_leon_de_juda/shared/widgets/brand_menu_button.dart';
 
 /// Pantalla Tabla de Posiciones. Header del torneo + tablas agrupadas por
 /// group (cuando aplica). Datos en vivo del backend, pull-to-refresh
@@ -25,13 +26,8 @@ class StandingsScreen extends ConsumerWidget {
     return Scaffold(
       drawer: const AppDrawer(),
       appBar: AppBar(
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu_rounded),
-            tooltip: 'Menú',
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
+        leading: const BrandMenuButton(),
+        leadingWidth: 52,
         title: const Text('Tabla de Posiciones'),
       ),
       body: RefreshIndicator(

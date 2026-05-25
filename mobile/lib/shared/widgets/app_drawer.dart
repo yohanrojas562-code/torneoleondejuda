@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:torneo_leon_de_juda/core/config/env.dart';
 import 'package:torneo_leon_de_juda/core/router/app_route.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_colors.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_radius.dart';
@@ -8,6 +9,7 @@ import 'package:torneo_leon_de_juda/core/theme/app_spacing.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_typography.dart';
 import 'package:torneo_leon_de_juda/features/auth/data/auth_repository.dart';
 import 'package:torneo_leon_de_juda/features/auth/data/auth_user.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Drawer lateral compartido entre todas las pantallas principales.
 /// Lista todas las rutas con highlight del item activo segun la ruta
@@ -83,6 +85,8 @@ class AppDrawer extends ConsumerWidget {
     final currentLocation = GoRouterState.of(context).matchedLocation;
     final auth = ref.watch(authControllerProvider);
 
+    final isAdmin = auth.user?.hasRole(UserRole.admin) ?? false;
+
     return Drawer(
       backgroundColor: AppColors.bgDeep,
       width: width * 0.85,
@@ -111,6 +115,42 @@ class AppDrawer extends ConsumerWidget {
                       context.goNamed(AppRoute.dashboard.name);
                     },
                   ),
+                if (isAdmin) ...[
+                  const _DrawerSectionHeader(text: 'ADMINISTRACIÓN'),
+                  const _AdminAction(
+                    icon: Icons.fact_check_outlined,
+                    label: 'Aprobar jugadores',
+                    soon: true,
+                  ),
+                  const _AdminAction(
+                    icon: Icons.sports_soccer_rounded,
+                    label: 'Gestionar partidos',
+                    soon: true,
+                  ),
+                  const _AdminAction(
+                    icon: Icons.shield_outlined,
+                    label: 'Gestionar equipos',
+                    soon: true,
+                  ),
+                  const _AdminAction(
+                    icon: Icons.open_in_new_rounded,
+                    label: 'Panel completo (web)',
+                    soon: false,
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                      vertical: AppSpacing.xs,
+                    ),
+                    child: Divider(
+                      color: AppColors.border,
+                      thickness: 0.5,
+                      height: 1,
+                    ),
+                  ),
+                  const _DrawerSectionHeader(text: 'NAVEGACIÓN GENERAL'),
+                ],
                 for (final item in _items)
                   _DrawerNavItem(
                     item: item,
@@ -358,4 +398,135 @@ class _DrawerItem {
   final AppRoute route;
   final IconData icon;
   final String label;
+}
+
+/// Header pequeño que separa secciones del drawer ("ADMINISTRACIÓN",
+/// "NAVEGACIÓN GENERAL", etc.).
+class _DrawerSectionHeader extends StatelessWidget {
+  const _DrawerSectionHeader({required this.text});
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.md,
+        AppSpacing.md,
+        AppSpacing.md,
+        AppSpacing.xs,
+      ),
+      child: Text(
+        text,
+        style: AppTypography.labelSmall.copyWith(
+          color: AppColors.primary,
+          letterSpacing: 1.5,
+          fontSize: 10,
+        ),
+      ),
+    );
+  }
+}
+
+/// Item de administración. Si `soon=true` muestra badge "PRÓXIMAMENTE" y
+/// no navega; si es el item del panel web, abre el navegador via
+/// url_launcher hacia `${Env.webBaseUrl}/admin`.
+class _AdminAction extends StatelessWidget {
+  const _AdminAction({
+    required this.icon,
+    required this.label,
+    required this.soon,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool soon;
+
+  Future<void> _openWebAdmin(BuildContext context) async {
+    Navigator.of(context).pop();
+    final uri = Uri.parse('${Env.webBaseUrl}/admin');
+    final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!ok && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No se pudo abrir el navegador.')),
+      );
+    }
+  }
+
+  void _showSoonSnack(BuildContext context) {
+    Navigator.of(context).pop();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: AppColors.surfaceHigh,
+        content: Text(
+          '$label: disponible próximamente en la app. Por ahora, '
+          'gestiona desde el panel web.',
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.xxs),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => soon ? _showSoonSnack(context) : _openWebAdmin(context),
+          borderRadius: AppRadius.brSm,
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.sm,
+            ),
+            decoration: const BoxDecoration(
+              borderRadius: AppRadius.brSm,
+            ),
+            child: Row(
+              children: [
+                Icon(icon, size: 22, color: AppColors.primary),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Text(
+                    label,
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.textPrimary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                if (soon)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.warning.withValues(alpha: 0.15),
+                      borderRadius: AppRadius.brXs,
+                      border: Border.all(
+                        color: AppColors.warning.withValues(alpha: 0.4),
+                      ),
+                    ),
+                    child: Text(
+                      'PRÓXIMAMENTE',
+                      style: AppTypography.labelSmall.copyWith(
+                        color: AppColors.warning,
+                        fontSize: 8,
+                      ),
+                    ),
+                  )
+                else
+                  const Icon(
+                    Icons.open_in_new_rounded,
+                    size: 16,
+                    color: AppColors.textMuted,
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

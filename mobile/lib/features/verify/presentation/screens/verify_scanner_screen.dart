@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:torneo_leon_de_juda/core/network/api_exception.dart';
+import 'package:torneo_leon_de_juda/core/router/app_route.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_colors.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_radius.dart';
 import 'package:torneo_leon_de_juda/core/theme/app_spacing.dart';
@@ -124,6 +126,11 @@ class _VerifyScannerScreenState extends ConsumerState<VerifyScannerScreen>
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          tooltip: 'Volver al inicio',
+          onPressed: () => context.goNamed(AppRoute.home.name),
+        ),
         title: const Text('Validador'),
         actions: [
           IconButton(

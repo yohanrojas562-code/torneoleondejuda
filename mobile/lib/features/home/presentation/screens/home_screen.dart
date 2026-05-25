@@ -11,6 +11,7 @@ import 'package:torneo_leon_de_juda/features/home/presentation/widgets/home_hero
 import 'package:torneo_leon_de_juda/features/home/presentation/widgets/upcoming_matches.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/app_drawer.dart';
 import 'package:torneo_leon_de_juda/shared/widgets/async_view.dart';
+import 'package:torneo_leon_de_juda/shared/widgets/brand_menu_button.dart';
 
 /// Pantalla Home — primer punto de contacto del usuario. AppBar custom,
 /// hero card de temporada activa, CTA Validar QR, AppGrid 2x4 con accesos
@@ -25,13 +26,8 @@ class HomeScreen extends ConsumerWidget {
     return Scaffold(
       drawer: const AppDrawer(),
       appBar: AppBar(
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu_rounded),
-            tooltip: 'Menú',
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
+        leading: const BrandMenuButton(),
+        leadingWidth: 52,
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
