@@ -55,7 +55,7 @@ class ListStandings extends ListRecords
                     $seasonId = (int) $data['season_id'];
 
                     try {
-                        StandingsService::recalculateForSeason($seasonId);
+                        app(StandingsService::class)->recalculateForSeason($seasonId);
 
                         Notification::make()
                             ->title('Tabla recalculada')
