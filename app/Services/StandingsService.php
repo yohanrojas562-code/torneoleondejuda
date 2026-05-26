@@ -97,13 +97,6 @@ class StandingsService
             }
         }
 
-        // Compute goal difference and trim form history
-        foreach ($stats as &$teamStats) {
-            $teamStats['goal_difference'] = $teamStats['goals_for'] - $teamStats['goals_against'];
-            $teamStats['form']            = array_slice($teamStats['form'], -5);
-        }
-        unset($teamStats);
-
         // Aggregate card totals from match direct fields
         foreach ($matches as $match) {
             $homeId = $match->home_team_id;
@@ -119,6 +112,41 @@ class StandingsService
                 $stats[$awayId]['red_cards']    += $match->away_red_cards    ?? 0;
             }
         }
+
+        // Aplica los OFFSETS MANUALES guardados del admin (si los hay) ANTES
+        // de calcular derived (goal_difference, fair_play) y antes de ordenar.
+        // Esto preserva ediciones manuales entre recálculos: si el admin sumó
+        // +3 puntos manualmente, esos +3 se acumulan en TODOS los recálculos
+        // futuros, sin importar cuántos partidos nuevos se agreguen.
+        $existing = Standing::where('season_id', $seasonId)
+            ->whereIn('team_id', $teamIds)
+            ->get()
+            ->keyBy('team_id');
+
+        foreach ($stats as $teamId => &$teamStats) {
+            $row = $existing->get($teamId);
+            if (! $row) {
+                continue;
+            }
+            $teamStats['played']        += (int) ($row->manual_played ?? 0);
+            $teamStats['won']           += (int) ($row->manual_won ?? 0);
+            $teamStats['drawn']         += (int) ($row->manual_drawn ?? 0);
+            $teamStats['lost']          += (int) ($row->manual_lost ?? 0);
+            $teamStats['goals_for']     += (int) ($row->manual_goals_for ?? 0);
+            $teamStats['goals_against'] += (int) ($row->manual_goals_against ?? 0);
+            $teamStats['points']        += (int) ($row->manual_points ?? 0);
+            $teamStats['yellow_cards']  += (int) ($row->manual_yellow_cards ?? 0);
+            $teamStats['blue_cards']    += (int) ($row->manual_blue_cards ?? 0);
+            $teamStats['red_cards']     += (int) ($row->manual_red_cards ?? 0);
+        }
+        unset($teamStats);
+
+        // Compute goal difference (con manuales ya aplicados) y trim form
+        foreach ($stats as &$teamStats) {
+            $teamStats['goal_difference'] = $teamStats['goals_for'] - $teamStats['goals_against'];
+            $teamStats['form']            = array_slice($teamStats['form'], -5);
+        }
+        unset($teamStats);
 
         // Calculate fair play points: yellow=-1, blue=-3, red=-5
         foreach ($stats as &$teamStats) {

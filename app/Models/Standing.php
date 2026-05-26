@@ -13,6 +13,11 @@ class Standing extends Model
         'goals_for', 'goals_against', 'goal_difference',
         'points', 'position', 'form',
         'yellow_cards', 'blue_cards', 'red_cards', 'fair_play_points',
+        // Offsets manuales: preservan ajustes del admin entre recálculos.
+        // Ver migracion add_manual_offsets_to_standings_table.
+        'manual_played', 'manual_won', 'manual_drawn', 'manual_lost',
+        'manual_goals_for', 'manual_goals_against', 'manual_points',
+        'manual_yellow_cards', 'manual_blue_cards', 'manual_red_cards',
     ];
 
     protected function casts(): array

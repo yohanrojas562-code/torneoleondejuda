@@ -25,7 +25,7 @@ class ListStandings extends ListRecords
                 ->color('warning')
                 ->visible(fn () => auth()->user()?->hasRole('admin'))
                 ->modalHeading('Recalcular tabla desde partidos finalizados')
-                ->modalDescription('ATENCION: Esto recalcula TODAS las estadisticas (PG, PE, PP, GF, GC, PTS, FairPlay, posicion, tarjetas y stats de jugadores) de la temporada seleccionada usando los partidos marcados como "finalizado" y sus eventos. Cualquier edicion manual de puntos o posiciones se perdera. Use esto solo cuando necesite un reset completo desde los datos de partidos.')
+                ->modalDescription('Recalcula las estadisticas (PG, PE, PP, GF, GC, PTS, FairPlay, posicion, tarjetas y stats de jugadores) de la temporada seleccionada usando los partidos marcados como "finalizado". Los ajustes manuales que hayas hecho (PJ, PTS, tarjetas) se PRESERVAN y se SUMAN al recalculo — no se borran. Usa esto cada vez que cargues nuevos resultados para que la tabla refleje partidos + manuales.')
                 ->form([
                     Forms\Components\Select::make('season_id')
                         ->label('Temporada')
