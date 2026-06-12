@@ -8,6 +8,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PatrocinadoresController;
 use App\Http\Controllers\PlayerCardController;
 use App\Http\Controllers\PqrsController;
+use App\Http\Controllers\PrivacidadController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StandingsController;
 use App\Http\Controllers\VallaController;
@@ -26,6 +27,7 @@ Route::get('/acerca-del-torneo', AcercaController::class)->name('acerca');
 Route::get('/verificar', VerificarController::class)->name('verificar');
 Route::get('/verificar/{code}', [VerificarController::class, 'show'])->name('verificar.show');
 Route::get('/patrocinadores', PatrocinadoresController::class)->name('patrocinadores');
+Route::get('/privacidad', PrivacidadController::class)->name('privacidad');
 
 Route::get('/pqrs', [PqrsController::class, 'create'])->name('pqrs.create');
 Route::post('/pqrs', [PqrsController::class, 'store'])->middleware('throttle:5,1')->name('pqrs.store');
