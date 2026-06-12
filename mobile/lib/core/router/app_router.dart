@@ -18,6 +18,7 @@ import 'package:torneo_leon_de_juda/features/organigram/presentation/screens/org
 import 'package:torneo_leon_de_juda/features/pqrs/presentation/screens/pqrs_screen.dart';
 import 'package:torneo_leon_de_juda/features/pqrs/presentation/screens/pqrs_success_screen.dart';
 import 'package:torneo_leon_de_juda/features/scorers/presentation/screens/scorers_screen.dart';
+import 'package:torneo_leon_de_juda/features/splash/presentation/screens/splash_screen.dart';
 import 'package:torneo_leon_de_juda/features/sponsors/presentation/screens/sponsors_screen.dart';
 import 'package:torneo_leon_de_juda/features/standings/presentation/screens/standings_screen.dart';
 import 'package:torneo_leon_de_juda/features/verify/presentation/screens/verify_scanner_screen.dart';
@@ -51,17 +52,19 @@ abstract final class AppRouter {
 
     return GoRouter(
       navigatorKey: rootKey,
-      initialLocation: AppRoute.home.path,
+      initialLocation: AppRoute.splash.path,
       refreshListenable: refresh,
 
       // Rutas /dashboard/* requieren sesión activa. Si el usuario no está
       // autenticado, lo mando a /login. Si está logueado e intenta ir a
-      // /login, lo mando directo al dashboard.
+      // /login, lo mando directo al dashboard. /splash siempre permitido.
       redirect: (context, state) {
+        final loc = state.matchedLocation;
+        if (loc == AppRoute.splash.path) return null;
+
         final auth = ref.read(authControllerProvider);
         if (auth.isInitializing) return null;
 
-        final loc = state.matchedLocation;
         final isDashboardRoute = loc.startsWith('/dashboard');
         final isLoginRoute = loc == AppRoute.login.path;
 
@@ -75,6 +78,11 @@ abstract final class AppRouter {
       },
 
       routes: [
+        GoRoute(
+          path: AppRoute.splash.path,
+          name: AppRoute.splash.name,
+          builder: (context, state) => const SplashScreen(),
+        ),
         // ─── Shell con bottom nav (4 tabs principales) ─────────────
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) =>

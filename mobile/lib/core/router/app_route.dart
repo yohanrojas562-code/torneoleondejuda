@@ -4,6 +4,9 @@
 /// Patron: si necesitas navegar, usar `context.goNamed(AppRoute.home.name)`
 /// o `context.go(AppRoute.home.path)`.
 enum AppRoute {
+  // ─── Splash (ruta inicial al arrancar la app) ──────────────────────
+  splash('/splash', 'splash'),
+
   // ─── Tabs principales (dentro del StatefulShell) ───────────────────
   home('/', 'home'),
   calendar('/calendario', 'calendar'),

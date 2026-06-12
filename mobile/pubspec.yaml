@@ -56,14 +56,28 @@ dev_dependencies:
   json_serializable: ^6.8.0
   custom_lint: ^0.7.0
   riverpod_lint: ^2.6.3
+  # Generador de iconos de app a partir del logo del torneo
+  flutter_launcher_icons: ^0.14.2
 
 flutter:
   uses-material-design: true
 
-  # Assets (los iremos agregando segun necesidad)
-  # assets:
-  #   - assets/images/
+  # Assets bundleados: logo del torneo para splash + launcher icon
+  assets:
+    - assets/branding/
 
   # Fonts: usamos google_fonts en runtime, no necesitamos bundlear
 
   generate: true
+
+# Configuracion de flutter_launcher_icons: genera todos los tamanios de
+# icon (Android mipmap-* + iOS AppIcon) a partir del logo del torneo.
+# Comando: `dart run flutter_launcher_icons`
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/branding/tournament_logo.png"
+  # Adaptive icons (Android 8+): fondo negro de marca + logo centrado
+  adaptive_icon_background: "#010100"
+  adaptive_icon_foreground: "assets/branding/tournament_logo.png"
+  remove_alpha_ios: true

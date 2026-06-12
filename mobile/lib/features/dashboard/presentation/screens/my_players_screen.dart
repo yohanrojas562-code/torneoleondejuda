@@ -21,8 +21,10 @@ class MyPlayersScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(myPlayersProvider);
-    final approvedCount = async.maybeWhen(
-      data: (d) => d.counts['approved'] ?? 0,
+    // Cuenta TOTAL de jugadores del equipo (aprobados + pendientes). Si
+    // llega a 12, el FAB ya no permite crear directo y abre dialog → PQRS.
+    final totalCount = async.maybeWhen(
+      data: (d) => d.counts['total'] ?? 0,
       orElse: () => 0,
     );
 
@@ -30,7 +32,7 @@ class MyPlayersScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Mis Jugadores')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
-          if (approvedCount >= 12) {
+          if (totalCount >= 12) {
             await _showQuotaDialog(context);
             return;
           }
@@ -66,9 +68,10 @@ class MyPlayersScreen extends ConsumerWidget {
       builder: (ctx) => AlertDialog(
         title: const Text('Límite de jugadores alcanzado'),
         content: const Text(
-          'Tu equipo ya tiene 12 jugadores aprobados (cupo máximo). '
+          'Tu equipo ya tiene 12 jugadores inscritos (cupo máximo). '
           'Para inscribir un jugador adicional debes abrir una PQRS al '
-          'comité organizador explicando el motivo.',
+          'comité organizador explicando el motivo. Los jugadores que '
+          'agregues siempre quedan pendientes de aprobación por el comité.',
         ),
         actions: [
           TextButton(

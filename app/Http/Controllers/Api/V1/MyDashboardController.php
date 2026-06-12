@@ -231,17 +231,15 @@ class MyDashboardController extends Controller
             $data['team_id'] = $teams->first();
         }
 
-        // Límite de 12 jugadores aprobados por equipo: si ya hay 12, NO se
-        // puede crear directamente. El líder debe abrir una PQRS para que el
-        // comité lo apruebe manualmente.
+        // Límite de 12 jugadores TOTALES por equipo (cualquier estado:
+        // aprobados + pendientes). Si ya hay 12, el líder no puede crear
+        // directamente desde la app y debe abrir una PQRS al comité.
         if (! $user->hasRole('admin')) {
-            $approvedCount = Player::where('team_id', $data['team_id'])
-                ->where('approval_status', 'approved')
-                ->count();
-            if ($approvedCount >= 12) {
+            $totalCount = Player::where('team_id', $data['team_id'])->count();
+            if ($totalCount >= 12) {
                 throw ValidationException::withMessages([
                     'team_id' => [
-                        'Tu equipo ya tiene 12 jugadores aprobados. Para inscribir un jugador adicional debes abrir una PQRS al comité.',
+                        'Tu equipo ya tiene 12 jugadores. Para inscribir un jugador adicional debes abrir una PQRS al comité.',
                     ],
                 ]);
             }
